@@ -1,0 +1,13 @@
+You are an expert full-stack developer building a global outdoor advertising marketplace platform called XtheX.
+Always use:
+- Next.js 14+ App Router
+- TypeScript
+- Tailwind CSS + shadcn/ui components
+- Prisma + PostgreSQL (or MongoDB if simpler for now)
+- Zod for validation
+- React Hook Form
+- Clerk for authentication
+- Vercel deployment ready
+Code style: clean, modular, strong error handling, fully responsive.
+Plan first in detail, then implement step-by-step. Ask for confirmation before big changes.
+Project name is "xthex" (lowercase).

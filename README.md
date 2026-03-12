@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## XtheX
 
-## Getting Started
+Global outdoor advertising marketplace:
 
-First, run the development server:
+- **Partners** upload media proposals → **AI review** → admin approval
+- **Brands** explore approved media on a map and contact partners
+
+## Tech
+
+- Next.js (App Router) + TypeScript + Tailwind
+- Clerk (Auth)
+- Prisma + PostgreSQL
+
+## Setup (Local)
+
+### 1) Install
+
+```bash
+npm install
+```
+
+### 2) Environment variables
+
+Copy `.env.example` to `.env.local` and fill values.
+
+```bash
+cp .env.example .env.local
+```
+
+Minimum to run the app:
+
+- `DATABASE_URL`
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`
+- `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` (for `/explore` map)
+- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET` (for partner image upload)
+
+### Clerk Webhook (User sync)
+
+This project can auto-sync Clerk users into Prisma `User` via webhook:
+
+- **Clerk Dashboard** → **Webhooks** → **Add Endpoint**
+  - Endpoint URL: `https://your-domain/api/webhooks/clerk`
+  - Events: `user.created`, `user.updated` (optional: `user.deleted`)
+- Copy the **Signing secret** and set it as:
+  - `CLERK_WEBHOOK_SECRET` in `.env.local` / Vercel env vars
+
+Local testing:
+
+- Use a tunneling tool like **ngrok** to expose your dev server, then set the webhook endpoint to:
+  - `https://<your-ngrok-subdomain>.ngrok.app/api/webhooks/clerk`
+
+### 3) Database
+
+If you already have Postgres, set `DATABASE_URL` and run:
+
+```bash
+npx prisma db push
+npx prisma db seed
+```
+
+### 4) Run
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment (Vercel)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1) Create a Vercel project
 
-## Learn More
+- Import this repository into Vercel
+- Set the **Environment Variables** (same keys as `.env.example`)
 
-To learn more about Next.js, take a look at the following resources:
+### 2) Database
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Use a managed Postgres (e.g. Vercel Postgres / Neon / Supabase) and set `DATABASE_URL`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 3) Build
 
-## Deploy on Vercel
+Vercel will run:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run build
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Notes
+
+- `/admin` requires a DB user with role `ADMIN`
+- `/dashboard/partner` requires a DB user with role `PARTNER`
+- If you use AI review, set either `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`
+

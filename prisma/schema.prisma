@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  PARTNER
+  BRAND
+  ADMIN
+}
+
+enum MediaType {
+  BILLBOARD
+  DIGITAL
+  TRANSIT
+  OTHER
+}
+
+enum ProposalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum MatchingStatus {
+  SAVED
+  INQUIRY
+  NEGOTIATION
+  CONTRACTING
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  clerkId   String   @unique
+  role      Role     @default(PARTNER)
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  proposals MediaProposal[] @relation("ProposalsByPartner")
+  reviews   ReviewLog[]     @relation("ReviewsByReviewer")
+  matches   Matching[]      @relation("MatchingsByBrand")
+}
+
+model MediaProposal {
+  id          String         @id @default(uuid()) @db.Uuid
+  userId      String         @db.Uuid
+  title       String
+  description String?
+  location    Json
+  mediaType   MediaType
+  size        String?
+  priceMin    Int?
+  priceMax    Int?
+  images      String[]
+  status      ProposalStatus @default(PENDING)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  user      User        @relation("ProposalsByPartner", fields: [userId], references: [id], onDelete: Cascade)
+  reviews   ReviewLog[] @relation("ReviewsByProposal")
+  matchings Matching[]
+
+  @@index([status, userId])
+}
+
+model ReviewLog {
+  id         String         @id @default(uuid()) @db.Uuid
+  proposalId String         @db.Uuid
+  reviewerId String?        @db.Uuid
+  decision   ProposalStatus
+  comment    String?
+  aiScore    Float?
+  createdAt  DateTime       @default(now())
+
+  proposal MediaProposal @relation("ReviewsByProposal", fields: [proposalId], references: [id], onDelete: Cascade)
+  reviewer User?         @relation("ReviewsByReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
+
+  @@index([proposalId])
+  @@index([reviewerId])
+  @@index([decision])
+}
+
+model Matching {
+  id         String         @id @default(uuid()) @db.Uuid
+  brandId    String         @db.Uuid
+  proposalId String         @db.Uuid
+  status     MatchingStatus @default(SAVED)
+  desiredPeriod String?
+  budget     Int?
+  notes      String?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  brand    User          @relation("MatchingsByBrand", fields: [brandId], references: [id], onDelete: Cascade)
+  proposal MediaProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  @@index([status, brandId])
+}

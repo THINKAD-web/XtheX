@@ -2,6 +2,9 @@
   "name": "xthex",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "postinstall": "prisma generate",
     "dev": "next dev --webpack",
@@ -40,7 +43,7 @@
     "leaflet": "^1.9.4",
     "leaflet.markercluster": "^1.5.3",
     "lucide-react": "^0.577.0",
-    "next": "16.1.6",
+    "next": "16.2.0",
     "next-intl": "^4.8.3",
     "next-themes": "^0.4.6",
     "openai": "^6.29.0",
@@ -71,7 +74,7 @@
     "@types/react-dom": "^19",
     "dotenv": "^17.3.1",
     "eslint": "^9",
-    "eslint-config-next": "16.1.6",
+    "eslint-config-next": "16.2.0",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",

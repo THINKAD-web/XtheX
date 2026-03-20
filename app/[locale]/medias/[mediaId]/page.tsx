@@ -25,7 +25,7 @@ function isMediaUuid(id: string): boolean {
 
 type PageProps = {
   params: Promise<{ locale: string; mediaId: string }>;
-  searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 async function Navbar() {
@@ -62,6 +62,7 @@ async function Navbar() {
 
 export default async function MediaDetailPage({ params, searchParams }: PageProps) {
   const { locale, mediaId } = await params;
+  const sp = (await searchParams) ?? {};
   const isKo = locale === "ko";
 
   if (!isMediaUuid(mediaId)) {
@@ -150,7 +151,7 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
   ]);
 
   const inquiryStatus =
-    typeof searchParams?.inquiry === "string" ? searchParams.inquiry : undefined;
+    typeof sp.inquiry === "string" ? sp.inquiry : undefined;
 
   const similarEffectMedias = await getSimilarMediasForMedia({
     id: media.id,

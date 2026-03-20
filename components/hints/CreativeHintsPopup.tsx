@@ -32,8 +32,6 @@ export function CreativeHintsPopup({
   const hints = React.useMemo(() => getCreativeHints(context), [context]);
   const [open, setOpen] = React.useState(false);
 
-  if (hints.length === 0) return null;
-
   const signature = React.useMemo(() => {
     const codes = (context.tagCodes ?? []).slice().sort().join(",");
     const weather = context.weatherMain ?? "";
@@ -43,6 +41,7 @@ export function CreativeHintsPopup({
   }, [context.hour, context.mediaName, context.tagCodes, context.weatherMain]);
 
   React.useEffect(() => {
+    if (hints.length === 0) return;
     if (!autoOpenOnceKey) return;
     if (typeof window === "undefined") return;
     if (!signature) return;
@@ -59,7 +58,9 @@ export function CreativeHintsPopup({
     } else if (signature !== lastSig) {
       window.localStorage.setItem(lastSigKey, signature);
     }
-  }, [autoOpenOnceKey, signature]);
+  }, [hints.length, autoOpenOnceKey, signature]);
+
+  if (hints.length === 0) return null;
 
   if (variant === "button") {
     return (

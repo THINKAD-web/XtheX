@@ -229,8 +229,10 @@ function LeafletClusterLayer({
     rootsRef.current.forEach((r) => r.unmount());
     rootsRef.current = [];
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const MCG = (L as any).markerClusterGroup({
+    type LeafletWithCluster = typeof L & {
+      markerClusterGroup: (opts: Record<string, unknown>) => L.LayerGroup;
+    };
+    const MCG = (L as LeafletWithCluster).markerClusterGroup({
       maxClusterRadius: 52,
       spiderfyOnMaxZoom: true,
       showCoverageOnHover: false,

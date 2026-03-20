@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { MediaType, PrismaClient, ProposalStatus, Role } from "@prisma/client";
+import { MediaType, PrismaClient, ProposalStatus, UserRole } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 
@@ -31,12 +31,14 @@ async function main() {
     create: {
       id: IDS.users.partner1,
       clerkId: "test_partner1",
-      role: Role.PARTNER,
+      role: UserRole.MEDIA_OWNER,
+      onboardingCompleted: true,
       email: "partner1@xthex.test",
       name: "Test Partner 1",
     },
     update: {
-      role: Role.PARTNER,
+      role: UserRole.MEDIA_OWNER,
+      onboardingCompleted: true,
       email: "partner1@xthex.test",
       name: "Test Partner 1",
     },
@@ -46,12 +48,14 @@ async function main() {
     create: {
       id: IDS.users.partner2,
       clerkId: "test_partner2",
-      role: Role.PARTNER,
+      role: UserRole.MEDIA_OWNER,
+      onboardingCompleted: true,
       email: "partner2@xthex.test",
       name: "Test Partner 2",
     },
     update: {
-      role: Role.PARTNER,
+      role: UserRole.MEDIA_OWNER,
+      onboardingCompleted: true,
       email: "partner2@xthex.test",
       name: "Test Partner 2",
     },
@@ -61,12 +65,14 @@ async function main() {
     create: {
       id: IDS.users.admin,
       clerkId: "test_admin",
-      role: Role.ADMIN,
+      role: UserRole.ADMIN,
+      onboardingCompleted: true,
       email: "admin@xthex.test",
       name: "Test Admin",
     },
     update: {
-      role: Role.ADMIN,
+      role: UserRole.ADMIN,
+      onboardingCompleted: true,
       email: "admin@xthex.test",
       name: "Test Admin",
     },

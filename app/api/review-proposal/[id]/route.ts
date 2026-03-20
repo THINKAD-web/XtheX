@@ -1,8 +1,9 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { findUserByClerkId } from "@/lib/auth/find-user-by-clerk";
 import { reviewProposalById } from "@/lib/ai/reviewProposal";
-import { Role } from "@prisma/client";
+import { UserRole } from "@prisma/client";
 
 export async function POST(
   _req: Request,
@@ -13,7 +14,7 @@ export async function POST(
 
   const { id } = await params;
 
-  const dbUser = await prisma.user.findUnique({ where: { clerkId: userId } });
+  const dbUser = await findUserByClerkId(userId);
   if (!dbUser) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const proposal = await prisma.mediaProposal.findUnique({
@@ -23,7 +24,7 @@ export async function POST(
   if (!proposal) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const isOwner = proposal.userId === dbUser.id;
-  const isAdmin = dbUser.role === Role.ADMIN;
+  const isAdmin = dbUser.role === UserRole.ADMIN;
   if (!isOwner && !isAdmin) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }

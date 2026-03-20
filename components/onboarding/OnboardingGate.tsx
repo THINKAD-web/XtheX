@@ -1,0 +1,90 @@
+"use client";
+
+import * as React from "react";
+import { useAuth } from "@clerk/nextjs";
+import { usePathname, useRouter } from "@/i18n/navigation";
+import { Loader2 } from "lucide-react";
+
+function isOnboardingPath(path: string | null): boolean {
+  if (!path) return false;
+  return (
+    path.includes("/onboarding") ||
+    path.includes("/sign-in") ||
+    path.includes("/sign-up")
+  );
+}
+
+export function OnboardingGate({ children }: { children: React.ReactNode }) {
+  const { isLoaded, isSignedIn } = useAuth();
+  const pathname = usePathname();
+  const router = useRouter();
+  const [showApp, setShowApp] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!isLoaded) return;
+
+    if (!isSignedIn) {
+      setShowApp(true);
+      return;
+    }
+
+    if (isOnboardingPath(pathname)) {
+      setShowApp(true);
+      return;
+    }
+
+    if (typeof window !== "undefined") {
+      if (sessionStorage.getItem("xthex_onboarding_ok") === "1") {
+        setShowApp(true);
+        return;
+      }
+    }
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/onboarding/status", {
+          credentials: "include",
+        });
+        const data = (await res.json()) as { completed?: boolean };
+        if (cancelled) return;
+        if (data.completed) {
+          sessionStorage.setItem("xthex_onboarding_ok", "1");
+          setShowApp(true);
+        } else {
+          router.replace("/onboarding/role");
+        }
+      } catch {
+        if (!cancelled) setShowApp(true);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoaded, isSignedIn, pathname, router]);
+
+  if (!isLoaded) {
+    return (
+      <div className="flex min-h-[40vh] items-center justify-center bg-zinc-50 dark:bg-zinc-950">
+        <Loader2 className="h-8 w-8 animate-spin text-zinc-400" />
+      </div>
+    );
+  }
+
+  if (
+    isSignedIn &&
+    !showApp &&
+    pathname &&
+    !isOnboardingPath(pathname)
+  ) {
+    return (
+      <div className="flex min-h-[50vh] flex-col items-center justify-center gap-2 bg-zinc-50 dark:bg-zinc-950">
+        <Loader2 className="h-8 w-8 animate-spin text-zinc-400" />
+        <p className="text-sm text-zinc-500">온보딩 확인 중…</p>
+      </div>
+    );
+  }
+
+  return <>{children}</>;
+}

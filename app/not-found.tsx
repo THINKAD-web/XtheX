@@ -1,13 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { useTranslations } from "next-intl";
+import { NextIntlClientProvider, useTranslations } from "next-intl";
 import { SignInButton, SignUpButton, Show, UserButton } from "@clerk/nextjs";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { Link, useRouter } from "@/i18n/navigation";
+import koMessages from "@/messages/ko.json";
 
-export default function NotFound() {
+function NotFoundContent() {
   const t = useTranslations("notFound");
   const tNav = useTranslations("nav");
   const tFooter = useTranslations("home.footer");
@@ -101,3 +102,15 @@ export default function NotFound() {
   );
 }
 
+/** Root 404 is outside [locale] layout — provide intl context so hooks work. */
+export default function NotFound() {
+  return (
+    <NextIntlClientProvider
+      locale="ko"
+      messages={koMessages}
+      timeZone="Asia/Seoul"
+    >
+      <NotFoundContent />
+    </NextIntlClientProvider>
+  );
+}

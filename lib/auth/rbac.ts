@@ -1,12 +1,13 @@
 import { auth } from "@clerk/nextjs/server";
-import { Role } from "@prisma/client";
+import { UserRole } from "@prisma/client";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { findUserByClerkId } from "@/lib/auth/find-user-by-clerk";
 
 export type AppUser = {
   id: string;
   clerkId: string;
-  role: Role;
+  role: UserRole;
+  onboardingCompleted: boolean;
   email: string;
   name: string | null;
 };
@@ -19,18 +20,16 @@ export async function getCurrentUser(): Promise<AppUser | null> {
   const { userId } = await auth();
   if (!userId) return null;
 
-  const dbUser = await prisma.user.findUnique({
-    where: { clerkId: userId },
-    select: {
-      id: true,
-      clerkId: true,
-      role: true,
-      email: true,
-      name: true,
-    },
-  });
-
-  return dbUser ?? null;
+  const dbUser = await findUserByClerkId(userId);
+  if (!dbUser) return null;
+  return {
+    id: dbUser.id,
+    clerkId: dbUser.clerkId,
+    role: dbUser.role,
+    onboardingCompleted: dbUser.onboardingCompleted,
+    email: dbUser.email,
+    name: dbUser.name,
+  };
 }
 
 /**
@@ -47,25 +46,35 @@ export async function getCurrentUser(): Promise<AppUser | null> {
  *     // user.role === "ADMIN" 이 보장됩니다.
  *   }
  */
-export async function requireRole(role: Role): Promise<AppUser> {
+export async function requireRole(role: UserRole): Promise<AppUser> {
   const user = await getCurrentUser();
   if (!user) redirect("/sign-in");
   if (user.role !== role) redirect("/sign-in");
   return user;
 }
 
-export async function isPartner(): Promise<boolean> {
+/** 매체사 (구 PARTNER) */
+export async function isMediaOwner(): Promise<boolean> {
   const user = await getCurrentUser();
-  return user?.role === Role.PARTNER;
+  return user?.role === UserRole.MEDIA_OWNER;
+}
+
+/** 광고주 (구 BRAND) */
+export async function isAdvertiser(): Promise<boolean> {
+  const user = await getCurrentUser();
+  return user?.role === UserRole.ADVERTISER;
+}
+
+export async function isPartner(): Promise<boolean> {
+  return isMediaOwner();
 }
 
 export async function isBrand(): Promise<boolean> {
-  const user = await getCurrentUser();
-  return user?.role === Role.BRAND;
+  return isAdvertiser();
 }
 
 export async function isAdmin(): Promise<boolean> {
   const user = await getCurrentUser();
-  return user?.role === Role.ADMIN;
+  return user?.role === UserRole.ADMIN;
 }
 

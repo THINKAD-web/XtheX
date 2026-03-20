@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import {
@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { PlacesAutocomplete } from "@/components/partner/places-autocomplete";
 import { CloudinaryMultiUpload } from "@/components/partner/cloudinary-upload";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 type ProposalFormProps = {
   onCreated?: (id: string, values: { title: string; mediaType: string }) => void;
@@ -27,14 +28,14 @@ function isErrorKey(msg: string): msg is `errors.${string}` {
 
 export function ProposalForm({ onCreated }: ProposalFormProps) {
   const t = useTranslations("dashboard.partner");
-  const [submitError, setSubmitError] = React.useState<string | null>(null);
+  const { toast } = useToast();
   const [submitting, setSubmitting] = React.useState(false);
 
   const errMsg = (message: string | undefined) =>
     !message ? "" : isErrorKey(message) ? t(message) : message;
 
   const form = useForm<MediaProposalFormValues>({
-    resolver: zodResolver(mediaProposalSchema),
+    resolver: zodResolver(mediaProposalSchema) as Resolver<MediaProposalFormValues>,
     defaultValues: {
       title: "",
       description: "",
@@ -49,7 +50,6 @@ export function ProposalForm({ onCreated }: ProposalFormProps) {
   });
 
   async function onSubmit(values: MediaProposalFormValues) {
-    setSubmitError(null);
     setSubmitting(true);
     try {
       const result = await createMediaProposal(values);
@@ -59,6 +59,9 @@ export function ProposalForm({ onCreated }: ProposalFormProps) {
           mediaType: values.mediaType,
         });
       }
+      toast({
+        title: t("toast_created"),
+      });
       form.reset({
         title: "",
         description: "",
@@ -70,9 +73,12 @@ export function ProposalForm({ onCreated }: ProposalFormProps) {
         imageUrls: [],
       });
     } catch (e) {
-      setSubmitError(
-        e instanceof Error ? e.message : t("errors.submit_failed")
-      );
+      toast({
+        variant: "destructive",
+        title: t("errors.submit_failed"),
+        description:
+          e instanceof Error ? e.message : t("errors.submit_failed"),
+      });
     } finally {
       setSubmitting(false);
     }
@@ -238,10 +244,6 @@ export function ProposalForm({ onCreated }: ProposalFormProps) {
           ) : null}
         </div>
       </div>
-
-      {submitError ? (
-        <p className="text-sm text-red-600">{submitError}</p>
-      ) : null}
 
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={submitting}>

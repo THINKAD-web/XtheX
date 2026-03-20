@@ -6,9 +6,9 @@ datasource db {
   provider = "postgresql"
 }
 
-enum Role {
-  PARTNER
-  BRAND
+enum UserRole {
+  ADVERTISER
+  MEDIA_OWNER
   ADMIN
 }
 
@@ -23,6 +23,9 @@ enum ProposalStatus {
   PENDING
   APPROVED
   REJECTED
+  ANALYZING
+  ANALYZED
+  FAILED
 }
 
 enum MatchingStatus {
@@ -35,18 +38,135 @@ enum MatchingStatus {
   CANCELLED
 }
 
-model User {
-  id        String   @id @default(uuid()) @db.Uuid
-  clerkId   String   @unique
-  role      Role     @default(PARTNER)
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// --- THINKKAD-style OOH Media (AI 업로드 → 검토 → 상세페이지) ---
+enum MediaCategory {
+  BILLBOARD
+  DIGITAL_BOARD
+  TRANSIT
+  STREET_FURNITURE
+  WALL
+  ETC
+}
 
-  proposals MediaProposal[] @relation("ProposalsByPartner")
-  reviews   ReviewLog[]     @relation("ReviewsByReviewer")
-  matches   Matching[]      @relation("MatchingsByBrand")
+enum MediaStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum CampaignStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+model Media {
+  id                String         @id @default(uuid()) @db.Uuid
+  mediaName         String
+  category          MediaCategory
+  description       String?
+  locationJson      Json           // { address?, district?, lat?, lng?, map_link? }
+  price             Int?           // 단위: 원
+  cpm               Int?           // CPM (원)
+  exposureJson      Json?          // { daily_traffic?, monthly_impressions?, reach?, frequency? }
+  targetAudience    String?
+  images            String[]       // 이미지 URL 또는 설명
+  /** 제안서 PDF Vision + 사용자 업로드 매체 사진 URL */
+  sampleImages        String[]       @default([])
+  /** 사용자 업로드 매체 사진별 Grok Vision 설명 (sampleImages와 대응) */
+  sampleDescriptions  String[]       @default([])
+  tags              String[]       // 매체·기능 키워드 (LED, 빌보드 등)
+  audienceTags      String[]       @default([]) // 타겟 정규화 태그 (검색·필터용)
+  pros              String?
+  cons              String?
+  trustScore        Int?           // 0–100
+  viewCount         Int            @default(0)
+  status            MediaStatus    @default(DRAFT)
+  adminMemo         String?
+  proposalFileUrl   String?        // S3/storage 원본 PDF 링크
+  /** 재파싱 전 폼 스냅샷 히스토리 { backups: [...], lastReparseAt } */
+  parseHistory      Json?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  createdById       String?       @db.Uuid
+
+  createdBy User? @relation("MediaCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  inquiries Inquiry[]
+
+  @@index([status, category])
+  @@index([createdById])
+}
+
+model User {
+  id                    String   @id @default(uuid()) @db.Uuid
+  clerkId               String   @unique
+  role                  UserRole @default(ADVERTISER)
+  onboardingCompleted   Boolean  @default(false)
+  email                 String   @unique
+  name                  String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  proposals      MediaProposal[]  @relation("ProposalsByPartner")
+  reviews        ReviewLog[]      @relation("ReviewsByReviewer")
+  matches        Matching[]      @relation("MatchingsByBrand")
+  mediaCreated   Media[]         @relation("MediaCreatedBy")
+  campaignDrafts CampaignDraft[] @relation("CampaignDraftsByUser")
+  campaigns      Campaign[]      @relation("CampaignsByUser")
+}
+
+/// 미디어 믹스 기반 캠페인 초안·제출 (대시보드 연동 예정)
+model Campaign {
+  id               String         @id @default(uuid()) @db.Uuid
+  userId           String         @db.Uuid
+  title            String?
+  status           CampaignStatus @default(DRAFT)
+  budget_krw       Int
+  duration_weeks   Int
+  target_summary   String         @db.Text
+  location_summary String         @db.Text
+  /** proposalId, media_ids, total_cost, estimated_reach, breakdown, reasoning_ko 등 */
+  mediaMix         Json
+  /** 옴니채널 카트로 생성한 캠페인 여부 */
+  omniChannel      Boolean        @default(false)
+  /** 옴니채널에 담긴 매체 UUID 목록 (빠른 필터·배지용, mediaMix와 동기) */
+  omniMediaIds     Json?
+  /** 파싱 스냅샷 (대시보드·재편집용) */
+  parseSnapshot    Json?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  user User @relation("CampaignsByUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([userId, createdAt])
+}
+
+model CampaignDraft {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String?  @db.Uuid
+  name          String?
+  channelDooh   Boolean  @default(true)
+  channelWeb    Boolean  @default(false)
+  channelMobile Boolean  @default(false)
+  mediaIds      Json     // string[] of media UUIDs
+  createdAt     DateTime @default(now())
+
+  user User? @relation("CampaignDraftsByUser", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+}
+
+model CampaignEvent {
+  id              String   @id @default(uuid()) @db.Uuid
+  campaignDraftId String?  @db.Uuid
+  occurredAt      DateTime @default(now())
+  impressions     Int      @default(0)
+  clicks          Int      @default(0)
+  spend          Int      @default(0)
+
+  @@index([campaignDraftId, occurredAt])
 }
 
 model MediaProposal {
@@ -54,6 +174,10 @@ model MediaProposal {
   userId      String         @db.Uuid
   title       String
   description String?
+  keywords    Json?
+  mediaTypes  Json?
+  summary     String?
+  tone        String?
   location    Json
   mediaType   MediaType
   size        String?
@@ -104,3 +228,65 @@ model Matching {
 
   @@index([status, brandId])
 }
+
+model Inquiry {
+  id        String   @id @default(uuid()) @db.Uuid
+  mediaId   String?  @db.Uuid
+  name      String
+  email     String
+  company   String?
+  budget    Int?
+  message   String
+  locale    String?
+  createdAt DateTime @default(now())
+
+  media Media? @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+
+  @@index([mediaId])
+}
+
+// --- Advanced keyword targeting for DOOH ---
+
+model TagCategory {
+  id        String   @id @default(uuid()) @db.Uuid
+  code      String   @unique
+  ko        String
+  en        String
+  ja        String?
+  order     Int      @default(0)
+
+  tags      Tag[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Tag {
+  id           String       @id @default(uuid()) @db.Uuid
+  code         String       @unique
+  ko           String
+  en           String
+  ja           String?
+  categoryId   String       @db.Uuid
+  category     TagCategory  @relation(fields: [categoryId], references: [id])
+  aliases      String[]
+
+  mappingField String       // e.g. "location.district"
+  mappingType  String       // e.g. "equals", "in", "contains"
+  mappingValue String?
+
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([categoryId])
+}
+
+model SavedFilterPreset {
+  id        String   @id @default(uuid()) @db.Uuid
+  nameKo    String
+  nameEn    String
+  filterJson Json
+  ownerId   String?  @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+

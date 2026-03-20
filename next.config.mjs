@@ -2,10 +2,20 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  serverExternalPackages: ["@prisma/client"],
+  serverExternalPackages: ["@prisma/client", "pdfjs-dist"],
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "50mb",
+    },
+    proxyClientMaxBodySize: "55mb",
+  },
 };
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
-export default withNextIntl(nextConfig);
+import bundleAnalyzer from "@next/bundle-analyzer";
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
+export default withBundleAnalyzer(withNextIntl(nextConfig));
 

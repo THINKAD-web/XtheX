@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ClerkProvider } from "@clerk/nextjs";
+import { ToastProvider } from "@/components/ui/use-toast";
+import { SonnerToaster } from "@/components/ui/sonner-toaster";
+import { BrightnessProvider } from "@/components/brightness/BrightnessPreference";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
@@ -8,11 +11,13 @@ import "./globals.css";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -53,16 +58,14 @@ export default async function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
           data-maps-key={mapsKey ? "set" : "not-set"}
         >
-          {mapsKey ? (
-            <Script
-              id="google-maps-js"
-              strategy="afterInteractive"
-              src={`https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(
-                mapsKey
-              )}&libraries=places`}
-            />
-          ) : null}
-          <ThemeProvider>{children}</ThemeProvider>
+          <ToastProvider>
+            <BrightnessProvider>
+              <ThemeProvider>
+                {children}
+                <SonnerToaster />
+              </ThemeProvider>
+            </BrightnessProvider>
+          </ToastProvider>
         </body>
       </html>
     </ClerkProvider>

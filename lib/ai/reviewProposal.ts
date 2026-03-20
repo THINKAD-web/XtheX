@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { ProposalStatus } from "@prisma/client";
+import {
+  chatCompletions,
+  resolveChatLlm,
+} from "@/lib/ai/openai-compatible-llm";
 
 const aiOutputSchema = z.object({
   approved: z.boolean(),
@@ -20,36 +24,21 @@ function extractJsonObject(text: string) {
   }
 }
 
-async function callOpenAI(prompt: string) {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) throw new Error("Missing OPENAI_API_KEY");
-  const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
-
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model,
-      temperature: 0.2,
-      messages: [
-        {
-          role: "system",
-          content:
-            'You are a strict reviewer. Output ONLY valid JSON with keys: approved(boolean), score(number 0-100), reason(string).',
-        },
-        { role: "user", content: prompt },
-      ],
-    }),
+async function callGrokOrOpenAICompatible(prompt: string) {
+  const cfg = resolveChatLlm();
+  if (!cfg) throw new Error("Missing XAI_API_KEY or OPENAI_API_KEY");
+  return chatCompletions(cfg, {
+    temperature: 0.2,
+    max_tokens: 500,
+    messages: [
+      {
+        role: "system",
+        content:
+          'You are a strict reviewer. Output ONLY valid JSON with keys: approved(boolean), score(number 0-100), reason(string).',
+      },
+      { role: "user", content: prompt },
+    ],
   });
-
-  if (!res.ok) throw new Error(`OpenAI error: ${await res.text()}`);
-  const json = (await res.json()) as any;
-  const text: string | undefined = json?.choices?.[0]?.message?.content;
-  if (!text) throw new Error("OpenAI: empty response");
-  return text;
 }
 
 async function callAnthropic(prompt: string) {
@@ -143,13 +132,17 @@ export async function reviewProposalById(proposalId: string) {
     images: proposal.images,
   });
 
-  const useOpenAI = !!process.env.OPENAI_API_KEY;
-  const useAnthropic = !!process.env.ANTHROPIC_API_KEY;
-  if (!useOpenAI && !useAnthropic) {
-    throw new Error("Missing OPENAI_API_KEY or ANTHROPIC_API_KEY");
+  const cfg = resolveChatLlm();
+  const useAnthropic = !!process.env.ANTHROPIC_API_KEY?.trim();
+  if (!cfg && !useAnthropic) {
+    throw new Error(
+      "Missing XAI_API_KEY (Grok), OPENAI_API_KEY, or ANTHROPIC_API_KEY",
+    );
   }
 
-  const rawText = useOpenAI ? await callOpenAI(prompt) : await callAnthropic(prompt);
+  const rawText = cfg
+    ? await callGrokOrOpenAICompatible(prompt)
+    : await callAnthropic(prompt);
   const rawJson = extractJsonObject(rawText);
   const parsed = aiOutputSchema.parse(rawJson ?? {});
 

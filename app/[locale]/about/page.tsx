@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/accordion";
 import type { StatsSectionItem } from "@/components/stats-section";
 import { StatsSection } from "@/components/stats-section";
-import { Card, CardContent } from "@/components/ui/card";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Link } from "@/i18n/navigation";
 import {
@@ -21,6 +20,7 @@ import {
   Star,
   Target,
 } from "lucide-react";
+import { landing } from "@/lib/landing-theme";
 
 export const metadata: Metadata = {
   title: "About XtheX - Global Outdoor Ad Marketplace",
@@ -43,8 +43,8 @@ export const metadata: Metadata = {
 async function AboutNav() {
   const t = await getTranslations("about");
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white/80 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/80">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
+    <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white/90 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/95">
+      <div className={`${landing.container} flex h-16 items-center justify-between`}>
         <Link
           href="/"
           className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50"
@@ -73,7 +73,7 @@ async function AboutNav() {
 async function AboutHero() {
   const t = await getTranslations("about");
   return (
-    <section className="relative overflow-hidden border-b border-zinc-200 bg-gradient-to-b from-zinc-100 to-white py-24 dark:border-zinc-800 dark:from-zinc-900 dark:to-zinc-950">
+    <section className="relative overflow-hidden border-b border-zinc-200 bg-gradient-to-b from-zinc-100 to-white py-20 dark:border-zinc-800 dark:from-zinc-900 dark:to-zinc-950 lg:py-28">
       <div
         className="absolute inset-0 opacity-40 dark:opacity-30"
         style={{
@@ -84,17 +84,15 @@ async function AboutHero() {
           backgroundSize: "48px 48px",
         }}
       />
-      <div className="relative z-10 mx-auto max-w-4xl px-4 text-center">
-        <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl">
-          {t("hero_title")}
-        </h1>
-        <p className="mt-2 text-lg text-zinc-600 dark:text-zinc-400">
+      <div className={`relative z-10 ${landing.container} max-w-4xl text-center`}>
+        <h1 className={landing.h1}>{t("hero_title")}</h1>
+        <p className="mt-6 text-pretty text-lg text-zinc-600 dark:text-zinc-400 lg:text-xl">
           {t("hero_subtitle")}
         </p>
-        <p className="mt-6 text-xl leading-relaxed text-zinc-700 dark:text-zinc-300 sm:text-2xl">
+        <p className="mx-auto mt-8 max-w-3xl text-pretty text-xl font-medium leading-relaxed text-zinc-800 dark:text-zinc-200 lg:text-2xl lg:leading-relaxed">
           {t("hero_tagline")}
         </p>
-        <div className="mt-8 flex justify-center">
+        <div className="mt-12 flex justify-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400">
             <Map className="h-6 w-6" />
           </div>
@@ -108,14 +106,10 @@ async function AboutVision() {
   const t = await getTranslations("about");
   const missionItems = [t("mission_item_1"), t("mission_item_2"), t("mission_item_3")];
   return (
-    <section className="border-b border-zinc-200 bg-white py-20 dark:border-zinc-800 dark:bg-zinc-950">
-      <div className="mx-auto max-w-3xl px-4 text-center">
-        <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl">
-          {t("vision_title")}
-        </h2>
-        <p className="mt-2 text-base text-zinc-600 dark:text-zinc-400">
-          {t("vision_subtitle")}
-        </p>
+    <section className={`${landing.section} border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950`}>
+      <div className={`${landing.container} max-w-3xl text-center`}>
+        <h2 className={landing.h2}>{t("vision_title")}</h2>
+        <p className={landing.lead}>{t("vision_subtitle")}</p>
         <div className="mt-10 flex flex-col items-center gap-6 sm:flex-row sm:justify-center sm:gap-8">
           <div className="flex flex-shrink-0 gap-3">
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400">
@@ -168,49 +162,40 @@ async function AboutProblemSolution() {
     { problem: "problem4", solution: "solution4" },
   ];
   return (
-    <section className="border-b border-zinc-200 bg-zinc-50/80 py-20 dark:border-zinc-800 dark:bg-zinc-900/50">
-      <div className="mx-auto max-w-6xl px-4">
-        <h2 className="text-center text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl">
-          {t("problems_title")}
-        </h2>
-        <p className="mt-2 text-center text-zinc-600 dark:text-zinc-400">
-          {t("problems_subtitle")}
-        </p>
-        <div className="mt-12 grid gap-6 sm:grid-cols-2">
+    <section className={`${landing.sectionAlt} border-b border-zinc-200 bg-zinc-50/90 dark:border-zinc-800 dark:bg-zinc-900/40`}>
+      <div className={landing.container}>
+        <h2 className={landing.h2}>{t("problems_title")}</h2>
+        <p className={landing.lead}>{t("problems_subtitle")}</p>
+        <div className={`${landing.grid2} mt-12 lg:mt-16`}>
           {items.map(({ problem, solution }, index) => (
-            <Card
-              key={index}
-              className="border-zinc-200 dark:border-zinc-800 dark:bg-zinc-950"
-            >
-              <CardContent className="pt-6 pb-6">
-                <div className="flex gap-4">
-                  <div className="flex flex-shrink-0 flex-col items-start gap-2">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400">
-                      <AlertTriangle className="h-5 w-5" />
-                    </div>
-                    <span className="text-xs font-medium uppercase tracking-wide text-red-600 dark:text-red-400">
-                      {t("problem_label")}
-                    </span>
+            <div key={index} className={landing.card}>
+              <div className="flex gap-4">
+                <div className="flex flex-shrink-0 flex-col items-start gap-2">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-500/15 text-red-600 dark:bg-red-900/40 dark:text-red-400">
+                    <AlertTriangle className="h-6 w-6" />
                   </div>
-                  <p className="text-sm font-medium leading-snug text-zinc-800 dark:text-zinc-200">
-                    {t(problem)}
-                  </p>
+                  <span className="text-xs font-semibold uppercase tracking-wide text-red-600 dark:text-red-400">
+                    {t("problem_label")}
+                  </span>
                 </div>
-                <div className="mt-4 flex gap-4 border-t border-zinc-200 pt-4 dark:border-zinc-800">
-                  <div className="flex flex-shrink-0 flex-col items-start gap-2">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
-                      <CheckCircle className="h-5 w-5" />
-                    </div>
-                    <span className="text-xs font-medium uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
-                      {t("solution_label")}
-                    </span>
+                <p className="text-base font-medium leading-relaxed text-zinc-800 dark:text-zinc-100 lg:text-lg">
+                  {t(problem)}
+                </p>
+              </div>
+              <div className="mt-6 flex gap-4 border-t border-border pt-6">
+                <div className="flex flex-shrink-0 flex-col items-start gap-2">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
+                    <CheckCircle className="h-6 w-6" />
                   </div>
-                  <p className="text-sm leading-snug text-zinc-700 dark:text-zinc-300">
-                    {t(solution)}
-                  </p>
+                  <span className="text-xs font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
+                    {t("solution_label")}
+                  </span>
                 </div>
-              </CardContent>
-            </Card>
+                <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-300 lg:text-lg">
+                  {t(solution)}
+                </p>
+              </div>
+            </div>
           ))}
         </div>
       </div>
@@ -228,44 +213,35 @@ async function AboutTestimonials() {
     { quote: "testimonial4_quote", name: "testimonial4_name", role: "testimonial4_role", company: "testimonial4_company", avatar: "최" },
   ];
   return (
-    <section className="relative border-t border-zinc-200 bg-gradient-to-b from-white to-zinc-50/80 py-20 dark:border-zinc-800 dark:from-zinc-950 dark:to-zinc-900/80">
-      <div className="mx-auto max-w-6xl px-4">
-        <h2 className="text-center text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl">
-          {t("testimonials_title")}
-        </h2>
-        <p className="mt-2 text-center text-zinc-600 dark:text-zinc-400">
-          {t("testimonials_subtitle")}
-        </p>
-        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <section className={`${landing.sectionAlt} border-t border-zinc-200 bg-gradient-to-b from-white to-zinc-50/90 dark:border-zinc-800 dark:from-zinc-950 dark:to-zinc-900/60`}>
+      <div className={landing.container}>
+        <h2 className={landing.h2}>{t("testimonials_title")}</h2>
+        <p className={landing.lead}>{t("testimonials_subtitle")}</p>
+        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:mt-16 lg:gap-8">
           {items.map(({ quote, name, role, company, avatar }) => (
-            <Card
-              key={quote}
-              className="flex flex-col border-zinc-200 dark:border-zinc-800 dark:bg-zinc-950"
-            >
-              <CardContent className="flex flex-col gap-4 pt-6 pb-6">
-                <div className="flex items-center gap-1 text-amber-500 dark:text-amber-400">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className="h-5 w-5 fill-current" />
-                  ))}
+            <div key={quote} className={`${landing.card} flex flex-col gap-4`}>
+              <div className="flex items-center gap-1 text-amber-500 dark:text-amber-400">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star key={i} className="h-5 w-5 fill-current" />
+                ))}
+              </div>
+              <p className="text-pretty text-base leading-relaxed text-zinc-600 dark:text-zinc-400 lg:text-lg">
+                &ldquo;{t(quote)}&rdquo;
+              </p>
+              <div className="mt-auto flex items-center gap-3 border-t border-border pt-4">
+                <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-blue-500/15 text-sm font-semibold text-blue-700 dark:bg-blue-500/20 dark:text-blue-300">
+                  {avatar}
                 </div>
-                <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-                  &ldquo;{t(quote)}&rdquo;
-                </p>
-                <div className="mt-auto flex items-center gap-3">
-                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-zinc-200 text-sm font-semibold text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300">
-                    {avatar}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-semibold text-zinc-900 dark:text-zinc-50">
-                      {t(name)}
-                      {t(role) || t(company)
-                        ? ` · ${[t(role), t(company)].filter(Boolean).join(" · ")}`
-                        : ""}
-                    </p>
-                  </div>
+                <div className="min-w-0">
+                  <p className="font-semibold text-zinc-900 dark:text-zinc-50">
+                    {t(name)}
+                    {t(role) || t(company)
+                      ? ` · ${[t(role), t(company)].filter(Boolean).join(" · ")}`
+                      : ""}
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       </div>
@@ -284,15 +260,11 @@ async function AboutFAQ() {
     { q: "faq_q6", a: "faq_a6" },
   ];
   return (
-    <section className="relative border-t border-zinc-200 bg-white py-20 dark:border-zinc-800 dark:bg-zinc-950">
-      <div className="mx-auto max-w-3xl px-4">
-        <h2 className="text-center text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl">
-          {t("faq_title")}
-        </h2>
-        <p className="mt-2 text-center text-zinc-600 dark:text-zinc-400">
-          {t("faq_subtitle")}
-        </p>
-        <Accordion type="single" collapsible className="mt-10">
+    <section className={`${landing.section} border-t border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950`}>
+      <div className={`${landing.container} max-w-3xl`}>
+        <h2 className={landing.h2}>{t("faq_title")}</h2>
+        <p className={landing.lead}>{t("faq_subtitle")}</p>
+        <Accordion type="single" collapsible className="mt-12 lg:mt-16">
           {faqItems.map(({ q, a }, index) => (
             <AccordionItem key={index} value={`about-faq-${index}`}>
               <AccordionTrigger>{t(q)}</AccordionTrigger>
@@ -308,22 +280,16 @@ async function AboutFAQ() {
 async function AboutCta() {
   const t = await getTranslations("about");
   return (
-    <section className="border-b border-zinc-200 bg-zinc-50 py-16 dark:border-zinc-800 dark:bg-zinc-900/50">
-      <div className="mx-auto max-w-2xl px-4 text-center">
-        <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+    <section className={`${landing.sectionAlt} border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/40`}>
+      <div className={`${landing.container} max-w-2xl text-center`}>
+        <h2 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 lg:text-3xl">
           {t("cta_title")}
         </h2>
-        <div className="mt-6 flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <Link
-            href="/explore"
-            className="inline-flex h-10 items-center justify-center rounded-md bg-zinc-900 px-6 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
-          >
+        <div className="mt-10 flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-center">
+          <Link href="/explore" className={landing.btnPrimary}>
             {t("cta_explore")}
           </Link>
-          <Link
-            href="/sign-up"
-            className="inline-flex h-10 items-center justify-center rounded-md border border-zinc-200 bg-white px-6 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 dark:hover:bg-zinc-800"
-          >
+          <Link href="/sign-up" className={landing.btnSecondary}>
             {t("cta_signup")}
           </Link>
         </div>
@@ -335,8 +301,8 @@ async function AboutCta() {
 async function AboutFooter() {
   const t = await getTranslations("about");
   return (
-    <footer className="bg-zinc-50 py-6 dark:bg-zinc-900">
-      <div className="mx-auto flex max-w-6xl justify-center px-4">
+    <footer className="border-t border-zinc-200 bg-zinc-50 py-8 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className={`${landing.container} flex justify-center`}>
         <Link
           href="/"
           className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"

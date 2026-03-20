@@ -3,13 +3,14 @@
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { ProposalStatus, Role } from "@prisma/client";
+import { findUserByClerkId } from "@/lib/auth/find-user-by-clerk";
+import { ProposalStatus } from "@prisma/client";
 
 async function requireAdmin() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const dbUser = await prisma.user.findUnique({ where: { clerkId: userId } });
+  const dbUser = await findUserByClerkId(userId);
   // TEMP: 개발 단계에서는 role 체크를 완화해서,
   // DB에 존재하기만 하면 admin 권한을 허용한다.
   if (!dbUser) throw new Error("Forbidden");

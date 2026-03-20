@@ -1,34 +1,50 @@
 import { auth } from "@clerk/nextjs/server";
+import { UserButton } from "@clerk/nextjs";
 import { getTranslations } from "next-intl/server";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { Role } from "@prisma/client";
+import { findUserByClerkId } from "@/lib/auth/find-user-by-clerk";
+import { UserRole } from "@prisma/client";
 import { PartnerDashboardClient } from "@/components/partner/dashboard-client";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export const runtime = "nodejs";
 
-export default async function PartnerDashboardPage() {
+type PageProps = { params: Promise<{ locale: string }> };
+
+export default async function PartnerDashboardPage({ params }: PageProps) {
+  const { locale } = await params;
   const t = await getTranslations("dashboard.partner");
   try {
     const { userId } = await auth();
     if (!userId) {
       return (
         <div className="min-h-screen bg-zinc-50 p-6">
-          <div className="mx-auto max-w-5xl rounded-lg border border-zinc-200 bg-white p-6">
-            <p className="text-sm text-zinc-700">{t("sign_in")}</p>
+          <header className="fixed left-0 right-0 top-0 z-50 border-b border-zinc-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/95">
+            <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
+              <Link href={`/${locale}`} className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
+                XtheX
+              </Link>
+            </div>
+          </header>
+          <div className="mx-auto max-w-5xl pt-24">
+            <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
+              <p className="text-sm text-zinc-700 dark:text-zinc-300">{t("sign_in")}</p>
+            </div>
           </div>
         </div>
       );
     }
 
-    let dbUser = await prisma.user.findUnique({ where: { clerkId: userId } });
+    let dbUser = await findUserByClerkId(userId);
     // 개발 단계: 로그인한 유저를 자동으로 PARTNER로 upsert 해서 막힘 없게 한다.
     if (!dbUser) {
       dbUser = await prisma.user.create({
         data: {
           clerkId: userId,
-          role: Role.PARTNER,
-          email: "", // Clerk 이메일 동기화는 추후 정교화
+          role: UserRole.MEDIA_OWNER,
+          onboardingCompleted: true,
+          email: `partner_${userId.slice(0, 8)}@xthex.local`,
           name: null,
         },
       });
@@ -37,29 +53,66 @@ export default async function PartnerDashboardPage() {
     const proposals = await prisma.mediaProposal.findMany({
       where: { userId: dbUser.id },
       orderBy: { createdAt: "desc" },
+      take: 10,
       select: {
         id: true,
         title: true,
-        mediaType: true,
+        description: true,
+        summary: true,
         status: true,
-        priceMin: true,
-        priceMax: true,
         createdAt: true,
       },
     });
 
     return (
-      <div className="min-h-screen bg-zinc-50 p-6">
-        <div className="mx-auto max-w-5xl space-y-8">
+      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
+        <header className="fixed left-0 right-0 top-0 z-50 border-b border-zinc-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/95">
+          <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
+            <Link
+              href={`/${locale}`}
+              className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50"
+            >
+              XtheX
+            </Link>
+            <nav className="flex items-center gap-4">
+              <Link
+                href={`/${locale}/explore`}
+                className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+              >
+                탐색
+              </Link>
+              <LanguageSwitcher />
+              <UserButton
+                appearance={{
+                  elements: { avatarBox: "h-8 w-8" },
+                }}
+              />
+            </nav>
+          </div>
+        </header>
+
+        <div className="mx-auto max-w-5xl space-y-8 px-4 pb-12 pt-20">
           <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-semibold">{t("page_title")}</h1>
+                <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
+                  {t("page_title")}
+                </h1>
                 <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
                   {t("page_subtitle")}
                 </p>
+                <p className="mt-2 text-sm text-zinc-700 dark:text-zinc-300">
+                  {t("welcome", {
+                    name: dbUser.name ?? t("default_name"),
+                  })}{" "}
+                  ({dbUser.role})
+                </p>
+                <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                  {t("join_date", {
+                    date: new Date(dbUser.createdAt).toLocaleDateString(),
+                  })}
+                </p>
               </div>
-              <LanguageSwitcher />
             </div>
           </div>
 
@@ -76,12 +129,19 @@ export default async function PartnerDashboardPage() {
     // eslint-disable-next-line no-console
     console.error("Partner dashboard error:", e);
     return (
-      <div className="min-h-screen bg-zinc-50 p-6">
-        <div className="mx-auto max-w-5xl rounded-lg border border-zinc-200 bg-white p-6">
-          <h1 className="text-lg font-semibold">{t("error_title")}</h1>
-          <p className="mt-2 text-sm text-zinc-700">
-            {t("error_message")}
-          </p>
+      <div className="min-h-screen bg-zinc-50 p-6 dark:bg-zinc-950">
+        <header className="fixed left-0 right-0 top-0 z-50 border-b border-zinc-200 bg-white/95 dark:border-zinc-800 dark:bg-zinc-950/95">
+          <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
+            <Link href={`/${locale}`} className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
+              XtheX
+            </Link>
+          </div>
+        </header>
+        <div className="mx-auto max-w-5xl pt-24">
+          <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
+            <h1 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">{t("error_title")}</h1>
+            <p className="mt-2 text-sm text-zinc-700 dark:text-zinc-300">{t("error_message")}</p>
+          </div>
         </div>
       </div>
     );

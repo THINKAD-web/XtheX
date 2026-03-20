@@ -87,6 +87,20 @@ Open `http://localhost:3000`.
 
 ## Deployment (Vercel)
 
+### Root Directory (중요)
+
+이 저장소는 **루트에 `package.json` 하나**만 있습니다 (`app/`, `src/` 아래에 별도 패키지 없음).
+
+- Vercel 프로젝트 **Settings → General → Root Directory** 는 **비워 두세요** (또는 `.` 만).
+- `apps/web` 같은 하위 폴더로 잘못 지정하면, 그 폴더에 `package.json`이 없어 **“No Next.js version detected”** 가 납니다.
+
+### `package.json`에 `next` 필수
+
+배포에 쓰이는 브랜치의 `package.json` **`dependencies`**(또는 `devDependencies`)에 **`next`** 가 있어야 합니다.  
+이 프로젝트는 예: `"next": "^15.0.0"` 대역(실제로는 15.x 최신으로 설치), `"react"` / `"react-dom": "^18.3.1"` 을 사용합니다.
+
+**GitHub에 반드시 푸시할 것:** `package.json` + `package-lock.json` (lockfile 없이 배포하면 버전이 어긋날 수 있음).
+
 ### 1) Create a Vercel project
 
 - Import this repository into Vercel
@@ -113,6 +127,20 @@ Vercel will run:
 ```bash
 npm run build
 ```
+
+### “No Next.js version detected” 가 날 때
+
+1. GitHub에서 해당 브랜치의 **루트 `package.json`** 을 열어 `dependencies` 안에 `"next"` 가 있는지 확인.
+2. Vercel **Root Directory** 가 위에서 말한 대로 비어 있는지 확인.
+3. 로컬에서 의존성 재설치 후 빌드 확인:
+
+```bash
+rm -rf node_modules
+npm install
+npm run build
+```
+
+4. 수정 후 커밋·푸시 → Vercel이 같은 브랜치를 다시 빌드하는지 확인.
 
 ## Notes
 

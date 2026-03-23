@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireDbUser } from "@/lib/campaign/api-auth";
+import { revalidateCampaignListPages } from "@/lib/campaign/revalidate-campaign-lists";
 
 export const runtime = "nodejs";
 
@@ -60,5 +61,6 @@ export async function DELETE(
   if (del.count === 0) {
     return NextResponse.json({ ok: false, error: "Not found" }, { status: 404 });
   }
+  revalidateCampaignListPages();
   return NextResponse.json({ ok: true });
 }

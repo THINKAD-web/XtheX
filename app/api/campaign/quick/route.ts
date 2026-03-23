@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireDbUser } from "@/lib/campaign/api-auth";
-import { routing } from "@/i18n/routing";
+import { revalidateCampaignListPages } from "@/lib/campaign/revalidate-campaign-lists";
 
 export const runtime = "nodejs";
 
@@ -12,16 +11,6 @@ const bodySchema = z.object({
   budget_krw: z.coerce.number().int().min(1).max(1_000_000_000_000).optional(),
   duration_weeks: z.coerce.number().int().min(1).max(104).optional(),
 });
-
-function revalidateCampaignsPages() {
-  for (const locale of routing.locales) {
-    if (locale === routing.defaultLocale) {
-      revalidatePath("/dashboard/campaigns", "page");
-    } else {
-      revalidatePath(`/${locale}/dashboard/campaigns`, "page");
-    }
-  }
-}
 
 export async function POST(req: Request) {
   const authz = await requireDbUser();
@@ -75,7 +64,7 @@ export async function POST(req: Request) {
       },
     });
 
-    revalidateCampaignsPages();
+    revalidateCampaignListPages();
 
     return NextResponse.json({
       ok: true,

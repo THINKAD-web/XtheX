@@ -1,7 +1,11 @@
+"use client";
+
 import type { LucideIcon } from "lucide-react";
 import { CheckCircle, FileText, Globe, Users } from "lucide-react";
 import { CountUp } from "@/components/count-up";
 import { landing } from "@/lib/landing-theme";
+import { useLandingLightChrome } from "@/hooks/use-landing-light-chrome";
+import { cn } from "@/lib/utils";
 
 const DEFAULT_ITEMS: Array<{
   end: number;
@@ -64,6 +68,8 @@ export function StatsSection({
   items: customItems,
   ease,
 }: StatsSectionProps) {
+  const isLight = useLandingLightChrome();
+
   const items = customItems
     ? customItems.map((item, i) => ({
         ...DEFAULT_ITEMS[i],
@@ -76,24 +82,68 @@ export function StatsSection({
 
   const sectionClass =
     variant === "calm"
-      ? `${landing.section} bg-white dark:bg-zinc-950`
-      : `${landing.sectionAlt} bg-gradient-to-b from-white to-zinc-50/90 dark:from-zinc-950 dark:to-zinc-900/50`;
+      ? cn(
+          landing.section,
+          "relative border-t py-20 lg:py-28",
+          isLight
+            ? "border-zinc-200 bg-white"
+            : "border-zinc-800/50 bg-white dark:bg-zinc-950",
+        )
+      : cn(
+          landing.sectionAlt,
+          "relative border-t py-20 lg:py-28",
+          isLight
+            ? "border-zinc-200 bg-gradient-to-b from-white to-zinc-50"
+            : "border-zinc-800/50 bg-gradient-to-b from-white to-zinc-50/90 dark:from-zinc-950 dark:to-zinc-900/50",
+        );
 
   return (
     <section className={sectionClass}>
       <div className={landing.container}>
-        <h2 className={landing.h2}>{title}</h2>
-        <p className={landing.lead}>{subtitle}</p>
+        <h2
+          className={cn(
+            "text-center text-3xl font-bold tracking-tight lg:text-4xl",
+            isLight ? "text-zinc-900 dark:text-zinc-900" : landing.h2,
+          )}
+        >
+          {title}
+        </h2>
+        <p
+          className={cn(
+            landing.lead,
+            isLight && "text-zinc-600 dark:text-zinc-600",
+          )}
+        >
+          {subtitle}
+        </p>
         <div className={landing.grid4}>
           {items.map(({ end, suffix, duration, icon: Icon, label }) => (
             <div
               key={label}
-              className={`${landing.card} flex flex-col items-center gap-4 px-6 py-10 text-center`}
+              className={cn(
+                `${landing.card} flex flex-col items-center gap-4 px-6 py-10 text-center`,
+                isLight &&
+                  "border-zinc-200 bg-white shadow-lg shadow-zinc-200/30 dark:border-zinc-200 dark:bg-white",
+              )}
             >
-              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400">
+              <div
+                className={cn(
+                  "flex h-14 w-14 items-center justify-center rounded-xl",
+                  isLight
+                    ? "bg-blue-100 text-blue-600"
+                    : "bg-blue-100 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400",
+                )}
+              >
                 <Icon className="h-7 w-7" />
               </div>
-              <span className="text-3xl font-bold tabular-nums text-zinc-900 dark:text-zinc-50 sm:text-4xl">
+              <span
+                className={cn(
+                  "text-3xl font-bold tabular-nums sm:text-4xl",
+                  isLight
+                    ? "text-zinc-900 dark:text-zinc-900"
+                    : "text-zinc-900 dark:text-zinc-50",
+                )}
+              >
                 <CountUp
                   end={end}
                   duration={duration}
@@ -102,7 +152,14 @@ export function StatsSection({
                   ease={ease}
                 />
               </span>
-              <p className="text-pretty text-sm font-medium text-zinc-600 dark:text-zinc-400">
+              <p
+                className={cn(
+                  "text-pretty text-sm font-medium",
+                  isLight
+                    ? "text-zinc-600 dark:text-zinc-600"
+                    : "text-zinc-600 dark:text-zinc-400",
+                )}
+              >
                 {label}
               </p>
             </div>

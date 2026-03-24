@@ -49,9 +49,9 @@ export function CompareShareExport({ ids, locale, className }: Props) {
         variant="outline"
         size="sm"
         onClick={handleCopyLink}
-        className="no-print border-zinc-600 text-zinc-200 hover:bg-zinc-800"
+        className="no-print border-zinc-400 text-zinc-900 hover:bg-zinc-100 dark:border-zinc-500 dark:text-zinc-100 dark:hover:bg-zinc-800"
       >
-        <Share2 className="mr-2 h-4 w-4" />
+        <Share2 className="mr-2 h-4 w-4 shrink-0 text-zinc-900 dark:text-zinc-100" />
         {copied ? (isKo ? "복사됨" : "Copied") : isKo ? "링크 복사" : "Copy link"}
       </Button>
       <Button
@@ -59,9 +59,9 @@ export function CompareShareExport({ ids, locale, className }: Props) {
         variant="outline"
         size="sm"
         onClick={handleSavePdf}
-        className="no-print border-zinc-600 text-zinc-200 hover:bg-zinc-800"
+        className="no-print border-zinc-400 text-zinc-900 hover:bg-zinc-100 dark:border-zinc-500 dark:text-zinc-100 dark:hover:bg-zinc-800"
       >
-        <FileDown className="mr-2 h-4 w-4" />
+        <FileDown className="mr-2 h-4 w-4 shrink-0 text-zinc-900 dark:text-zinc-100" />
         {isKo ? "PDF로 저장" : "Save as PDF"}
       </Button>
     </div>

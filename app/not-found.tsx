@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import { NextIntlClientProvider, useTranslations } from "next-intl";
-import { SignInButton, SignUpButton, Show, UserButton } from "@clerk/nextjs";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { AuthNav } from "@/components/auth/auth-nav";
 import { Button } from "@/components/ui/button";
 import { Link, useRouter } from "@/i18n/navigation";
 import koMessages from "@/messages/ko.json";
@@ -27,19 +27,10 @@ function NotFoundContent() {
           </Link>
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
-            <Show when="signed-out">
-              <SignInButton mode="modal">
-                <Button variant="ghost" size="sm">
-                  {tNav("sign_in")}
-                </Button>
-              </SignInButton>
-              <SignUpButton mode="modal">
-                <Button size="sm">{tNav("sign_up")}</Button>
-              </SignUpButton>
-            </Show>
-            <Show when="signed-in">
-              <UserButton />
-            </Show>
+            <AuthNav
+              signInLabel={tNav("sign_in")}
+              signUpLabel={tNav("sign_up")}
+            />
           </div>
         </div>
       </header>

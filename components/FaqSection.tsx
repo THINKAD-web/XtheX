@@ -10,9 +10,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { landing } from "@/lib/landing-theme";
+import { useLandingLightChrome } from "@/hooks/use-landing-light-chrome";
+import { cn } from "@/lib/utils";
 
 export function FaqSection() {
   const t = useTranslations("home.faq");
+  const isLight = useLandingLightChrome();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -30,25 +33,60 @@ export function FaqSection() {
   ];
 
   return (
-    <section className={`${landing.section} bg-white dark:bg-zinc-950`}>
+    <section
+      className={cn(
+        landing.section,
+        "relative border-t py-20 lg:py-28",
+        isLight
+          ? "border-zinc-200 bg-white"
+          : "border-zinc-800/50 bg-white dark:bg-zinc-950",
+      )}
+    >
       <div className={`${landing.container} max-w-3xl`}>
-        <h2 className={landing.h2}>{t("section_title")}</h2>
-        <p className={landing.lead}>{t("section_subtitle")}</p>
+        <h2
+          className={cn(
+            "text-center text-3xl font-bold tracking-tight lg:text-4xl",
+            isLight ? "text-zinc-900 dark:text-zinc-900" : landing.h2,
+          )}
+        >
+          {t("section_title")}
+        </h2>
+        <p
+          className={cn(
+            landing.lead,
+            isLight && "text-zinc-600 dark:text-zinc-600",
+          )}
+        >
+          {t("section_subtitle")}
+        </p>
 
         <div
-          className={`${landing.surface} mt-12 overflow-hidden hover:scale-100 lg:mt-16`}
+          className={cn(
+            `${landing.surface} mt-12 overflow-hidden hover:scale-100 lg:mt-16`,
+            isLight &&
+              "border-zinc-200 bg-white shadow-lg shadow-zinc-200/40 dark:border-zinc-200 dark:bg-white",
+          )}
         >
           <Accordion type="single" collapsible className="px-1 sm:px-2">
             {faqItems.map(({ q, a }, index) => (
               <AccordionItem
                 key={index}
                 value={`item-${index}`}
-                className="border-zinc-200 px-3 dark:border-zinc-700/80 sm:px-4"
+                className={cn(
+                  "border-zinc-200 px-3 sm:px-4",
+                  !isLight && "dark:border-zinc-700/80",
+                )}
               >
-                <AccordionTrigger className="rounded-lg py-5 text-left text-base font-semibold text-zinc-900 no-underline hover:no-underline hover:bg-zinc-100/80 data-[state=open]:bg-zinc-100/60 dark:text-zinc-100 dark:hover:bg-zinc-800/60 dark:data-[state=open]:bg-zinc-800/40 [&[data-state=open]>svg]:text-blue-400">
+                <AccordionTrigger
+                  className={cn(
+                    "rounded-lg py-5 text-left text-base font-semibold text-foreground no-underline hover:no-underline",
+                    "hover:bg-accent/80 data-[state=open]:bg-accent/60",
+                    "[&[data-state=open]>svg]:text-blue-600 dark:[&[data-state=open]>svg]:text-blue-400",
+                  )}
+                >
                   <span className="pr-4 text-pretty">{t(q)}</span>
                 </AccordionTrigger>
-                <AccordionContent className="pb-5 pl-0 pr-2 text-pretty leading-relaxed text-zinc-600 dark:text-zinc-400 sm:pr-4">
+                <AccordionContent className="pb-5 pl-0 pr-2 text-pretty text-muted-foreground leading-relaxed sm:pr-4">
                   {t(a)}
                 </AccordionContent>
               </AccordionItem>

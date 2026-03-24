@@ -53,8 +53,9 @@ export function UploadButton({
         onClick={handleClick}
         disabled={disabled || !hasFiles || isPending}
         className={cn(
-          "w-full rounded-lg bg-orange-600 font-medium text-white hover:bg-orange-500",
-          "focus-visible:ring-orange-500 disabled:opacity-50"
+          "w-full rounded-lg font-semibold shadow-sm",
+          "bg-zinc-900 text-white hover:bg-zinc-800",
+          "disabled:bg-zinc-200 disabled:text-zinc-500 disabled:shadow-none disabled:opacity-100",
         )}
       >
         {isPending ? (
@@ -66,9 +67,7 @@ export function UploadButton({
           "AI 추출 시작"
         )}
       </Button>
-      {isPending && (
-        <Progress value={progress} className="h-1.5 bg-zinc-800" />
-      )}
+      {isPending && <Progress value={progress} className="h-1.5 bg-muted" />}
     </div>
   );
 }

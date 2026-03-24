@@ -247,11 +247,13 @@ export function AiUploadForm({ locale }: AiUploadFormProps) {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border border-sky-800/50 bg-sky-950/30 px-4 py-3 text-sm text-sky-100/90">
+      <div className="rounded-xl border border-sky-300 bg-sky-100 px-4 py-3 text-sm leading-relaxed text-sky-950">
         <p>
           PDF·PPT를 업로드하면 AI가 매체 정보를 추출합니다. 완료 후 목록에서{" "}
-          <strong className="text-sky-200">추출 데이터 확인·수정</strong>을 누르면
-          추출된 데이터를 수정·확인한 뒤 임시 저장 또는 공개할 수 있습니다.
+          <strong className="font-semibold text-sky-950 underline decoration-sky-600/40 underline-offset-2">
+            추출 데이터 확인·수정
+          </strong>
+          을 누르면 추출된 데이터를 수정·확인한 뒤 임시 저장 또는 공개할 수 있습니다.
         </p>
       </div>
 
@@ -268,7 +270,7 @@ export function AiUploadForm({ locale }: AiUploadFormProps) {
       />
 
       {queue && queue.length > 0 && (
-        <div className="space-y-3 border-t border-zinc-800 pt-6">
+        <div className="space-y-3 border-t border-border pt-6">
           <AiUploadAnalysisQueue
             items={queue}
             locale={locale}
@@ -280,7 +282,7 @@ export function AiUploadForm({ locale }: AiUploadFormProps) {
             <button
               type="button"
               onClick={clearQueue}
-              className="text-xs text-zinc-500 underline hover:text-zinc-300"
+              className="text-xs text-muted-foreground underline hover:text-foreground"
             >
               목록 지우고 새로 업로드
             </button>

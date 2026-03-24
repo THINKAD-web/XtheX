@@ -1,12 +1,10 @@
-import { SignUp } from "@clerk/nextjs";
+import { redirect } from "next/navigation";
+import { routing } from "@/i18n/routing";
 
-export default function SignUpPage() {
-  return (
-    <div className="min-h-screen w-full bg-zinc-50 p-6">
-      <div className="mx-auto flex max-w-md justify-center pt-12">
-        <SignUp path="/sign-up" />
-      </div>
-    </div>
-  );
+type Props = { params: Promise<{ locale: string }> };
+
+export default async function LegacySignUpPage({ params }: Props) {
+  const { locale } = await params;
+  if (locale === routing.defaultLocale) redirect("/signup");
+  redirect(`/${locale}/signup`);
 }
-

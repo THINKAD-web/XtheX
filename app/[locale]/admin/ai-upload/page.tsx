@@ -1,5 +1,5 @@
-import { auth } from "@clerk/nextjs/server";
-import { findUserByClerkId } from "@/lib/auth/find-user-by-clerk";
+import { UserRole } from "@prisma/client";
+import { getCurrentUser } from "@/lib/auth/rbac";
 import { getTranslations } from "next-intl/server";
 import { AdminAiUploadPageInner } from "@/components/admin/ai-upload/AdminAiUploadPageInner";
 import { AdminAiUploadGatePage } from "@/components/admin/ai-upload/AdminAiUploadGatePage";
@@ -11,15 +11,15 @@ export default async function AdminAiUploadPage({
 }) {
   const { locale } = await params;
   const ta = await getTranslations("admin.aiUpload");
-  const { userId } = await auth();
+  const tAdmin = await getTranslations("admin");
+  const user = await getCurrentUser();
 
-  if (!userId) {
+  if (!user) {
     return <AdminAiUploadGatePage message={ta("signIn")} />;
   }
 
-  const dbUser = await findUserByClerkId(userId);
-  if (!dbUser) {
-    return <AdminAiUploadGatePage message={ta("userNotFound")} />;
+  if (user.role !== UserRole.ADMIN) {
+    return <AdminAiUploadGatePage message={tAdmin("common.adminOnly")} />;
   }
 
   const llmConfigured = Boolean(

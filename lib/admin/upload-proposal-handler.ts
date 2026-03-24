@@ -1,4 +1,5 @@
-import { auth } from "@clerk/nextjs/server";
+import { UserRole } from "@prisma/client";
+import { getCurrentUser } from "@/lib/auth/rbac";
 import { prisma } from "@/lib/prisma";
 import { MediaStatus, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
@@ -100,7 +101,7 @@ function mapLlmAndExtractErrors(msg: string): string | null {
     msg.includes("clerkMiddleware") ||
     msg.includes("auth-middleware")
   ) {
-    return "로그인 인증 경로 오류입니다. 프로젝트 루트에 proxy.ts(Clerk)가 있는지 확인하고 dev 서버를 재시작해 주세요.";
+    return "로그인 인증 경로 오류입니다. middleware.ts와 NEXTAUTH_SECRET 설정을 확인하고 dev 서버를 재시작해 주세요.";
   }
   if (msg.startsWith("EXTRACT:")) {
     return msg.replace(/^EXTRACT:/, "").trim();
@@ -270,15 +271,12 @@ export async function runUploadProposalFromFormData(
   formData: FormData,
 ): Promise<UploadProposalResult> {
   try {
-    const { userId } = await auth();
-    if (!userId) {
+    const dbUser = await getCurrentUser();
+    if (!dbUser) {
       return { success: false, error: "로그인이 필요합니다." };
     }
-
-    const { findUserByClerkId } = await import("@/lib/auth/find-user-by-clerk");
-    const dbUser = await findUserByClerkId(userId);
-    if (!dbUser) {
-      return { success: false, error: "사용자 정보를 찾을 수 없습니다." };
+    if (dbUser.role !== UserRole.ADMIN) {
+      return { success: false, error: "관리자만 업로드할 수 있습니다." };
     }
 
     const rawFiles = formData.getAll("files") as File[];

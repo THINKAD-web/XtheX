@@ -1,5 +1,5 @@
 import * as React from "react";
-import { auth } from "@clerk/nextjs/server";
+import { getAuthSession } from "@/lib/auth/session";
 
 type Props = {
   when: "signed-in" | "signed-out";
@@ -7,8 +7,8 @@ type Props = {
 };
 
 export async function Show({ when, children }: Props) {
-  const { userId } = await auth();
-  const isSignedIn = !!userId;
+  const session = await getAuthSession();
+  const isSignedIn = !!session?.user;
 
   if (when === "signed-in") {
     return isSignedIn ? <>{children}</> : null;

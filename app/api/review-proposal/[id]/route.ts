@@ -1,7 +1,7 @@
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { findUserByClerkId } from "@/lib/auth/find-user-by-clerk";
+import { findUserById } from "@/lib/auth/find-user-by-clerk";
+import { getAuthSession } from "@/lib/auth/session";
 import { reviewProposalById } from "@/lib/ai/reviewProposal";
 import { UserRole } from "@prisma/client";
 
@@ -9,12 +9,14 @@ export async function POST(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const session = await getAuthSession();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   const { id } = await params;
 
-  const dbUser = await findUserByClerkId(userId);
+  const dbUser = await findUserById(session.user.id);
   if (!dbUser) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const proposal = await prisma.mediaProposal.findUnique({

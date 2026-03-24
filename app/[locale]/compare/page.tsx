@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import Link from "next/link";
 import React from "react";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { Link } from "@/i18n/navigation";
+import { AppSiteChrome } from "@/components/layout/AppSiteChrome";
 import { getTranslations } from "next-intl/server";
 import { getRecommendedTagCodesForMedia } from "@/lib/compare/recommended-tags";
 import { CompareRecommendedTags } from "@/components/compare/CompareRecommendedTags";
@@ -18,7 +18,17 @@ import { WeatherHintWithFetch } from "@/components/compare/WeatherHint";
 import { CompareCreativeHints } from "@/components/hints/CompareCreativeHints";
 import { getBundleRecommendationsForCompare } from "@/lib/medias/similar";
 import { SimilarBundleSection } from "@/components/medias/SimilarBundleSection";
-import { landing } from "@/lib/landing-theme";
+import {
+  exploreMockToCompareMedia,
+  getExploreEmptyDbMock,
+  isMediaUuid,
+} from "@/lib/explore/explore-empty-db-mocks";
+
+const container = "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8";
+const panel =
+  "rounded-2xl border border-border bg-card text-card-foreground shadow-sm ring-1 ring-black/[0.04] dark:ring-white/[0.08]";
+const sectionY = "relative border-t border-border py-12 lg:py-16";
+const stack = "space-y-10 lg:space-y-14";
 
 type PageProps = {
   params: Promise<{ locale: string }>;
@@ -47,48 +57,63 @@ export default async function ComparePage({ params, searchParams }: PageProps) {
 
   if (ids.length === 0) {
     return (
-      <div className="min-h-screen bg-background text-zinc-900 dark:text-zinc-50">
-        <section className={landing.section}>
-          <div className={landing.container}>
-            <div className={`${landing.card} mx-auto max-w-xl space-y-6 hover:scale-100`}>
-              <h2 className="text-3xl font-bold tracking-tight lg:text-4xl">
+      <AppSiteChrome mainClassName="pb-24">
+        <section className={sectionY}>
+          <div className={container}>
+            <div className={`${panel} mx-auto max-w-xl space-y-6 p-8`}>
+              <h2 className="text-3xl font-bold tracking-tight text-foreground lg:text-4xl">
                 {isKo ? "비교할 매체가 없습니다" : "No media selected for comparison"}
               </h2>
-              <p className="text-pretty text-base leading-relaxed text-zinc-600 dark:text-zinc-400 lg:text-lg">
+              <p className="text-pretty text-base leading-relaxed text-muted-foreground lg:text-lg">
                 {isKo
                   ? "/explore에서 매체 카드의 ‘비교’ 버튼을 눌러 최대 3개까지 선택한 뒤, 비교하기 버튼을 눌러보세요."
                   : "On /explore, choose up to 3 media using the 'Compare' button, then press 'Compare'."}
               </p>
-              <Link href={`/${locale}/explore`} className={landing.btnPrimary}>
+              <Link
+                href="/explore"
+                className="inline-flex h-11 min-w-[200px] items-center justify-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+              >
                 {isKo ? "매체 탐색으로 돌아가기" : "Back to explore"}
               </Link>
             </div>
           </div>
         </section>
-      </div>
+      </AppSiteChrome>
     );
   }
 
-  const medias = await prisma.media.findMany({
-    where: {
-      id: { in: ids },
-    },
-    select: {
-      id: true,
-      mediaName: true,
-      description: true,
-      category: true,
-      price: true,
-      cpm: true,
-      trustScore: true,
-      locationJson: true,
-      exposureJson: true,
-      images: true,
-      pros: true,
-      cons: true,
-      targetAudience: true,
-    },
-  });
+  const uuidIds = ids.filter(isMediaUuid);
+  const dbMedias =
+    uuidIds.length > 0
+      ? await prisma.media.findMany({
+          where: { id: { in: uuidIds } },
+          select: {
+            id: true,
+            mediaName: true,
+            description: true,
+            category: true,
+            price: true,
+            cpm: true,
+            trustScore: true,
+            locationJson: true,
+            exposureJson: true,
+            images: true,
+            pros: true,
+            cons: true,
+            targetAudience: true,
+          },
+        })
+      : [];
+  const dbById = new Map(dbMedias.map((m) => [m.id, m]));
+
+  const medias = ids
+    .map((id) => {
+      const mock = getExploreEmptyDbMock(id);
+      if (mock) return exploreMockToCompareMedia(mock);
+      if (isMediaUuid(id)) return dbById.get(id) ?? null;
+      return null;
+    })
+    .filter((m): m is NonNullable<(typeof dbMedias)[number]> => m != null);
 
   const mediasWithLocale = medias.map((m) => ({
     ...m,
@@ -131,20 +156,23 @@ export default async function ComparePage({ params, searchParams }: PageProps) {
 
   if (mediasWithLocale.length === 0) {
     return (
-      <div className="min-h-screen bg-background text-zinc-900 dark:text-zinc-50">
-        <section className={landing.section}>
-          <div className={landing.container}>
-            <div className={`${landing.card} mx-auto max-w-xl space-y-6 hover:scale-100`}>
-              <h2 className="text-3xl font-bold tracking-tight lg:text-4xl">
+      <AppSiteChrome mainClassName="pb-24">
+        <section className={sectionY}>
+          <div className={container}>
+            <div className={`${panel} mx-auto max-w-xl space-y-6 p-8`}>
+              <h2 className="text-3xl font-bold tracking-tight text-foreground lg:text-4xl">
                 {isKo ? "비교할 매체를 찾을 수 없습니다" : "No matching media found"}
               </h2>
-              <Link href={`/${locale}/explore`} className={landing.btnPrimary}>
+              <Link
+                href="/explore"
+                className="inline-flex h-11 min-w-[200px] items-center justify-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+              >
                 {isKo ? "매체 탐색으로 돌아가기" : "Back to explore"}
               </Link>
             </div>
           </div>
         </section>
-      </div>
+      </AppSiteChrome>
     );
   }
 
@@ -180,7 +208,7 @@ export default async function ComparePage({ params, searchParams }: PageProps) {
       rows.map((r) => ({ code: r.code, labelKo: r.ko, labelEn: r.en })),
     );
 
-  const bundleItems = await getBundleRecommendationsForCompare({ mediaIds: ids });
+  const bundleItems = await getBundleRecommendationsForCompare({ mediaIds: uuidIds });
 
   const mediaLikeForReasons = mediasWithLocale.map((m) => ({
     mediaName: m.displayName,
@@ -189,106 +217,98 @@ export default async function ComparePage({ params, searchParams }: PageProps) {
   }));
 
   return (
-    <>
-      <header className="fixed left-0 right-0 top-0 z-50 border-b border-zinc-800 bg-zinc-950/95 backdrop-blur-sm">
-        <div className={`flex h-14 items-center justify-between text-zinc-50 ${landing.container}`}>
-          <Link
-            href={`/${locale}`}
-            className="text-lg font-bold tracking-tight text-zinc-50"
-          >
-            XtheX
-          </Link>
-          <LanguageSwitcher />
-        </div>
-      </header>
-
-      <div className="min-h-screen bg-background pb-24 pt-20 text-zinc-900 dark:text-zinc-50">
-        <section className={landing.section}>
-          <div className={landing.container}>
-            <div className={landing.sectionStack}>
-          <header className="flex flex-wrap items-center justify-between gap-6 lg:gap-8">
-            <div>
-              <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 lg:text-4xl">
-                {isKo ? "매체 비교" : "Media comparison"}
-              </h2>
-              <p className="mt-4 max-w-2xl text-pretty text-base leading-relaxed text-zinc-600 dark:text-zinc-400 lg:text-lg">
-                {isKo
-                  ? "최대 3개 매체를 한 눈에 비교합니다."
-                  : "Compare up to 3 media side by side."}
-              </p>
-              {(minPrice != null || maxPrice != null || minCpm != null) && (
-                <div className="mt-2 flex flex-wrap gap-2 text-xs text-zinc-700">
-                  {minPrice != null && maxPrice != null && (
-                    <span className="rounded-full border border-zinc-200 bg-white px-3 py-1 shadow-sm">
-                      {isKo ? "총 예산 범위" : "Total price range"}:{" "}
-                      {minPrice.toLocaleString()} ~ {maxPrice.toLocaleString()}
-                      {isKo ? "원" : " KRW"}
-                    </span>
-                  )}
-                  {minCpm != null && (
-                    <span className="rounded-full border border-zinc-200 bg-white px-3 py-1 shadow-sm">
-                      {isKo ? "최소 CPM" : "Lowest CPM"}:{" "}
-                      {minCpm.toLocaleString()}
-                      {isKo ? "원" : " KRW"}
-                    </span>
+    <AppSiteChrome mainClassName="pb-24">
+      <section className={sectionY}>
+        <div className={container}>
+          <div className={stack}>
+              <header className="flex flex-wrap items-center justify-between gap-6 lg:gap-8">
+                <div>
+                  <h1 className="text-3xl font-bold tracking-tight text-foreground lg:text-4xl">
+                    {isKo ? "매체 비교" : "Media comparison"}
+                  </h1>
+                  <p className="mt-4 max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground lg:text-lg">
+                    {isKo
+                      ? "최대 3개 매체를 한 눈에 비교합니다."
+                      : "Compare up to 3 media side by side."}
+                  </p>
+                  {(minPrice != null || maxPrice != null || minCpm != null) && (
+                    <div className="mt-2 flex flex-wrap gap-2 text-xs text-foreground">
+                      {minPrice != null && maxPrice != null && (
+                        <span className="rounded-full border border-border bg-muted/50 px-3 py-1">
+                          {isKo ? "총 예산 범위" : "Total price range"}:{" "}
+                          {minPrice.toLocaleString()} ~ {maxPrice.toLocaleString()}
+                          {isKo ? "원" : " KRW"}
+                        </span>
+                      )}
+                      {minCpm != null && (
+                        <span className="rounded-full border border-border bg-muted/50 px-3 py-1">
+                          {isKo ? "최소 CPM" : "Lowest CPM"}: {minCpm.toLocaleString()}
+                          {isKo ? "원" : " KRW"}
+                        </span>
+                      )}
+                    </div>
                   )}
                 </div>
-              )}
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <CompareShareExport ids={ids} locale={locale} />
-              <Link
-                href={`/${locale}/explore`}
-                className={landing.btnSecondary + " min-w-0 shrink-0 px-5"}
-              >
-                {isKo ? "매체 탐색으로 돌아가기" : "Back to explore"}
-              </Link>
-            </div>
-          </header>
+                <div className="flex flex-wrap items-center gap-3">
+                  <CompareShareExport ids={ids} locale={locale} />
+                  <Link
+                    href="/explore"
+                    className="inline-flex h-10 shrink-0 items-center justify-center rounded-md border border-input bg-background px-5 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                  >
+                    {isKo ? "매체 탐색으로 돌아가기" : "Back to explore"}
+                  </Link>
+                </div>
+              </header>
 
-          <WeatherHintWithFetch
-            locale={locale}
-            city="Seoul,KR"
-            className="mb-4 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950"
-          />
-          <CompareCreativeHints
-            locale={locale}
-            medias={mediasWithLocale.map((m) => ({
-              mediaName: m.displayName,
-              category: m.category,
-            }))}
-            className="mb-4"
-            tone="light"
-          />
+              <WeatherHintWithFetch
+                locale={locale}
+                city="Seoul,KR"
+                className="mb-4 flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-100 px-4 py-3 text-sm text-amber-950"
+              />
+              <CompareCreativeHints
+                locale={locale}
+                medias={mediasWithLocale.map((m) => ({
+                  mediaName: m.displayName,
+                  category: m.category,
+                }))}
+                className="mb-4"
+                tone="light"
+              />
 
-          <div className={`overflow-x-auto ${landing.surface} p-4 sm:p-6`}>
-            <table className="min-w-full border-collapse text-sm">
-              <thead>
-                <tr>
-                  <th className="w-40 py-3 pr-4 text-left text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
-                    {isKo ? "항목" : "Attribute"}
-                  </th>
-                  {mediasWithLocale.map((m) => (
-                    <th
-                      key={m.id}
-                      className="min-w-[180px] py-3 pl-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-zinc-600"
-                    >
-                      <Link
-                        href={`/${locale}/medias/${m.id}`}
-                        className="line-clamp-2 text-sm font-semibold text-zinc-900 hover:text-orange-600 hover:underline"
-                      >
-                        {m.displayName}
-                      </Link>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {attributes.map((attr) => (
-                  <tr key={attr.key} className="border-t border-zinc-200">
-                    <td className="py-3 pr-4 align-top text-xs font-medium text-zinc-600">
-                      {isKo ? attr.labelKo : attr.labelEn}
-                    </td>
+              <div className={`overflow-x-auto ${panel} p-4 sm:p-6`}>
+                <table className="min-w-full border-collapse text-sm">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="w-40 py-3 pr-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        {isKo ? "항목" : "Attribute"}
+                      </th>
+                      {mediasWithLocale.map((m) => (
+                        <th
+                          key={m.id}
+                          className="min-w-[180px] py-3 pl-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+                        >
+                          {isMediaUuid(m.id) ? (
+                            <Link
+                              href={`/medias/${m.id}`}
+                              className="line-clamp-2 text-sm font-semibold text-foreground hover:text-primary hover:underline"
+                            >
+                              {m.displayName}
+                            </Link>
+                          ) : (
+                            <span className="line-clamp-2 text-sm font-semibold text-foreground" title="데모 매체">
+                              {m.displayName}
+                            </span>
+                          )}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {attributes.map((attr) => (
+                      <tr key={attr.key} className="border-t border-border">
+                        <td className="py-3 pr-4 align-top text-xs font-medium text-muted-foreground">
+                          {isKo ? attr.labelKo : attr.labelEn}
+                        </td>
                     {mediasWithLocale.map((m, idx) => {
                       const loc = locs[idx];
                       const exp = exposures[idx];
@@ -308,7 +328,7 @@ export default async function ComparePage({ params, searchParams }: PageProps) {
                                 className="h-20 w-full max-w-[140px] rounded-md object-cover"
                               />
                             ) : (
-                              <span className="text-xs text-zinc-500">
+                              <span className="text-xs text-muted-foreground">
                                 {isKo ? "이미지 없음" : "No image"}
                               </span>
                             );
@@ -321,9 +341,7 @@ export default async function ComparePage({ params, searchParams }: PageProps) {
                                   (isKo ? "주소 정보 없음" : "No address")}
                               </div>
                               {loc.district && (
-                                <div className="text-xs text-zinc-500">
-                                  {loc.district}
-                                </div>
+                                <div className="text-xs text-muted-foreground">{loc.district}</div>
                               )}
                             </>
                           );
@@ -349,7 +367,7 @@ export default async function ComparePage({ params, searchParams }: PageProps) {
                           break;
                         case "exposure":
                           content = (
-                            <ul className="space-y-1 text-xs text-zinc-600">
+                            <ul className="space-y-1 text-xs text-muted-foreground">
                               {exp.daily_traffic && (
                                 <li>
                                   {isKo ? "일일 유동인구" : "Daily traffic"}:{" "}
@@ -408,10 +426,7 @@ export default async function ComparePage({ params, searchParams }: PageProps) {
                       }
 
                       return (
-                        <td
-                          key={m.id}
-                          className="py-3 pl-4 align-top text-sm text-zinc-800"
-                        >
+                        <td key={m.id} className="py-3 pl-4 align-top text-sm text-foreground">
                           {content}
                         </td>
                       );
@@ -435,27 +450,25 @@ export default async function ComparePage({ params, searchParams }: PageProps) {
 
           <section className="space-y-6 lg:space-y-8">
             <div>
-              <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50 lg:text-2xl">
+              <h3 className="text-xl font-semibold text-foreground lg:text-2xl">
                 {isKo ? "간단 비교 통계" : "Quick comparison stats"}
               </h3>
-              <p className="mt-2 max-w-2xl text-pretty text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 lg:text-base">
+              <p className="mt-2 max-w-2xl text-pretty text-sm leading-relaxed text-muted-foreground lg:text-base">
                 {isKo
                   ? "가격과 신뢰도 기준으로 한눈에 추천을 보여줍니다."
                   : "Highlights the best options by price and trust score."}
               </p>
             </div>
 
-            <div className={landing.grid2}>
-              <div className={landing.card}>
-                <h4 className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:gap-8">
+              <div className={`${panel} p-6`}>
+                <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   {isKo ? "가성비 추천" : "Best value"}
                 </h4>
                 {bestPrice ? (
                   <div className="mt-2 space-y-1 text-sm">
-                    <p className="font-medium text-zinc-900">
-                      {bestPrice.displayName}
-                    </p>
-                    <p className="text-zinc-600">
+                    <p className="font-medium text-foreground">{bestPrice.displayName}</p>
+                    <p className="text-muted-foreground">
                       {isKo ? "대략 가격" : "Approx. price"}:{" "}
                       {bestPrice.price != null
                         ? `${bestPrice.price.toLocaleString()}${isKo ? "원" : " KRW"}`
@@ -463,7 +476,7 @@ export default async function ComparePage({ params, searchParams }: PageProps) {
                           ? "가격 정보 없음"
                           : "No price info"}
                     </p>
-                    <p className="mt-2 text-xs text-zinc-500">
+                    <p className="mt-2 text-xs text-muted-foreground">
                       {getBestValueReason(
                         {
                           mediaName: bestPrice.displayName,
@@ -474,7 +487,7 @@ export default async function ComparePage({ params, searchParams }: PageProps) {
                     </p>
                   </div>
                 ) : (
-                  <p className="mt-2 text-sm text-zinc-500">
+                  <p className="mt-2 text-sm text-muted-foreground">
                     {isKo
                       ? "가격 비교 가능한 매체가 없습니다."
                       : "No media with price to compare."}
@@ -482,22 +495,20 @@ export default async function ComparePage({ params, searchParams }: PageProps) {
                 )}
               </div>
 
-              <div className={landing.card}>
-                <h4 className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+              <div className={`${panel} p-6`}>
+                <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   {isKo ? "신뢰도 추천" : "Most trusted"}
                 </h4>
                 {bestTrust ? (
                   <div className="mt-2 space-y-1 text-sm">
-                    <p className="font-medium text-zinc-900">
-                      {bestTrust.displayName}
-                    </p>
-                    <p className="text-zinc-600">
+                    <p className="font-medium text-foreground">{bestTrust.displayName}</p>
+                    <p className="text-muted-foreground">
                       {isKo ? "신뢰도 점수" : "Trust score"}:{" "}
                       {bestTrust.trustScore != null
                         ? `${bestTrust.trustScore}/100`
                         : "—"}
                     </p>
-                    <p className="mt-2 text-xs text-zinc-500">
+                    <p className="mt-2 text-xs text-muted-foreground">
                       {getMostTrustedReason(
                         {
                           mediaName: bestTrust.displayName,
@@ -508,7 +519,7 @@ export default async function ComparePage({ params, searchParams }: PageProps) {
                     </p>
                   </div>
                 ) : (
-                  <p className="mt-2 text-sm text-zinc-500">
+                  <p className="mt-2 text-sm text-muted-foreground">
                     {isKo
                       ? "신뢰도 점수가 등록된 매체가 없습니다."
                       : "No media with trust score to compare."}
@@ -517,11 +528,11 @@ export default async function ComparePage({ params, searchParams }: PageProps) {
               </div>
             </div>
 
-            <div className={landing.panel}>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            <div className={`${panel} bg-muted/30 p-6`}>
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 {isKo ? "예산별 추천 조합" : "Recommendation by budget"}
               </h3>
-              <ul className="mt-3 space-y-2 text-sm text-zinc-700">
+              <ul className="mt-3 space-y-2 text-sm text-foreground">
                 <li>
                   &lt; 3천만 {isKo ? "원" : " KRW"}:{" "}
                   {getBudgetRecommendation(
@@ -636,7 +647,6 @@ export default async function ComparePage({ params, searchParams }: PageProps) {
             </div>
           </div>
         </section>
-      </div>
-    </>
+    </AppSiteChrome>
   );
 }

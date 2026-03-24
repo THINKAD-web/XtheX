@@ -1,7 +1,50 @@
 import "dotenv/config";
+import bcrypt from "bcrypt";
 import { MediaType, PrismaClient, ProposalStatus, UserRole } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
+
+/** NextAuth credentials 로그인용 — 테스트 계정 비밀번호 보강 */
+const SEED_TEST_PASSWORD_PLAIN = "password123";
+const BCRYPT_ROUNDS = 12;
+
+/** 아래 upsert와 동일한 시드 이메일 (clerkId 없어도 매칭 가능) */
+const SEED_USER_EMAILS = [
+  "partner1@xthex.test",
+  "partner2@xthex.test",
+  "admin@xthex.test",
+] as const;
+
+/**
+ * `password`가 null인 사용자 중
+ * - `clerkId`가 있거나
+ * - 시드에서 쓰는 이메일인 경우
+ * → bcrypt 해시(`password123`) 설정.
+ */
+async function ensureHashedPasswordsForClerkUsers(prisma: PrismaClient) {
+  const users = await prisma.user.findMany({
+    where: {
+      password: null,
+      OR: [
+        { clerkId: { not: null } },
+        { email: { in: [...SEED_USER_EMAILS] } },
+      ],
+    },
+    select: { id: true, email: true, clerkId: true },
+  });
+  if (users.length === 0) return;
+
+  const hashed = await bcrypt.hash(SEED_TEST_PASSWORD_PLAIN, BCRYPT_ROUNDS);
+  for (const u of users) {
+    await prisma.user.update({
+      where: { id: u.id },
+      data: { password: hashed },
+    });
+    console.log(
+      `[seed] credentials 비밀번호 설정: ${u.email} (clerkId=${u.clerkId ?? "null"}) → "${SEED_TEST_PASSWORD_PLAIN}"`,
+    );
+  }
+}
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) throw new Error("Missing DATABASE_URL");
@@ -280,6 +323,8 @@ async function main() {
       },
     });
   }
+
+  await ensureHashedPasswordsForClerkUsers(prisma);
 }
 
 main()

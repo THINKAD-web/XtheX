@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { MediaCategory, MediaStatus, Prisma } from "@prisma/client";
 import { z } from "zod";
 import { audienceTagsMatchingSearchQuery } from "@/lib/media/audience-tags";
+import { EXPLORE_EMPTY_DB_MOCKS } from "@/lib/explore/explore-empty-db-mocks";
 
 const querySchema = z.object({
   mediaType: z.string().optional(),
@@ -142,28 +143,9 @@ export async function GET(req: Request) {
     createdAt: m.createdAt.toISOString(),
   }));
 
-  // When there is no real media yet, return a mock marker so that
-  // the map/list/popup UX can be experienced.
+  // 발행(PUBLISHED) 매체가 없을 때만: 데모용 여러 핀·카드 (실데이터와 혼합되지 않음)
   if (items.length === 0 && !idCursor) {
-    items = [
-      {
-        id: "mock-media-1",
-        title: "MOCK 강남대로 디지털 보드",
-        description: "강남역 사거리 인근 테스트용 디지털 보드 매체입니다.",
-        location: {
-          address: "서울 강남구 강남대로 390",
-          district: "강남구",
-          lat: 37.4979,
-          lng: 127.0276,
-        },
-        mediaType: MediaCategory.DIGITAL_BOARD,
-        size: "",
-        priceMin: 3000000,
-        priceMax: 5000000,
-        images: ["https://picsum.photos/800/600?random=11"],
-        createdAt: new Date().toISOString(),
-      },
-    ];
+    items = EXPLORE_EMPTY_DB_MOCKS.map((row) => ({ ...row }));
   }
 
   const nextCursor =

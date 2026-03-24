@@ -1,9 +1,8 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { MediaStatus, UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { findUserByClerkId } from "@/lib/auth/find-user-by-clerk";
-import { MediaStatus } from "@prisma/client";
+import { getCurrentUser } from "@/lib/auth/rbac";
 import { revalidatePath } from "next/cache";
 import { mergeAudienceTagsForStorage } from "@/lib/media/audience-tags";
 export type MediaReviewFormPayload = {
@@ -38,10 +37,9 @@ export type MediaReviewFormPayload = {
 };
 
 async function requireAdminAndMedia(mediaId: string) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-  const dbUser = await findUserByClerkId(userId);
-  if (!dbUser) throw new Error("Forbidden");
+  const dbUser = await getCurrentUser();
+  if (!dbUser) throw new Error("Unauthorized");
+  if (dbUser.role !== UserRole.ADMIN) throw new Error("Forbidden");
   const media = await prisma.media.findUniqueOrThrow({ where: { id: mediaId } });
   return { dbUser, media };
 }

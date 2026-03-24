@@ -1,20 +1,17 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { findUserByClerkId } from "@/lib/auth/find-user-by-clerk";
-import { MediaCategory, MediaStatus } from "@prisma/client";
+import { getCurrentUser } from "@/lib/auth/rbac";
+import { MediaCategory, MediaStatus, UserRole } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 export async function createDemoMedias() {
-  const { userId } = await auth();
-  if (!userId) {
+  const dbUser = await getCurrentUser();
+  if (!dbUser) {
     throw new Error("로그인이 필요합니다.");
   }
-
-  const dbUser = await findUserByClerkId(userId);
-  if (!dbUser) {
-    throw new Error("사용자 정보를 찾을 수 없습니다.");
+  if (dbUser.role !== UserRole.ADMIN) {
+    throw new Error("관리자만 데모 매체를 생성할 수 있습니다.");
   }
 
   const baseUserId = dbUser.id;

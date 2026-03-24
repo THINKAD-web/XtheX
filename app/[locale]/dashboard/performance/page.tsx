@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { auth } from "@clerk/nextjs/server";
+import { getAuthSession } from "@/lib/auth/session";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -95,15 +95,15 @@ type PageProps = { params: Promise<{ locale: string }> };
 export default async function PerformanceDashboardPage({ params }: PageProps) {
   const { locale } = await params;
   const t = await getTranslations("dashboard.performance");
-  const { userId: clerkId } = await auth();
+  const session = await getAuthSession();
 
   let draftsWithStats: DraftWithStats[] = [];
   let isSignedIn = false;
 
-  if (clerkId) {
+  if (session?.user?.id) {
     isSignedIn = true;
     const user = await prisma.user.findUnique({
-      where: { clerkId },
+      where: { id: session.user.id },
       select: { id: true },
     });
     if (user) {

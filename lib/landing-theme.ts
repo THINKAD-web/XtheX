@@ -100,3 +100,15 @@ export const landingChart = {
   lineTertiary: "#818cf8",
   lineAccent: "#38bdf8",
 } as const;
+
+/** 밝기(밝게) + 차트 영역용 — 흰 카드 위 가독성 */
+export const landingChartLight = {
+  grid: "#d4d4d8",
+  axis: "#52525b",
+  tooltipBg: "#ffffff",
+  tooltipBorder: "#e4e4e7",
+  linePrimary: "#2563eb",
+  lineSecondary: "#0891b2",
+  lineTertiary: "#4f46e5",
+  lineAccent: "#0284c7",
+} as const;

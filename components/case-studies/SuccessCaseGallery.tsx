@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { ImageCarousel } from "@/components/ui/image-carousel";
 import type { SuccessCase } from "@/lib/case-studies/success-cases";
 import { landing } from "@/lib/landing-theme";
+import { useLandingLightChrome } from "@/hooks/use-landing-light-chrome";
+import { cn } from "@/lib/utils";
 
 type Props = {
   locale: string;
@@ -27,6 +29,8 @@ type Props = {
   className?: string;
   /** admin/medias 등 밝은 배경용 */
   tone?: "dark" | "light";
+  /** 홈 등: 헤더 밝기(☀)와 카드 톤 동기화 */
+  autoToneFromBrightness?: boolean;
 };
 
 function estimateFromCpm(input: { budgetKrw: number; cpm: number; ctrPercent: number; valuePerClickKrw: number }) {
@@ -58,9 +62,12 @@ export function SuccessCaseGallery({
   avgCpm = null,
   className,
   tone = "dark",
+  autoToneFromBrightness = false,
 }: Props) {
   const isKo = locale === "ko";
-  const onLight = tone === "light";
+  const landingLight = useLandingLightChrome();
+  const onLight =
+    tone === "light" || (autoToneFromBrightness && landingLight);
   const demoBudget = 30_000_000;
   const ctr = 0.3;
   const vpc = 1500;
@@ -95,21 +102,41 @@ export function SuccessCaseGallery({
 
           const content = (
             <div
-              className={`min-w-[300px] max-w-[340px] flex-shrink-0 text-zinc-100 ${landing.cardDark} p-4`}
+              className={cn(
+                "min-w-[300px] max-w-[340px] flex-shrink-0 p-4",
+                onLight
+                  ? "rounded-2xl border border-zinc-200 bg-white text-zinc-900 shadow-lg shadow-zinc-200/50"
+                  : cn("text-zinc-100", landing.cardDark),
+              )}
             >
               <div className="space-y-2">
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="line-clamp-2 text-base font-semibold leading-snug">
+                  <h3
+                    className={cn(
+                      "line-clamp-2 text-base font-semibold leading-snug",
+                      onLight ? "text-zinc-900" : "text-zinc-50",
+                    )}
+                  >
                     {title}
                   </h3>
                   <Badge
                     variant="outline"
-                    className="shrink-0 border-blue-500/40 bg-blue-500/10 text-xs text-blue-300"
+                    className={cn(
+                      "shrink-0 border-blue-500/40 text-xs",
+                      onLight
+                        ? "bg-blue-50 text-blue-800"
+                        : "bg-blue-500/10 text-blue-300",
+                    )}
                   >
                     {industry}
                   </Badge>
                 </div>
-                <p className="text-pretty text-xs leading-relaxed text-zinc-400">
+                <p
+                  className={cn(
+                    "text-pretty text-xs leading-relaxed",
+                    onLight ? "text-zinc-600" : "text-zinc-400",
+                  )}
+                >
                   {summary}
                 </p>
               </div>
@@ -117,7 +144,14 @@ export function SuccessCaseGallery({
               <div className="mt-3 space-y-3">
                 <ImageCarousel images={c.images} height={160} />
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-xs font-medium text-cyan-400/90">{kpi}</span>
+                  <span
+                    className={cn(
+                      "text-xs font-medium",
+                      onLight ? "text-cyan-700" : "text-cyan-400/90",
+                    )}
+                  >
+                    {kpi}
+                  </span>
                   {onApply ? (
                     <Button
                       type="button"
@@ -141,42 +175,76 @@ export function SuccessCaseGallery({
                 </div>
 
                 {dyn ? (
-                  <div className="rounded-xl border border-zinc-700/50 bg-zinc-950/50 p-3 text-xs text-zinc-300">
+                  <div
+                    className={cn(
+                      "rounded-xl border p-3 text-xs",
+                      onLight
+                        ? "border-zinc-200 bg-zinc-50 text-zinc-700"
+                        : "border-zinc-700/50 bg-zinc-950/50 text-zinc-300",
+                    )}
+                  >
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <span className="text-zinc-400">
+                      <span className={onLight ? "text-zinc-600" : "text-zinc-400"}>
                         {isKo ? "현재 필터 기준 예상 KPI" : "Est. KPI from current filter"}
                       </span>
-                      <span className="text-zinc-500">
+                      <span className={onLight ? "text-zinc-500" : "text-zinc-500"}>
                         {isKo ? `예산 ${compactKo(demoBudget)}원 · CTR ${ctr}%` : `Budget ₩${demoBudget.toLocaleString()} · CTR ${ctr}%`}
                       </span>
                     </div>
                     <div className="mt-1 grid grid-cols-2 gap-2">
                       <div className="flex justify-between">
                         <span className="text-zinc-500">{isKo ? "노출" : "Imp."}</span>
-                        <span className="font-medium text-zinc-100">
+                        <span
+                          className={cn(
+                            "font-medium",
+                            onLight ? "text-zinc-900" : "text-zinc-100",
+                          )}
+                        >
                           {isKo ? compactKo(dyn.impressions) : dyn.impressions.toLocaleString()}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-zinc-500">{isKo ? "클릭" : "Clicks"}</span>
-                        <span className="font-medium text-zinc-100">{dyn.clicks.toLocaleString()}</span>
+                        <span
+                          className={cn(
+                            "font-medium",
+                            onLight ? "text-zinc-900" : "text-zinc-100",
+                          )}
+                        >
+                          {dyn.clicks.toLocaleString()}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-zinc-500">CPC</span>
-                        <span className="font-medium text-zinc-100">
+                        <span
+                          className={cn(
+                            "font-medium",
+                            onLight ? "text-zinc-900" : "text-zinc-100",
+                          )}
+                        >
                           {dyn.cpc == null ? "—" : `${Math.round(dyn.cpc).toLocaleString()}${isKo ? "원" : " KRW"}`}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-zinc-500">ROI</span>
-                        <span className="font-medium text-zinc-100">
+                        <span
+                          className={cn(
+                            "font-medium",
+                            onLight ? "text-zinc-900" : "text-zinc-100",
+                          )}
+                        >
                           {dyn.roi == null ? "—" : `${(dyn.roi * 100).toFixed(1)}%`}
                         </span>
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <p className="text-[11px] leading-relaxed text-zinc-500">
+                  <p
+                    className={cn(
+                      "text-[11px] leading-relaxed",
+                      onLight ? "text-zinc-500" : "text-zinc-500",
+                    )}
+                  >
                     {isKo
                       ? "필터 적용 후(매체 CPM 확보) 동적 KPI가 표시됩니다."
                       : "Apply filters to show dynamic KPI (needs CPM)."}

@@ -1,7 +1,7 @@
-import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
+import { UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { findUserByClerkId } from "@/lib/auth/find-user-by-clerk";
+import { getCurrentUser } from "@/lib/auth/rbac";
 import { getTranslations } from "next-intl/server";
 import { generateWeeklyReport } from "@/lib/reports/generate-summary";
 import type { PeriodSummary } from "@/lib/reports/generate-summary";
@@ -22,10 +22,10 @@ export default async function AdminReportsPage({
   const { locale } = await params;
   const t = await getTranslations("admin");
   const tr = await getTranslations("admin.reports");
-  const { userId } = await auth();
+  const user = await getCurrentUser();
   const dl = dateLocale(locale);
 
-  if (!userId) {
+  if (!user) {
     return (
       <div className="min-h-screen bg-zinc-950 p-6 text-zinc-100">
         <div className="mx-auto max-w-4xl">
@@ -35,8 +35,7 @@ export default async function AdminReportsPage({
     );
   }
 
-  const dbUser = await findUserByClerkId(userId);
-  if (!dbUser) {
+  if (user.role !== UserRole.ADMIN) {
     return (
       <div className="min-h-screen bg-zinc-950 p-6 text-zinc-100">
         <div className="mx-auto max-w-4xl">

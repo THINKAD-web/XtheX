@@ -6,7 +6,8 @@
  */
 
 import * as React from "react";
-import { useAuth, SignInButton } from "@clerk/nextjs";
+import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import {
   ShoppingBag,
   Trash2,
@@ -40,7 +41,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useOmniCart } from "@/hooks/useOmniCart";
-import { useRouter } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { toast as sonnerToast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -197,6 +198,7 @@ function SortableOmniRow({
 }
 
 export function OmniCartShell() {
+  const pathname = usePathname();
   const {
     items,
     count,
@@ -213,7 +215,8 @@ export function OmniCartShell() {
     string | null
   >(null);
   const [successModalOpen, setSuccessModalOpen] = React.useState(false);
-  const { isSignedIn } = useAuth();
+  const { status } = useSession();
+  const isSignedIn = status === "authenticated";
   const router = useRouter();
   const [countBumpSeq, setCountBumpSeq] = React.useState(0);
   const [badgeBounce, setBadgeBounce] = React.useState(false);
@@ -347,6 +350,8 @@ export function OmniCartShell() {
   };
 
   if (!hydrated) return null;
+  /** 관리자 화면은 업무 집중용 — 플로팅 카트 숨김 */
+  if (pathname?.includes("/admin")) return null;
 
   return (
     <>
@@ -634,11 +639,9 @@ export function OmniCartShell() {
                 ) : null}
                 <div className="ml-auto flex flex-wrap gap-2">
                   {!isSignedIn ? (
-                    <SignInButton mode="modal">
-                      <button type="button" className={BTN}>
-                        로그인 후 제출
-                      </button>
-                    </SignInButton>
+                    <Link href="/login" className={BTN} prefetch={false}>
+                      로그인 후 제출
+                    </Link>
                   ) : (
                     <button
                       type="button"

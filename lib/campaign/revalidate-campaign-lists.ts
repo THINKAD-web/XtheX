@@ -6,10 +6,10 @@ export function revalidateCampaignListPages() {
   for (const locale of routing.locales) {
     if (locale === routing.defaultLocale) {
       revalidatePath("/dashboard/campaigns", "page");
-      revalidatePath("/advertiser", "page");
+      revalidatePath("/dashboard/advertiser", "page");
     } else {
       revalidatePath(`/${locale}/dashboard/campaigns`, "page");
-      revalidatePath(`/${locale}/advertiser`, "page");
+      revalidatePath(`/${locale}/dashboard/advertiser`, "page");
     }
   }
 }

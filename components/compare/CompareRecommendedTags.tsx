@@ -33,8 +33,8 @@ export function CompareRecommendedTags({
   }, [tagLabels, isKo]);
 
   return (
-    <tr className="border-t border-zinc-200">
-      <td className="py-3 pr-4 align-top text-xs font-medium text-zinc-600">
+    <tr className="border-t border-border">
+      <td className="py-3 pr-4 align-top text-xs font-medium text-muted-foreground">
         {isKo ? "이 매체 추천 타겟팅" : "Recommended targeting"}
       </td>
       {medias.map((m) => {
@@ -63,9 +63,7 @@ export function CompareRecommendedTags({
                 );
               })}
               {codes.length === 0 && (
-                <span className="text-xs text-zinc-500">
-                  {isKo ? "—" : "—"}
-                </span>
+                <span className="text-xs text-muted-foreground">—</span>
               )}
             </div>
           </td>

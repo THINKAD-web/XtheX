@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
-import { ClerkProvider } from "@clerk/nextjs";
+import { AuthSessionProvider } from "@/components/providers/auth-session-provider";
 import { ToastProvider } from "@/components/ui/use-toast";
 import { SonnerToaster } from "@/components/ui/sonner-toaster";
 import { BrightnessProvider } from "@/components/brightness/BrightnessPreference";
+import { BrightnessThemeBridge } from "@/components/brightness/BrightnessThemeBridge";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
@@ -52,22 +53,23 @@ export default async function RootLayout({
 }>) {
   const mapsKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   return (
-    <ClerkProvider>
-      <html lang="ko" suppressHydrationWarning>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-          data-maps-key={mapsKey ? "set" : "not-set"}
-        >
+    <html lang="ko" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        data-maps-key={mapsKey ? "set" : "not-set"}
+      >
+        <AuthSessionProvider>
           <ToastProvider>
             <BrightnessProvider>
               <ThemeProvider>
+                <BrightnessThemeBridge />
                 {children}
                 <SonnerToaster />
               </ThemeProvider>
             </BrightnessProvider>
           </ToastProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+        </AuthSessionProvider>
+      </body>
+    </html>
   );
 }

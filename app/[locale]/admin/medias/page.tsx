@@ -1,6 +1,6 @@
-import { auth } from "@clerk/nextjs/server";
+import { UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { findUserByClerkId } from "@/lib/auth/find-user-by-clerk";
+import { getCurrentUser } from "@/lib/auth/rbac";
 import { getTranslations } from "next-intl/server";
 import { createDemoMedias } from "./actions";
 import { AdminMediasClient } from "@/components/admin/AdminMediasClient";
@@ -17,8 +17,8 @@ export default async function AdminMediasPage({
 }) {
   const t = await getTranslations("admin");
   const tm = await getTranslations("admin.medias");
-  const { userId } = await auth();
-  if (!userId) {
+  const user = await getCurrentUser();
+  if (!user) {
     return (
       <div className="min-h-screen bg-zinc-50 p-6">
         <div className="mx-auto max-w-5xl rounded-lg border border-zinc-200 bg-white p-6">
@@ -28,12 +28,11 @@ export default async function AdminMediasPage({
     );
   }
 
-  const dbUser = await findUserByClerkId(userId);
-  if (!dbUser) {
+  if (user.role !== UserRole.ADMIN) {
     return (
       <div className="min-h-screen bg-zinc-50 p-6">
         <div className="mx-auto max-w-5xl rounded-lg border border-zinc-200 bg-white p-6">
-          <p className="text-sm text-zinc-700">{t("common.userNotFound")}</p>
+          <p className="text-sm text-zinc-700">{t("common.adminOnly")}</p>
         </div>
       </div>
     );

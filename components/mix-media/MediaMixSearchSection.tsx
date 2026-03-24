@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useAuth, SignInButton } from "@clerk/nextjs";
+import { useSession } from "next-auth/react";
 import { Loader2, SendHorizontal, ImagePlus, X, MapPin, Save, ExternalLink, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +16,7 @@ import type {
 import { MixMediaMapLazy, type MixMapMarker } from "@/components/mix-media/MixMediaMapLazy";
 import { landing } from "@/lib/landing-theme";
 import { cn } from "@/lib/utils";
+import { useLandingLightChrome } from "@/hooks/use-landing-light-chrome";
 import { useOmniCart } from "@/hooks/useOmniCart";
 import { mixCategoryToOmni } from "@/lib/omni-cart/category";
 
@@ -244,7 +245,8 @@ function buildMapMarkers(
 }
 
 export function MediaMixSearchSection() {
-  const { isSignedIn } = useAuth();
+  const { status } = useSession();
+  const isSignedIn = status === "authenticated";
   const { toast } = useToast();
   const [query, setQuery] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -264,6 +266,8 @@ export function MediaMixSearchSection() {
   const [draftCampaignId, setDraftCampaignId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [authWallOpen, setAuthWallOpen] = useState(false);
+
+  const isDayUi = useLandingLightChrome();
 
   const debouncedBudget = useDebouncedValue(budgetSlider, 450);
   const lastRecalcBudget = useRef<number | null>(null);
@@ -492,38 +496,81 @@ export function MediaMixSearchSection() {
   return (
     <section
       id="media-mix-ai"
-      className={`${landing.sectionAlt} border-zinc-200 bg-gradient-to-b from-zinc-50 to-white dark:border-zinc-800 dark:from-zinc-950 dark:to-zinc-900/50`}
+      className={cn(
+        landing.sectionAlt,
+        "relative border-t py-20 lg:py-28",
+        isDayUi
+          ? "border-zinc-200 bg-gradient-to-b from-zinc-50 via-white to-zinc-100"
+          : "border-zinc-800/50 bg-gradient-to-b from-zinc-950 to-zinc-900/60",
+      )}
     >
       <div
         className={
           result ? landing.container : "mx-auto max-w-4xl px-4 sm:px-6 lg:px-8"
         }
       >
-        <h2 className={landing.h2}>자연어로 미디어 믹스 추천</h2>
-        <p className={landing.lead}>
+        <h2
+          className={cn(
+            "text-center text-3xl font-bold tracking-tight lg:text-4xl",
+            isDayUi ? "text-zinc-900" : "text-zinc-50",
+          )}
+        >
+          자연어로 미디어 믹스 추천
+        </h2>
+        <p
+          className={cn(
+            "mx-auto mt-4 max-w-2xl text-pretty text-center text-base leading-relaxed lg:text-lg",
+            isDayUi ? "text-zinc-600" : "text-zinc-400",
+          )}
+        >
           타겟·예산·기간·지역을 문장으로 입력하면 AI가 파싱하고, DB 매체를
           조합해 3~5개 제안을 드립니다. 크리에이티브 이미지를 올리면 스타일
           힌트도 반영합니다.
         </p>
 
         <div
-          className={`${landing.surface} mt-10 overflow-hidden lg:mt-12`}
+          className={cn(
+            "mt-10 overflow-hidden rounded-2xl border shadow-xl lg:mt-12",
+            isDayUi
+              ? "border-zinc-200 bg-white text-zinc-900 shadow-zinc-200/40"
+              : "border-zinc-700/80 bg-zinc-900/95 text-zinc-100 shadow-black/40",
+          )}
         >
-          <div className="border-b border-border bg-muted/50 px-4 py-3 dark:bg-zinc-800/50">
-            <p className="text-sm text-muted-foreground">
+          <div
+            className={cn(
+              "border-b px-4 py-3",
+              isDayUi
+                ? "border-zinc-200 bg-zinc-50"
+                : "border-zinc-700/80 bg-zinc-800/60",
+            )}
+          >
+            <p
+              className={cn(
+                "text-sm",
+                isDayUi ? "text-zinc-600" : "text-zinc-400",
+              )}
+            >
               예: 20대 여성 타겟, 예산 5000만원, 서울 강남 중심 4주, 카페 브랜드
               젊고 트렌디한 느낌
             </p>
           </div>
           <textarea
-            className="min-h-[160px] w-full resize-y border-0 bg-transparent px-4 py-5 text-base leading-relaxed text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-0 lg:min-h-[180px] lg:text-lg"
+            className={cn(
+              "min-h-[160px] w-full resize-y border-0 bg-transparent px-4 py-5 text-base leading-relaxed placeholder:text-zinc-400 focus:outline-none focus:ring-0 lg:min-h-[180px] lg:text-lg",
+              isDayUi ? "text-zinc-900" : "text-zinc-100",
+            )}
             placeholder="캠페인 브리프를 자유롭게 입력하세요…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             disabled={loading}
             aria-label="미디어 믹스 브리프"
           />
-          <div className="flex flex-col gap-3 border-t border-border px-4 py-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          <div
+            className={cn(
+              "flex flex-col gap-3 border-t px-4 py-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between",
+              isDayUi ? "border-zinc-200" : "border-zinc-700/80",
+            )}
+          >
             <div className="flex flex-wrap items-center gap-2">
               <input
                 id="mix-media-image"
@@ -534,7 +581,14 @@ export function MediaMixSearchSection() {
                 disabled={loading}
               />
               <label htmlFor="mix-media-image" className="cursor-pointer">
-                <span className="inline-flex h-11 cursor-pointer items-center justify-center rounded-lg border border-border bg-background px-4 text-sm font-medium hover:bg-muted">
+                <span
+                  className={cn(
+                    "inline-flex h-11 cursor-pointer items-center justify-center rounded-lg border px-4 text-sm font-medium",
+                    isDayUi
+                      ? "border-zinc-200 bg-white text-zinc-800 hover:bg-zinc-50"
+                      : "border-zinc-600 bg-zinc-800/80 text-zinc-100 hover:bg-zinc-800",
+                  )}
+                >
                   <ImagePlus className="mr-2 h-4 w-4" />
                   크리에이티브 (선택)
                 </span>
@@ -606,9 +660,12 @@ export function MediaMixSearchSection() {
                 </p>
               </CardHeader>
               <CardContent className="flex flex-wrap gap-3">
-                <SignInButton mode="modal">
-                  <Button type="button">로그인</Button>
-                </SignInButton>
+                <Link
+                  href="/login"
+                  className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                >
+                  로그인
+                </Link>
                 <Button
                   type="button"
                   variant="outline"

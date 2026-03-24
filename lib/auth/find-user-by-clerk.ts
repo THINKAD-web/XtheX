@@ -24,7 +24,7 @@ function isConnectionError(e: unknown): boolean {
 
 export type UserByClerkRow = {
   id: string;
-  clerkId: string;
+  clerkId: string | null;
   role: UserRole;
   email: string;
   name: string | null;
@@ -32,6 +32,31 @@ export type UserByClerkRow = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export async function findUserById(id: string): Promise<UserByClerkRow | null> {
+  if (!id?.trim()) return null;
+  const prisma = getPrisma();
+  try {
+    return await prisma.user.findUnique({
+      where: { id: id.trim() },
+      select: {
+        id: true,
+        clerkId: true,
+        role: true,
+        onboardingCompleted: true,
+        email: true,
+        name: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  } catch (e) {
+    if (isConnectionError(e)) {
+      throw new DatabaseConnectionError();
+    }
+    throw e;
+  }
+}
 
 export async function findUserByClerkId(
   clerkId: string,

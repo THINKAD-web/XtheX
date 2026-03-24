@@ -1,10 +1,10 @@
 import { CampaignStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth/rbac";
-import { redirect } from "next/navigation";
+import { gateAdvertiserDashboard } from "@/lib/auth/dashboard-gate";
 import { CampaignTable } from "@/components/campaigns/campaign-table";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const VALID_STATUS = new Set<CampaignStatus>([
   "DRAFT",
@@ -15,13 +15,15 @@ const VALID_STATUS = new Set<CampaignStatus>([
 
 type Props = {
   searchParams: Promise<{ status?: string }>;
+  /** 상태 필터 링크 기준 경로 */
+  listBasePath?: string;
 };
 
-export async function AdvertiserCampaignsSection({ searchParams }: Props) {
-  const user = await getCurrentUser();
-  if (!user) {
-    redirect("/sign-in");
-  }
+export async function AdvertiserCampaignsSection({
+  searchParams,
+  listBasePath = "/dashboard/advertiser",
+}: Props) {
+  const user = await gateAdvertiserDashboard();
 
   const sp = await searchParams;
   const raw = sp.status?.toUpperCase();
@@ -89,7 +91,7 @@ export async function AdvertiserCampaignsSection({ searchParams }: Props) {
       <CampaignTable
         campaigns={rows}
         activeFilter={activeFilter}
-        listBasePath="/advertiser"
+        listBasePath={listBasePath}
       />
     </>
   );

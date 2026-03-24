@@ -1,9 +1,8 @@
 "use server";
 
-import { auth, currentUser } from "@clerk/nextjs/server";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
-import { findUserByClerkId } from "@/lib/auth/find-user-by-clerk";
+import { getCurrentUser } from "@/lib/auth/rbac";
 import {
   mediaProposalSchema,
   type MediaProposalFormValues,
@@ -14,39 +13,9 @@ import { z, ZodError } from "zod";
 import { revalidatePath } from "next/cache";
 
 async function ensureDbUser() {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  const clerkUser = await currentUser();
-  if (!clerkUser) throw new Error("Unauthorized");
-
-  const email =
-    clerkUser.emailAddresses[0]?.emailAddress ??
-    (clerkUser.primaryEmailAddress?.emailAddress as string | undefined);
-
-  const name =
-    [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ").trim() ||
-    clerkUser.username ||
-    null;
-
-  const fallbackEmail =
-    email ||
-    (clerkUser.primaryEmailAddress?.emailAddress as string | undefined) ||
-    `partner_${userId.slice(0, 8)}@xthex.local`;
-
-  const dbUser =
-    (await findUserByClerkId(userId)) ??
-    (await prisma.user.create({
-      data: {
-        clerkId: userId,
-        email: fallbackEmail,
-        name,
-        role: UserRole.MEDIA_OWNER,
-        onboardingCompleted: true,
-      },
-    }));
-
-  return dbUser;
+  const user = await getCurrentUser();
+  if (!user) throw new Error("Unauthorized");
+  return user;
 }
 
 export async function createMediaProposal(input: unknown) {

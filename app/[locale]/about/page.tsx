@@ -8,8 +8,8 @@ import {
 } from "@/components/ui/accordion";
 import type { StatsSectionItem } from "@/components/stats-section";
 import { StatsSection } from "@/components/stats-section";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Link } from "@/i18n/navigation";
+import { AppSiteChrome } from "@/components/layout/AppSiteChrome";
 import {
   AlertTriangle,
   CheckCircle,
@@ -39,36 +39,6 @@ export const metadata: Metadata = {
     description: "전세계 옥외광고를 AI로 연결하는 글로벌 플랫폼.",
   },
 };
-
-async function AboutNav() {
-  const t = await getTranslations("about");
-  return (
-    <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white/90 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/95">
-      <div className={`${landing.container} flex h-16 items-center justify-between`}>
-        <Link
-          href="/"
-          className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50"
-        >
-          XtheX
-        </Link>
-        <div className="flex items-center gap-4">
-          <nav className="flex items-center gap-4 text-sm">
-            <Link
-              href="/"
-              className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-            >
-              {t("nav_home")}
-            </Link>
-            <span className="font-medium text-zinc-900 dark:text-zinc-50">
-              {t("nav_about")}
-            </span>
-          </nav>
-          <LanguageSwitcher />
-        </div>
-      </div>
-    </header>
-  );
-}
 
 async function AboutHero() {
   const t = await getTranslations("about");
@@ -323,8 +293,7 @@ export default async function AboutPage() {
     { end: 15000, suffix: "+", duration: 3, label: t("stats_label4") },
   ];
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-950">
-      <AboutNav />
+    <AppSiteChrome mainClassName="bg-white dark:bg-zinc-950">
       <main>
         <AboutHero />
         <AboutVision />
@@ -341,6 +310,6 @@ export default async function AboutPage() {
         <AboutCta />
       </main>
       <AboutFooter />
-    </div>
+    </AppSiteChrome>
   );
 }

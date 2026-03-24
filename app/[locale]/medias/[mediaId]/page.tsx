@@ -1,9 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
-import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
-import { Show } from "@/components/auth/show";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { Button } from "@/components/ui/button";
+import { SiteHeader } from "@/components/layout/SiteHeader";
 import { prisma } from "@/lib/prisma";
 import { OmnichannelTrigger } from "@/components/campaign/OmnichannelTrigger";
 import { MediaGallery } from "@/components/medias/MediaGallery";
@@ -27,38 +23,6 @@ type PageProps = {
   params: Promise<{ locale: string; mediaId: string }>;
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 };
-
-async function Navbar() {
-  const t = await getTranslations("nav");
-  return (
-    <header className="fixed left-0 right-0 top-0 z-50 border-b border-zinc-200 bg-white/80 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/80">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-        <Link
-          href="/"
-          className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50"
-        >
-          XtheX
-        </Link>
-        <div className="flex items-center gap-3">
-          <LanguageSwitcher />
-          <Show when="signed-out">
-            <SignInButton mode="modal">
-              <Button variant="ghost" size="sm">
-                {t("sign_in")}
-              </Button>
-            </SignInButton>
-            <SignUpButton mode="modal">
-              <Button size="sm">{t("sign_up")}</Button>
-            </SignUpButton>
-          </Show>
-          <Show when="signed-in">
-            <UserButton />
-          </Show>
-        </div>
-      </div>
-    </header>
-  );
-}
 
 export default async function MediaDetailPage({ params, searchParams }: PageProps) {
   const { locale, mediaId } = await params;
@@ -163,9 +127,9 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
 
   return (
     <>
-      <Navbar />
+      <SiteHeader />
       <ViewCountTracker mediaId={media.id} />
-      <div className="min-h-screen bg-zinc-950 pt-20 text-zinc-50">
+      <div className="min-h-screen bg-zinc-950 pt-14 text-zinc-50">
         {/* Hero */}
         <section className="relative overflow-hidden border-b border-zinc-900 bg-gradient-to-b from-zinc-950 via-zinc-950 to-zinc-900">
           <div className="absolute inset-0 opacity-40">

@@ -1,7 +1,7 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { getAuthSession } from "@/lib/auth/session";
 
 export type SaveCampaignDraftInput = {
   mediaIds: string[];
@@ -35,10 +35,10 @@ export async function saveCampaignDraft(
   }
 
   let userId: string | null = null;
-  const { userId: clerkId } = await auth();
-  if (clerkId) {
+  const session = await getAuthSession();
+  if (session?.user?.id) {
     const user = await prisma.user.findUnique({
-      where: { clerkId },
+      where: { id: session.user.id },
       select: { id: true },
     });
     userId = user?.id ?? null;

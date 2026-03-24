@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Link } from "@/i18n/navigation";
+import { HomeRoleCtas } from "@/components/home/home-role-ctas";
 import { Monitor } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { landing } from "@/lib/landing-theme";
@@ -89,22 +89,19 @@ export function HomeHeroDaypart() {
         >
           {t("subtitle")}
         </p>
-        <div className="mt-12 flex w-full max-w-md flex-col items-stretch justify-center gap-4 sm:mx-auto sm:max-w-none sm:flex-row sm:items-center sm:justify-center">
-          <Link href="/dashboard/partner" className={landing.btnPrimary}>
-            {t("cta_partner")}
-          </Link>
-          <Link
-            href="/explore"
-            className={cn(
-              "inline-flex h-11 min-w-[200px] items-center justify-center rounded-lg border px-6 text-sm font-medium transition-colors",
-              isDay
-                ? "border-zinc-300 bg-white text-zinc-900 shadow-sm hover:bg-zinc-50"
-                : "min-w-[200px] border-zinc-500 text-white hover:bg-white/10 dark:border-zinc-500",
-            )}
-          >
-            {t("cta_explore")}
-          </Link>
-        </div>
+        <HomeRoleCtas
+          mediaLabel={t("cta_partner")}
+          advertiserLabel={t("cta_explore")}
+          mediaSignedInHref="/dashboard/media-owner"
+          advertiserSignedInHref="/explore"
+          mediaClassName={landing.btnPrimary}
+          advertiserClassName={cn(
+            "inline-flex h-11 min-w-[200px] items-center justify-center rounded-lg border px-6 text-sm font-medium transition-colors",
+            isDay
+              ? "border-zinc-300 bg-white text-zinc-900 shadow-sm hover:bg-zinc-50"
+              : "min-w-[200px] border-zinc-500 text-white hover:bg-white/10 dark:border-zinc-500",
+          )}
+        />
       </div>
     </section>
   );

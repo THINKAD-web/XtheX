@@ -1,23 +1,24 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { findUserByClerkId } from "@/lib/auth/find-user-by-clerk";
+import { UserRole } from "@prisma/client";
+import { findUserById } from "@/lib/auth/find-user-by-clerk";
+import { getAuthSession } from "@/lib/auth/session";
 import { processUserMediaSampleFiles } from "@/lib/admin/process-user-media-samples";
 
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
+    const session = await getAuthSession();
+    if (!session?.user?.id) {
       return NextResponse.json(
         { ok: false, error: "로그인이 필요합니다." },
         { status: 401 },
       );
     }
-    const dbUser = await findUserByClerkId(userId);
-    if (!dbUser) {
+    const dbUser = await findUserById(session.user.id);
+    if (!dbUser || dbUser.role !== UserRole.ADMIN) {
       return NextResponse.json(
-        { ok: false, error: "사용자 정보를 찾을 수 없습니다." },
+        { ok: false, error: "권한이 없습니다." },
         { status: 403 },
       );
     }

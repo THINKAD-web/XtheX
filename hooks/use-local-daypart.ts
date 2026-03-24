@@ -1,11 +1,10 @@
 "use client";
 
-import { useBrightness } from "@/components/brightness/BrightnessPreference";
+import { useLandingLightChrome } from "@/hooks/use-landing-light-chrome";
 
 /**
- * 밝기 버튼(자동/밝게/어둡게) + 시간대 반영.
- * @see BrightnessProvider (root layout)
+ * 히어로·솔리드 스트립용: 밝기(☀) + next-themes 라이트를 함께 반영.
  */
 export function useLocalDaypart(): "day" | "night" {
-  return useBrightness().effective;
+  return useLandingLightChrome() ? "day" : "night";
 }

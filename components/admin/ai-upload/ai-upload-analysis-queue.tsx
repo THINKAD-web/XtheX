@@ -65,11 +65,9 @@ export function AiUploadAnalysisQueue({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-zinc-200">
-          파일 목록 ({items.length})
-        </h3>
+        <h3 className="text-sm font-semibold text-foreground">파일 목록 ({items.length})</h3>
         {anyAnalyzing && (
-          <div className="flex items-center gap-2 text-sm text-blue-400">
+          <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
             <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
             처리 중...
           </div>
@@ -81,85 +79,67 @@ export function AiUploadAnalysisQueue({
             <div
               className={cn(
                 "relative overflow-hidden rounded-xl border transition-colors",
-                item.phase === "analyzing" &&
-                  "border-blue-500/40 bg-blue-950/25",
-                item.phase === "waiting" && "border-zinc-700 bg-zinc-900/60",
+                item.phase === "analyzing" && "border-blue-200 bg-blue-50/80 dark:border-blue-500/35 dark:bg-blue-950/30",
+                item.phase === "waiting" && "border-border bg-muted/30",
                 item.phase === "done" &&
-                  "border-amber-500/50 bg-amber-950/20 shadow-sm",
-                item.phase === "error" &&
-                  "border-red-500/40 bg-red-950/15",
+                  "border-amber-200 bg-amber-50/60 shadow-sm dark:border-amber-500/35 dark:bg-amber-950/25",
+                item.phase === "error" && "border-destructive/30 bg-destructive/5 dark:bg-destructive/10",
               )}
             >
               <div className="flex items-start gap-3 p-3 pr-2">
                 <div className="mt-0.5 shrink-0">
                   {item.phase === "analyzing" ? (
-                    <Brain className="h-8 w-8 text-blue-400" aria-hidden />
+                    <Brain className="h-8 w-8 text-blue-600 dark:text-blue-400" aria-hidden />
                   ) : item.phase === "done" ? (
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/20 text-amber-400">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400">
                       <Check className="h-4 w-4" />
                     </div>
                   ) : item.phase === "error" ? (
-                    <XCircle className="h-8 w-8 text-red-400" aria-hidden />
+                    <XCircle className="h-8 w-8 text-destructive" aria-hidden />
                   ) : (
-                    <FileText className="h-8 w-8 text-zinc-500" aria-hidden />
+                    <FileText className="h-8 w-8 text-muted-foreground" aria-hidden />
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-zinc-100">
-                    {item.file.name}
-                  </p>
-                  <p className="mt-0.5 text-xs text-zinc-500">
+                  <p className="truncate text-sm font-medium text-foreground">{item.file.name}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
                     {formatSize(item.file.size)}
-                    {item.phase === "waiting" && (
-                      <span className="ml-2 text-zinc-500">· 대기 중</span>
-                    )}
+                    {item.phase === "waiting" && <span className="ml-2">· 대기 중</span>}
                     {item.phase === "analyzing" && (
-                      <span className="ml-2 font-medium text-blue-400">
-                        · AI 분석 중...
-                      </span>
+                      <span className="ml-2 font-medium text-blue-600 dark:text-blue-400">· AI 분석 중...</span>
                     )}
                     {item.phase === "done" && item.preview && (
                       <>
-                        <span className="ml-2 font-medium text-amber-500">
-                          · 검토 대기 중
-                        </span>
+                        <span className="ml-2 font-medium text-amber-700 dark:text-amber-400">· 검토 대기 중</span>
                         {item.preview.trustScore != null && (
-                          <span className="ml-2 text-zinc-400">
-                            AI 신뢰도: {item.preview.trustScore}%
-                          </span>
+                          <span className="ml-2 text-muted-foreground">AI 신뢰도: {item.preview.trustScore}%</span>
                         )}
                       </>
                     )}
                     {item.phase === "error" && item.error && (
-                      <span className="ml-2 text-red-400">
+                      <span className="ml-2 text-destructive">
                         · {item.error.slice(0, 120)}
                         {item.error.length > 120 ? "…" : ""}
                       </span>
                     )}
                   </p>
                   {item.phase === "done" && item.preview && (
-                    <p className="mt-1 truncate text-xs text-zinc-400">
-                      {item.preview.mediaName} ·{" "}
-                      {categoryLabel(item.preview.category)}
+                    <p className="mt-1 truncate text-xs text-muted-foreground">
+                      {item.preview.mediaName} · {categoryLabel(item.preview.category)}
                     </p>
                   )}
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-1">
                   {item.phase === "done" && item.preview && (
                     <>
-                      <Button
-                        type="button"
-                        size="sm"
-                        className="h-8 gap-1 bg-emerald-600 text-white hover:bg-emerald-700"
-                        onClick={() => onOpenDetail(item.id)}
-                      >
+                      <Button type="button" size="sm" className="h-8 gap-1" onClick={() => onOpenDetail(item.id)}>
                         <Check className="h-3.5 w-3.5" />
                         추출 데이터 확인·수정
                       </Button>
                       <button
                         type="button"
                         onClick={() => onToggleDetail(item.id)}
-                        className="flex items-center gap-0.5 text-xs text-zinc-500 hover:text-zinc-300"
+                        className="flex items-center gap-0.5 text-xs text-muted-foreground hover:text-foreground"
                         aria-expanded={item.detailOpen}
                       >
                         {item.detailOpen ? (
@@ -178,9 +158,9 @@ export function AiUploadAnalysisQueue({
               </div>
               {item.phase === "analyzing" && (
                 <div className="px-3 pb-2">
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-700/80">
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
                     <div
-                      className="h-full rounded-full bg-blue-500 transition-[width] duration-300 ease-out"
+                      className="h-full rounded-full bg-blue-600 transition-[width] duration-300 ease-out dark:bg-blue-500"
                       style={{
                         width: `${Math.max(8, Math.min(item.progress, 100))}%`,
                       }}
@@ -190,7 +170,7 @@ export function AiUploadAnalysisQueue({
               )}
             </div>
             {item.phase === "done" && item.preview && item.detailOpen && (
-              <div className="mt-2 rounded-xl border border-orange-500/30 bg-zinc-950/90 p-4 text-sm shadow-inner">
+              <div className="mt-2 rounded-xl border border-border bg-muted/20 p-4 text-sm shadow-inner dark:bg-card/50">
                 <InlineDraftEditor
                   draftId={item.preview.draftId}
                   locale={locale}

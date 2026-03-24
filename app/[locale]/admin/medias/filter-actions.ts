@@ -3,16 +3,12 @@
 import { prisma } from "@/lib/prisma";
 import { buildWhereFromJson } from "@/lib/filters/buildWhere";
 import { AdvancedFilterSchema } from "@/lib/filters/schema";
-import { auth } from "@clerk/nextjs/server";
+import { getAuthSession } from "@/lib/auth/session";
 
-async function prismaUserIdFromClerk(): Promise<string | null> {
-  const { userId: clerkId } = await auth();
-  if (!clerkId) return null;
-  const u = await prisma.user.findUnique({
-    where: { clerkId },
-    select: { id: true },
-  });
-  return u?.id ?? null;
+async function prismaUserIdFromSession(): Promise<string | null> {
+  const session = await getAuthSession();
+  const id = session?.user?.id;
+  return id?.trim() ? id : null;
 }
 
 export async function searchMediasWithAdvancedFilter(filterJson: unknown) {
@@ -31,7 +27,7 @@ export async function searchMediasWithAdvancedFilter(filterJson: unknown) {
 }
 
 export async function listFilterPresets() {
-  const ownerDbId = await prismaUserIdFromClerk();
+  const ownerDbId = await prismaUserIdFromSession();
 
   const presets = await prisma.savedFilterPreset.findMany({
     orderBy: { createdAt: "desc" },
@@ -56,7 +52,7 @@ export async function saveFilterPreset(
   nameEn: string,
   filterJson: unknown,
 ) {
-  const ownerDbId = await prismaUserIdFromClerk();
+  const ownerDbId = await prismaUserIdFromSession();
 
   const parsed = AdvancedFilterSchema.safeParse(filterJson);
   if (!parsed.success) {

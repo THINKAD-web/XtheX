@@ -2,7 +2,7 @@
 
 ## 1. dev 서버 재시작
 
-`proxy.ts`·`next.config.mjs`를 바꾼 뒤에는 **`npm run dev`를 한 번 끄고 다시 켜세요.**
+`middleware.ts`·`next.config.mjs`를 바꾼 뒤에는 **`npm run dev`를 한 번 끄고 다시 켜세요.**
 
 ## 2. 로그인 · DB 사용자
 
@@ -66,7 +66,7 @@ PDF_VISION_DISABLE=1                      # Vision 끄기
 
 ## 6. 인증(Clerk) 오류
 
-- 토스트에 **「proxy.ts」「clerkMiddleware」「인증」** 관련 문구가 나오면, 프로젝트 루트에 **`proxy.ts`**가 있고 `clerkMiddleware`가 적용돼 있는지 확인한 뒤 서버를 재시작하세요.
+- 토스트에 **「middleware.ts」「clerkMiddleware」「인증」** 관련 문구가 나오면, 프로젝트 루트에 **`middleware.ts`**가 있고 `clerkMiddleware`가 적용돼 있는지 확인한 뒤 서버를 재시작하세요.
 
 ## 재파싱
 

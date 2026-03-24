@@ -1,12 +1,11 @@
-import { auth } from "@clerk/nextjs/server";
-import { UserButton } from "@clerk/nextjs";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { findUserByClerkId } from "@/lib/auth/find-user-by-clerk";
-import { UserRole } from "@prisma/client";
+import { getCurrentUser } from "@/lib/auth/rbac";
+import { getLoginPath } from "@/lib/auth/paths";
 import { PartnerDashboardClient } from "@/components/partner/dashboard-client";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { UserMenu } from "@/components/auth/user-menu";
 
 export const runtime = "nodejs";
 
@@ -15,11 +14,13 @@ type PageProps = { params: Promise<{ locale: string }> };
 export default async function PartnerDashboardPage({ params }: PageProps) {
   const { locale } = await params;
   const t = await getTranslations("dashboard.partner");
+  const loginPath = await getLoginPath();
+
   try {
-    const { userId } = await auth();
-    if (!userId) {
+    const dbUser = await getCurrentUser();
+    if (!dbUser) {
       return (
-        <div className="min-h-screen bg-zinc-50 p-6">
+        <div className="min-h-screen bg-zinc-50 p-6 dark:bg-zinc-950">
           <header className="fixed left-0 right-0 top-0 z-50 border-b border-zinc-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/95">
             <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
               <Link href={`/${locale}`} className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
@@ -30,24 +31,16 @@ export default async function PartnerDashboardPage({ params }: PageProps) {
           <div className="mx-auto max-w-5xl pt-24">
             <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
               <p className="text-sm text-zinc-700 dark:text-zinc-300">{t("sign_in")}</p>
+              <Link
+                href={loginPath}
+                className="mt-4 inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              >
+                로그인
+              </Link>
             </div>
           </div>
         </div>
       );
-    }
-
-    let dbUser = await findUserByClerkId(userId);
-    // 개발 단계: 로그인한 유저를 자동으로 PARTNER로 upsert 해서 막힘 없게 한다.
-    if (!dbUser) {
-      dbUser = await prisma.user.create({
-        data: {
-          clerkId: userId,
-          role: UserRole.MEDIA_OWNER,
-          onboardingCompleted: true,
-          email: `partner_${userId.slice(0, 8)}@xthex.local`,
-          name: null,
-        },
-      });
     }
 
     const proposals = await prisma.mediaProposal.findMany({
@@ -82,11 +75,7 @@ export default async function PartnerDashboardPage({ params }: PageProps) {
                 탐색
               </Link>
               <LanguageSwitcher />
-              <UserButton
-                appearance={{
-                  elements: { avatarBox: "h-8 w-8" },
-                }}
-              />
+              <UserMenu />
             </nav>
           </div>
         </header>
@@ -130,7 +119,7 @@ export default async function PartnerDashboardPage({ params }: PageProps) {
     console.error("Partner dashboard error:", e);
     return (
       <div className="min-h-screen bg-zinc-50 p-6 dark:bg-zinc-950">
-        <header className="fixed left-0 right-0 top-0 z-50 border-b border-zinc-200 bg-white/95 dark:border-zinc-800 dark:bg-zinc-950/95">
+        <header className="fixed left-0 right-0 top-0 z-50 border-b border-zinc-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/95">
           <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
             <Link href={`/${locale}`} className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
               XtheX
@@ -147,4 +136,3 @@ export default async function PartnerDashboardPage({ params }: PageProps) {
     );
   }
 }
-

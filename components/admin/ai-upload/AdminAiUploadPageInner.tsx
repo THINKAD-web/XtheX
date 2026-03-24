@@ -1,12 +1,16 @@
 "use client";
 
-import * as React from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AiUploadForm } from "@/components/admin/ai-upload/ai-upload-form";
-import { landing } from "@/lib/landing-theme";
-import { useLocalDaypart } from "@/hooks/use-local-daypart";
 import { cn } from "@/lib/utils";
+
+/** 이 화면은 메인과 같이 항상 밝은 ‘종이’ UI (html.dark여도 대비 유지) */
+const shell =
+  "min-h-screen bg-gradient-to-b from-zinc-100 to-zinc-50 text-zinc-900 antialiased dark:from-zinc-100 dark:to-zinc-50 dark:text-zinc-900";
+
+const paperCard =
+  "rounded-2xl border border-zinc-200 bg-white text-zinc-900 shadow-md ring-1 ring-zinc-200/80 dark:border-zinc-200 dark:bg-white dark:text-zinc-900 dark:ring-zinc-200/80";
 
 type Messages = {
   back: string;
@@ -29,84 +33,32 @@ export function AdminAiUploadPageInner({
   forceMock: boolean;
   messages: Messages;
 }) {
-  const isDay = useLocalDaypart() === "day";
-
   return (
-    <div
-      className={cn(
-        "min-h-screen transition-colors duration-500",
-        isDay ? "bg-zinc-50 text-zinc-900" : "bg-zinc-950 text-zinc-100",
-      )}
-    >
-      <div className={`${landing.container} max-w-5xl py-10 lg:py-14`}>
+    <div className={shell}>
+      <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
         <div className="mb-8 flex items-center gap-4">
           <Link
-            href={`/${locale}/admin`}
-            className={cn(
-              "inline-flex h-11 items-center rounded-lg px-2 text-sm font-medium transition-colors",
-              isDay
-                ? "text-zinc-600 hover:text-blue-600"
-                : "text-zinc-400 hover:text-blue-400",
-            )}
+            href="/admin"
+            className="inline-flex h-11 items-center rounded-lg px-2 text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-900"
           >
-            ← {m.back}
+            {m.back}
           </Link>
         </div>
 
         {!llmConfigured || forceMock ? (
           <div
-            className={cn(
-              "mb-4 rounded-lg border px-4 py-3 text-sm",
-              isDay
-                ? "border-amber-300 bg-amber-50 text-amber-950"
-                : "border-amber-500/40 bg-amber-950/40 text-amber-100",
-            )}
+            className="mb-4 rounded-lg border border-amber-400/90 bg-amber-100 px-4 py-3 text-sm text-amber-950"
             role="alert"
           >
-            <p
-              className={cn(
-                "font-semibold",
-                isDay ? "text-amber-900" : "text-amber-200",
-              )}
-            >
-              {!llmConfigured ? m.mock_no_key_title : m.mock_env_title}
-            </p>
-            {!llmConfigured ? (
-              <p
-                className={cn(
-                  "mt-2",
-                  isDay ? "text-amber-900/90" : "text-amber-100/90",
-                )}
-              >
-                {m.mock_no_key_body}
-              </p>
-            ) : null}
+            <p className="font-semibold text-amber-950">{!llmConfigured ? m.mock_no_key_title : m.mock_env_title}</p>
+            {!llmConfigured ? <p className="mt-2 leading-relaxed text-amber-950/95">{m.mock_no_key_body}</p> : null}
           </div>
         ) : null}
 
-        <Card
-          className={cn(
-            "transition-colors duration-500 hover:scale-[1.01]",
-            isDay
-              ? "border-zinc-200 bg-white shadow-md"
-              : `${landing.cardDark} border-zinc-800`,
-          )}
-        >
+        <Card className={paperCard}>
           <CardHeader className="space-y-2 pb-2">
-            <CardTitle
-              className={cn(
-                "text-2xl font-bold tracking-tight lg:text-3xl",
-                isDay ? "text-zinc-900" : "text-white",
-              )}
-            >
-              {m.card_title}
-            </CardTitle>
-            <p
-              className={cn(
-                "text-base leading-relaxed",
-                isDay ? "text-zinc-600" : "text-zinc-400",
-              )}
-            >
+            <CardTitle className="text-2xl font-bold tracking-tight text-zinc-900 lg:text-3xl">{m.card_title}</CardTitle>
+            <p className="text-base leading-relaxed text-zinc-600">
               {llmConfigured && !forceMock ? m.card_desc_live : m.card_desc_mock}
             </p>
           </CardHeader>

@@ -1,6 +1,6 @@
-import { auth } from "@clerk/nextjs/server";
+import { UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { findUserByClerkId } from "@/lib/auth/find-user-by-clerk";
+import { getCurrentUser } from "@/lib/auth/rbac";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,8 +12,8 @@ export default async function AdminReviewPage({
 }: {
   params: Promise<{ locale: string; mediaId: string }>;
 }) {
-  const { userId } = await auth();
-  if (!userId) {
+  const user = await getCurrentUser();
+  if (!user) {
     return (
       <div className="min-h-screen bg-black p-6">
         <p className="text-zinc-400">로그인이 필요합니다.</p>
@@ -21,11 +21,10 @@ export default async function AdminReviewPage({
     );
   }
 
-  const dbUser = await findUserByClerkId(userId);
-  if (!dbUser) {
+  if (user.role !== UserRole.ADMIN) {
     return (
       <div className="min-h-screen bg-black p-6">
-        <p className="text-zinc-400">사용자 정보를 찾을 수 없습니다.</p>
+        <p className="text-zinc-400">관리자만 접근할 수 있습니다.</p>
       </div>
     );
   }

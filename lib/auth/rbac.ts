@@ -1,26 +1,28 @@
-import { auth } from "@clerk/nextjs/server";
 import { UserRole } from "@prisma/client";
 import { redirect } from "next/navigation";
-import { findUserByClerkId } from "@/lib/auth/find-user-by-clerk";
+import { findUserById } from "@/lib/auth/find-user-by-clerk";
+import { getAuthSession } from "@/lib/auth/session";
+import { getLoginPath } from "@/lib/auth/paths";
 
 export type AppUser = {
   id: string;
-  clerkId: string;
+  clerkId: string | null;
   role: UserRole;
   onboardingCompleted: boolean;
   email: string;
   name: string | null;
+  createdAt: Date;
 };
 
 /**
- * 현재 요청의 Clerk 세션과 연동된 Prisma User를 가져옵니다.
- * 세션이 없거나 DB에 유저가 없으면 null을 반환합니다.
+ * NextAuth 세션과 연동된 Prisma User를 가져옵니다.
  */
 export async function getCurrentUser(): Promise<AppUser | null> {
-  const { userId } = await auth();
-  if (!userId) return null;
+  const session = await getAuthSession();
+  const id = session?.user?.id;
+  if (!id) return null;
 
-  const dbUser = await findUserByClerkId(userId);
+  const dbUser = await findUserById(id);
   if (!dbUser) return null;
   return {
     id: dbUser.id,
@@ -29,6 +31,7 @@ export async function getCurrentUser(): Promise<AppUser | null> {
     onboardingCompleted: dbUser.onboardingCompleted,
     email: dbUser.email,
     name: dbUser.name,
+    createdAt: dbUser.createdAt,
   };
 }
 
@@ -48,8 +51,8 @@ export async function getCurrentUser(): Promise<AppUser | null> {
  */
 export async function requireRole(role: UserRole): Promise<AppUser> {
   const user = await getCurrentUser();
-  if (!user) redirect("/sign-in");
-  if (user.role !== role) redirect("/sign-in");
+  if (!user) redirect(await getLoginPath());
+  if (user.role !== role) redirect(await getLoginPath());
   return user;
 }
 

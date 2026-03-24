@@ -1,5 +1,6 @@
-import { auth } from "@clerk/nextjs/server";
+import { UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth/rbac";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import {
@@ -29,14 +30,24 @@ export default async function AdminInquiriesPage({
   const { locale } = await params;
   const t = await getTranslations("admin");
   const ti = await getTranslations("admin.inquiries");
-  const { userId } = await auth();
+  const user = await getCurrentUser();
   const dl = dateLocale(locale);
 
-  if (!userId) {
+  if (!user) {
     return (
       <div className="min-h-screen bg-zinc-50 p-6">
         <div className="mx-auto max-w-6xl rounded-lg border border-zinc-200 bg-white p-6">
           <p className="text-sm text-zinc-700">{t("common.signIn")}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (user.role !== UserRole.ADMIN) {
+    return (
+      <div className="min-h-screen bg-zinc-50 p-6">
+        <div className="mx-auto max-w-6xl rounded-lg border border-zinc-200 bg-white p-6">
+          <p className="text-sm text-zinc-700">{t("common.adminOnly")}</p>
         </div>
       </div>
     );

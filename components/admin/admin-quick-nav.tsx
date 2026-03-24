@@ -1,99 +1,56 @@
-import type { ReactNode } from "react";
-import Link from "next/link";
-import { landing } from "@/lib/landing-theme";
-
-const outline = `${landing.btnSecondary} !min-w-0 shrink-0 px-4 sm:px-5`;
-const primary = `${landing.btnPrimary} !min-w-0 shrink-0 px-4 sm:px-5`;
+import { Link } from "@/i18n/navigation";
+import { cn } from "@/lib/utils";
 
 type TAdminHome = (key: string) => string;
 
-export function AdminQuickNav({
-  locale,
-  t,
-}: {
-  locale: string;
-  t: TAdminHome;
-}) {
-  const p = `/${locale}`;
+const linkBase =
+  "inline-flex h-9 items-center justify-center whitespace-nowrap rounded-md border border-transparent px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background";
 
+const linkPrimary = cn(linkBase, "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90");
+const linkOutline = cn(linkBase, "border-border bg-background text-foreground hover:bg-muted");
+const linkSoft = cn(linkBase, "bg-muted/80 text-foreground hover:bg-muted");
+
+export function AdminQuickNav({ t }: { t: TAdminHome }) {
   return (
     <div>
-      <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-        {t("nav_quick_title")}
-      </p>
+      <p className="text-sm font-semibold text-foreground">{t("nav_quick_title")}</p>
+      <p className="mt-1 text-xs text-muted-foreground">{t("nav_quick_hint")}</p>
 
-      <div className="mt-6 flex flex-col gap-6 lg:gap-8">
-        <NavGroup label={t("nav_group_admin")}>
-          <Link href={`${p}/admin/medias`} className={outline}>
-            {t("nav_medias")}
-          </Link>
-          <Link href={`${p}/admin/ai-upload`} className={primary}>
-            {t("nav_aiUpload")}
-          </Link>
-          <Link href={`${p}/admin/inquiries`} className={outline}>
-            {t("nav_inquiries")}
-          </Link>
-          <Link href={`${p}/admin/reports`} className={outline}>
-            {t("nav_reports")}
-          </Link>
-        </NavGroup>
+      <div className="mt-6 space-y-8">
+        <div>
+          <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {t("nav_group_admin")}
+          </p>
+          <div className="flex flex-wrap gap-2 sm:gap-3">
+            <Link href="/admin/medias" className={cn(linkOutline, "w-full sm:w-auto sm:min-w-[9.5rem]")}>
+              {t("nav_medias")}
+            </Link>
+            <Link href="/admin/ai-upload" className={cn(linkPrimary, "w-full sm:w-auto sm:min-w-[9.5rem]")}>
+              {t("nav_aiUpload")}
+            </Link>
+            <Link href="/admin/inquiries" className={cn(linkOutline, "w-full sm:w-auto sm:min-w-[9.5rem]")}>
+              {t("nav_inquiries")}
+            </Link>
+            <Link href="/admin/reports" className={cn(linkOutline, "w-full sm:w-auto sm:min-w-[9.5rem]")}>
+              {t("nav_reports")}
+            </Link>
+          </div>
+        </div>
 
-        <NavGroup label={t("nav_group_platform")}>
-          <Link href={`${p}/explore`} className={outline}>
-            {t("nav_explore")}
-          </Link>
-          <Link href={`${p}/compare`} className={outline}>
-            {t("nav_compare")}
-          </Link>
-          <Link href={p} className={outline}>
-            {t("nav_landing")}
-          </Link>
-        </NavGroup>
-
-        <NavGroup label={t("nav_group_dashboard")}>
-          <Link href={`${p}/dashboard/partner`} className={outline}>
-            {t("nav_partner")}
-          </Link>
-          <Link href={`${p}/dashboard/performance`} className={outline}>
-            {t("nav_performance")}
-          </Link>
-          <Link href={`${p}/sign-up`} className={outline}>
-            {t("nav_signup")}
-          </Link>
-        </NavGroup>
-
-        <NavGroup label={t("nav_group_site")}>
-          <Link href={`${p}/about`} className={outline}>
-            {t("nav_about")}
-          </Link>
-          <Link href={`${p}/contact`} className={outline}>
-            {t("nav_contact")}
-          </Link>
-          <Link href={`${p}/terms`} className={outline}>
-            {t("nav_terms")}
-          </Link>
-          <Link href={`${p}/sign-in`} className={outline}>
-            {t("nav_signin")}
-          </Link>
-        </NavGroup>
+        <div>
+          <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {t("nav_group_dashboard")}
+          </p>
+          <div className="flex flex-wrap gap-2 sm:gap-3">
+            <Link href="/dashboard/partner" className={cn(linkSoft, "w-full sm:w-auto sm:min-w-[9.5rem]")}>
+              {t("nav_partner")}
+            </Link>
+            <Link href="/dashboard/performance" className={cn(linkSoft, "w-full sm:w-auto sm:min-w-[9.5rem]")}>
+              {t("nav_performance")}
+            </Link>
+          </div>
+        </div>
       </div>
-    </div>
-  );
-}
-
-function NavGroup({
-  label,
-  children,
-}: {
-  label: string;
-  children: ReactNode;
-}) {
-  return (
-    <div>
-      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
-        {label}
-      </p>
-      <div className="flex flex-wrap gap-3 lg:gap-4">{children}</div>
     </div>
   );
 }

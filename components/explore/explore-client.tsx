@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import * as React from "react";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
@@ -15,8 +15,13 @@ import { OmnichannelPopup } from "@/components/campaign/OmnichannelPopup";
 import { useOmniCart } from "@/hooks/useOmniCart";
 import { landing } from "@/lib/landing-theme";
 import { exploreMediaTypeToCategory } from "@/lib/omni-cart/category";
+import { useLandingLightChrome } from "@/hooks/use-landing-light-chrome";
+import { cn } from "@/lib/utils";
 
 const mapsKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+
+const exploreSelectClass =
+  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
 const OMNI_BTN =
   "inline-flex shrink-0 items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-all hover:from-blue-700 hover:to-cyan-600 disabled:pointer-events-none disabled:opacity-40";
@@ -24,6 +29,25 @@ const OMNI_BTN =
 /** 매체 비교 — 옴니채널 카트와 동일한 pill/그라데이션 톤 (색만 구분) */
 const COMPARE_BTN =
   "inline-flex shrink-0 items-center justify-center rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-all hover:from-violet-700 hover:to-fuchsia-700 disabled:pointer-events-none disabled:opacity-40";
+
+/** 패널·카드 베이스 + 메인(Features/FAQ)과 동일한 밝은 크롬 오버라이드 */
+const explorePanelBase =
+  "rounded-2xl border border-border bg-card p-4 text-card-foreground shadow-sm sm:p-6 ring-1 ring-black/[0.04] dark:ring-white/[0.08]";
+
+/** 다크 클래스가 남아 있어도 흰 패널 위에서 본문이 보이게 (foreground가 밝은색인 경우 대비) */
+const exploreLightChromeText =
+  "[&_.text-foreground]:!text-zinc-900 [&_.text-muted-foreground]:!text-zinc-600";
+
+const explorePanelLightChrome =
+  "border-zinc-200 bg-white shadow-lg shadow-zinc-200/40 dark:border-zinc-200 dark:bg-white " +
+  exploreLightChromeText;
+
+const exploreMediaCardBase =
+  "h-full w-full cursor-pointer text-left rounded-2xl border border-border bg-card p-4 text-card-foreground shadow-sm sm:p-6 transition-[box-shadow,border-color] duration-300 ease-out hover:border-border/80 hover:shadow-md ring-1 ring-black/[0.04] dark:ring-white/[0.08]";
+
+const exploreMediaCardLightChrome =
+  "border-zinc-200 bg-white shadow-lg shadow-zinc-200/30 dark:border-zinc-200 dark:bg-white " +
+  exploreLightChromeText;
 
 type Item = {
   id: string;
@@ -289,6 +313,10 @@ export function ExploreClient() {
   const [omnichannelOpen, setOmnichannelOpen] = React.useState(false);
   const [omnichannelMediaIds, setOmnichannelMediaIds] = React.useState<string[]>([]);
   const { add, addMany } = useOmniCart();
+  const isLight = useLandingLightChrome();
+  const explorePanelClass = cn(explorePanelBase, isLight && explorePanelLightChrome);
+  const exploreMediaCardClass = cn(exploreMediaCardBase, isLight && exploreMediaCardLightChrome);
+
   const centerFromQuery = React.useMemo(() => {
     const center = searchParams?.get("center");
     if (!center) return null;
@@ -501,34 +529,57 @@ export function ExploreClient() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <section className={landing.section}>
+    <div
+      className={cn(
+        "min-h-screen",
+        isLight ? "bg-gradient-to-b from-zinc-50 to-white" : "bg-background",
+      )}
+    >
+      <section
+        className={cn(
+          landing.sectionAlt,
+          "relative border-t py-20 lg:py-28",
+          isLight
+            ? "border-zinc-200 bg-gradient-to-b from-zinc-50 to-white"
+            : "border-zinc-800/50 bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-950 dark:to-zinc-900/40",
+        )}
+      >
         <div className={landing.container}>
           <div className={landing.sectionStack}>
             <header>
-              <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 lg:text-4xl">
+              <h2
+                className={cn(
+                  "text-3xl font-bold tracking-tight lg:text-4xl",
+                  isLight ? "text-zinc-900 dark:text-zinc-900" : "text-foreground",
+                )}
+              >
                 {t("title")}
               </h2>
-              <p className="mt-4 max-w-2xl text-pretty text-left text-base leading-relaxed text-zinc-600 dark:text-zinc-400 lg:text-lg">
+              <p
+                className={cn(
+                  "mt-4 max-w-2xl text-pretty text-left text-base leading-relaxed lg:text-lg",
+                  isLight ? "text-zinc-600 dark:text-zinc-600" : "text-muted-foreground",
+                )}
+              >
                 {t("subtitle")}
               </p>
             </header>
             <div className="space-y-6 lg:space-y-8">
-            <div className={`relative ${landing.surface} p-4 sm:p-6`}>
-              <div className="mb-2 flex items-center justify-between text-xs text-zinc-600">
+            <div className={cn("relative", explorePanelClass)}>
+              <div className="mb-2 flex items-center justify-between text-xs text-muted-foreground">
                 <div className="inline-flex items-center gap-2">
                   <span>현재 {items.length}개 매체</span>
                   {filters.mediaType !== "ALL" && (
-                    <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] uppercase tracking-wide text-zinc-600">
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
                       {filters.mediaType}
                     </span>
                   )}
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
-                  <label className="inline-flex cursor-pointer items-center gap-1.5 text-[11px] text-zinc-600">
+                  <label className="inline-flex cursor-pointer items-center gap-1.5 text-[11px] text-muted-foreground">
                     <input
                       type="checkbox"
-                      className="rounded border-zinc-300"
+                      className="rounded border-input text-foreground"
                       checked={filterByMapViewport}
                       onChange={(e) => setFilterByMapViewport(e.target.checked)}
                     />
@@ -541,14 +592,14 @@ export function ExploreClient() {
                   <button
                     type="button"
                     onClick={() => setMapCollapsed((v) => !v)}
-                    className="rounded-full border border-zinc-300 px-2 py-0.5 text-[11px] font-medium text-zinc-700 hover:bg-zinc-100"
+                    className="rounded-full border border-border px-2 py-0.5 text-[11px] font-medium text-foreground hover:bg-accent"
                   >
                     {mapCollapsed ? "지도 펼치기" : "지도 접기"}
                   </button>
                 </div>
               </div>
               {!mapCollapsed ? (
-                <div className="h-[65vh] lg:h-[80vh] overflow-hidden rounded-md border border-zinc-200">
+                <div className="h-[65vh] lg:h-[80vh] overflow-hidden rounded-md border border-border">
                   {true ? (
                     <APIProvider apiKey={mapsKey ?? ""}>
                       <Map
@@ -587,9 +638,9 @@ export function ExploreClient() {
                             }}
                             onCloseClick={closeMarkerInfo}
                           >
-                            <div className="max-w-xs space-y-2 text-xs text-zinc-900">
+                            <div className="max-w-xs space-y-2 text-xs text-foreground">
                               {selectedInfoWindow.item.images?.length ? (
-                                <div className="overflow-hidden rounded-md border border-zinc-200">
+                                <div className="overflow-hidden rounded-md border border-border">
                                   <ImageCarousel
                                     images={selectedInfoWindow.item.images.slice(0, 3)}
                                     height={120}
@@ -601,12 +652,12 @@ export function ExploreClient() {
                                   {selectedInfoWindow.item.title}
                                 </p>
                                 {selectedInfoWindow.item.description ? (
-                                  <p className="text-zinc-600">
+                                  <p className="text-muted-foreground">
                                     {selectedInfoWindow.item.description.slice(0, 50)}
                                     {selectedInfoWindow.item.description.length > 50 ? "…" : ""}
                                   </p>
                                 ) : null}
-                                <p className="text-zinc-500">
+                                <p className="text-muted-foreground">
                                   {selectedInfoWindow.item.priceMin != null &&
                                   selectedInfoWindow.item.priceMax != null
                                     ? `${selectedInfoWindow.item.priceMin.toLocaleString()} ~ ${selectedInfoWindow.item.priceMax.toLocaleString()}`
@@ -624,7 +675,7 @@ export function ExploreClient() {
                                   </button>
                                   <button
                                     type="button"
-                                    className="font-medium text-zinc-700 underline-offset-2 hover:underline"
+                                    className="font-medium text-foreground underline-offset-2 hover:underline"
                                     onClick={() => goToDetail(selectedInfoWindow.item)}
                                   >
                                     상세보기
@@ -637,7 +688,7 @@ export function ExploreClient() {
                       </Map>
                     </APIProvider>
                   ) : (
-                    <div className="flex h-full items-center justify-center text-sm text-zinc-600">
+                    <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
                       {t("map.missing_key")}
                     </div>
                   )}
@@ -645,43 +696,33 @@ export function ExploreClient() {
               ) : null}
             </div>
 
-          <section className={`${landing.surface} space-y-4 p-4 sm:p-6`}>
+          <section className={cn(explorePanelClass, "space-y-4")}>
             <div className="flex flex-wrap justify-end gap-3">
-              <button
-                type="button"
-                className={`${landing.btnPrimary} min-w-[140px]`}
-                onClick={applyFilters}
-                disabled={loading}
-              >
+              <Button type="button" className="min-w-[140px]" onClick={applyFilters} disabled={loading}>
                 {t("apply")}
-              </button>
-              <button
-                type="button"
-                className={`${landing.btnSecondary} min-w-[140px]`}
-                onClick={resetAllFilters}
-                disabled={loading}
-              >
+              </Button>
+              <Button type="button" variant="outline" className="min-w-[140px]" onClick={resetAllFilters} disabled={loading}>
                 {t("reset")}
-              </button>
+              </Button>
             </div>
             <div className="grid gap-6 md:grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(0,1.1fr)] lg:gap-8">
               <div className="grid gap-2">
-                <label className="text-xs font-medium text-zinc-600">
+                <label className="text-xs font-medium text-muted-foreground">
                   {t("search.label")}
                 </label>
                 <Input
                   placeholder={t("search.placeholder")}
                   value={draftFilters.q}
                   onChange={(e) => setDraftFilters((f) => ({ ...f, q: e.target.value }))}
-                  className="h-9 text-sm text-zinc-900 placeholder:text-zinc-500"
+                  className="h-9 text-sm"
                 />
               </div>
               <div className="grid gap-2">
-                <label className="text-xs font-medium text-zinc-600">
+                <label className="text-xs font-medium text-muted-foreground">
                   {t("filters.mediaType")}
                 </label>
                 <select
-                  className="h-9 w-full rounded-md border border-zinc-200 bg-white px-3 text-sm text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2"
+                  className={exploreSelectClass}
                   value={draftFilters.mediaType}
                   onChange={(e) => setDraftFilters((f) => ({ ...f, mediaType: e.target.value }))}
                 >
@@ -693,11 +734,11 @@ export function ExploreClient() {
                 </select>
               </div>
               <div className="grid gap-2">
-                <label className="text-xs font-medium text-zinc-600">
+                <label className="text-xs font-medium text-muted-foreground">
                   {isKo ? "정렬" : "Sort"}
                 </label>
                 <select
-                  className="h-9 w-full rounded-md border border-zinc-200 bg-white px-3 text-sm text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2"
+                  className={exploreSelectClass}
                   value={draftFilters.sort}
                   onChange={(e) => setDraftFilters((f) => ({ ...f, sort: e.target.value }))}
                 >
@@ -717,7 +758,7 @@ export function ExploreClient() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="grid gap-2">
-                  <label className="text-xs font-medium text-zinc-600">
+                  <label className="text-xs font-medium text-muted-foreground">
                     {t("filters.priceMin")}
                   </label>
                   <Input
@@ -725,11 +766,11 @@ export function ExploreClient() {
                     inputMode="numeric"
                     value={draftFilters.priceMin}
                     onChange={(e) => setDraftFilters((f) => ({ ...f, priceMin: e.target.value }))}
-                    className="h-9 text-sm text-zinc-900 placeholder:text-zinc-500"
+                    className="h-9 text-sm"
                   />
                 </div>
                 <div className="grid gap-2">
-                  <label className="text-xs font-medium text-zinc-600">
+                  <label className="text-xs font-medium text-muted-foreground">
                     {t("filters.priceMax")}
                   </label>
                   <Input
@@ -737,7 +778,7 @@ export function ExploreClient() {
                     inputMode="numeric"
                     value={draftFilters.priceMax}
                     onChange={(e) => setDraftFilters((f) => ({ ...f, priceMax: e.target.value }))}
-                    className="h-9 text-sm text-zinc-900 placeholder:text-zinc-500"
+                    className="h-9 text-sm"
                   />
                 </div>
               </div>
@@ -745,8 +786,8 @@ export function ExploreClient() {
             {error ? <p className="text-xs text-red-600">{error}</p> : null}
           </section>
           {/* Active filter chips */}
-          <div className="flex flex-wrap gap-2 text-xs text-zinc-600">
-            <span className="text-[11px] uppercase tracking-wide text-zinc-500">
+          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+            <span className="text-[11px] uppercase tracking-wide text-muted-foreground">
               {t("active_filters")}
             </span>
             {filters.mediaType !== "ALL" && (
@@ -758,7 +799,7 @@ export function ExploreClient() {
                 <button
                   type="button"
                   onClick={() => clearAppliedFilter("mediaType")}
-                  className="flex h-4 w-4 items-center justify-center rounded-full text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
+                  className="flex h-4 w-4 items-center justify-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
                   aria-label="Remove media type filter"
                 >
                   <X className="h-3 w-3" />
@@ -774,7 +815,7 @@ export function ExploreClient() {
                 <button
                   type="button"
                   onClick={() => clearAppliedFilter("size")}
-                  className="flex h-4 w-4 items-center justify-center rounded-full text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
+                  className="flex h-4 w-4 items-center justify-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
                   aria-label="Remove size filter"
                 >
                   <X className="h-3 w-3" />
@@ -800,7 +841,7 @@ export function ExploreClient() {
                     clearAppliedFilter("priceMin");
                     clearAppliedFilter("priceMax");
                   }}
-                  className="flex h-4 w-4 items-center justify-center rounded-full text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
+                  className="flex h-4 w-4 items-center justify-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
                   aria-label="Remove price filter"
                 >
                   <X className="h-3 w-3" />
@@ -816,7 +857,7 @@ export function ExploreClient() {
                 <button
                   type="button"
                   onClick={() => clearAppliedFilter("q")}
-                  className="flex h-4 w-4 items-center justify-center rounded-full text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
+                  className="flex h-4 w-4 items-center justify-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
                   aria-label="Remove search filter"
                 >
                   <X className="h-3 w-3" />
@@ -830,17 +871,27 @@ export function ExploreClient() {
               filters.priceMax.trim() ||
               filters.q.trim()
             ) && (
-              <span className="text-[11px] text-zinc-400">{t("none")}</span>
+              <span className="text-[11px] text-muted-foreground">{t("none")}</span>
             )}
           </div>
 
-            <div className={`${landing.surface} p-4 sm:p-6`}>
+            <div className={explorePanelClass}>
               <div className="flex flex-wrap items-end justify-between gap-3">
                 <div>
-                  <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50 lg:text-2xl">
+                  <h3
+                    className={cn(
+                      "text-xl font-semibold lg:text-2xl",
+                      isLight ? "text-zinc-900 dark:text-zinc-900" : "text-foreground",
+                    )}
+                  >
                     {t("results")}
                   </h3>
-                  <p className="mt-1 max-w-xl text-pretty text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 lg:text-base">
+                  <p
+                    className={cn(
+                      "mt-1 max-w-xl text-pretty text-sm leading-relaxed lg:text-base",
+                      isLight ? "text-zinc-600 dark:text-zinc-600" : "text-muted-foreground",
+                    )}
+                  >
                     {t("loaded", { count: items.length })}
                   </p>
                 </div>
@@ -931,7 +982,7 @@ export function ExploreClient() {
                       }}
                       role="button"
                       tabIndex={0}
-                      className={`h-full w-full cursor-pointer text-left ${landing.card}`}
+                      className={exploreMediaCardClass}
                     >
                       <div className="flex gap-3">
                         <label
@@ -943,7 +994,7 @@ export function ExploreClient() {
                             type="checkbox"
                             checked={compareIds.includes(item.id)}
                             onChange={() => toggleCompare(item.id)}
-                            className="mt-0.5 h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-400"
+                            className="mt-0.5 h-4 w-4 rounded border-input text-foreground focus:ring-ring"
                             aria-label="비교 목록에 담기"
                           />
                         </label>
@@ -952,13 +1003,13 @@ export function ExploreClient() {
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-3">
-                            <p className="truncate font-medium">{item.title}</p>
-                            <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-700">
+                            <p className="truncate font-medium text-foreground">{item.title}</p>
+                            <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
                               {item.mediaType}
                             </span>
                           </div>
-                          <p className="mt-1 line-clamp-2 text-sm text-zinc-600">{item.description}</p>
-                          <p className="mt-2 truncate text-xs text-zinc-500">
+                          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{item.description}</p>
+                          <p className="mt-2 truncate text-xs text-muted-foreground">
                             {ll?.address ? ll.address : "—"} ·{" "}
                             {item.priceMin != null && item.priceMax != null
                               ? `${item.priceMin.toLocaleString()} ~ ${item.priceMax.toLocaleString()}`
@@ -966,7 +1017,7 @@ export function ExploreClient() {
                             {item.size ? ` · ${item.size}` : ""}
                           </p>
                           <div
-                            className="mt-2 flex flex-wrap items-center justify-end gap-2 border-t border-zinc-100 pt-2"
+                            className="mt-2 flex flex-wrap items-center justify-end gap-2 border-t border-border pt-2"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <button
@@ -987,9 +1038,9 @@ export function ExploreClient() {
                 })}
 
                 {items.length === 0 && !loading ? (
-                  <div className="py-16 text-center text-sm text-zinc-600">
+                  <div className="py-16 text-center text-sm text-muted-foreground">
                     <p>{t("no_results")}</p>
-                    <p className="mt-1 text-xs text-zinc-500">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       탐색에는 <strong>발행(Published)</strong>된 매체만 보입니다. AI/수동 업로드 직후는 초안(Draft)이라
                       목록에 안 나올 수 있어요 — Admin → 매체에서 발행하거나, 데모 매체를 만들어 보세요.
                     </p>
@@ -997,13 +1048,13 @@ export function ExploreClient() {
                 ) : null}
 
                 {loading && (
-                  <div className="py-4 text-center text-xs text-zinc-500">
+                  <div className="py-4 text-center text-xs text-muted-foreground">
                     Loading more results...
                   </div>
                 )}
 
                 {!loading && items.length > 0 && !nextCursor ? (
-                  <div className="py-4 text-center text-xs text-zinc-400">
+                  <div className="py-4 text-center text-xs text-muted-foreground">
                     {t("no_more_results")}
                   </div>
                 ) : null}
@@ -1025,13 +1076,18 @@ export function ExploreClient() {
           }}
         >
           <div
-            className="w-full max-w-2xl rounded-lg bg-white p-6"
+            className={cn(
+              "w-full max-w-2xl rounded-lg border border-border bg-card p-6 text-card-foreground shadow-lg",
+              isLight &&
+                "border-zinc-200 bg-white shadow-lg shadow-zinc-200/40 dark:border-zinc-200 dark:bg-white " +
+                  exploreLightChromeText,
+            )}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
-                <h3 className="truncate text-xl font-semibold">{selected.title}</h3>
-                <p className="mt-1 text-sm text-zinc-600">{selected.mediaType}</p>
+                <h3 className="truncate text-xl font-semibold text-foreground">{selected.title}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">{selected.mediaType}</p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <button
@@ -1078,28 +1134,28 @@ export function ExploreClient() {
               </div>
             </div>
 
-            <p className="mt-4 whitespace-pre-wrap text-sm text-zinc-800">{selected.description}</p>
+            <p className="mt-4 whitespace-pre-wrap text-sm text-foreground">{selected.description}</p>
 
             <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-              <div className="rounded-md border border-zinc-200 p-3">
-                <p className="text-xs text-zinc-500">{t("modal.location")}</p>
-                <p className="mt-1">{getLatLng(selected.location)?.address ?? "—"}</p>
+              <div className="rounded-md border border-border p-3">
+                <p className="text-xs text-muted-foreground">{t("modal.location")}</p>
+                <p className="mt-1 text-foreground">{getLatLng(selected.location)?.address ?? "—"}</p>
               </div>
-              <div className="rounded-md border border-zinc-200 p-3">
-                <p className="text-xs text-zinc-500">{t("modal.price")}</p>
-                <p className="mt-1">
+              <div className="rounded-md border border-border p-3">
+                <p className="text-xs text-muted-foreground">{t("modal.price")}</p>
+                <p className="mt-1 text-foreground">
                   {selected.priceMin != null && selected.priceMax != null
                     ? `${selected.priceMin.toLocaleString()} ~ ${selected.priceMax.toLocaleString()}`
                     : "—"}
                 </p>
               </div>
-              <div className="rounded-md border border-zinc-200 p-3">
-                <p className="text-xs text-zinc-500">{t("modal.size")}</p>
-                <p className="mt-1">{selected.size ?? "—"}</p>
+              <div className="rounded-md border border-border p-3">
+                <p className="text-xs text-muted-foreground">{t("modal.size")}</p>
+                <p className="mt-1 text-foreground">{selected.size ?? "—"}</p>
               </div>
-              <div className="rounded-md border border-zinc-200 p-3">
-                <p className="text-xs text-zinc-500">{t("modal.images")}</p>
-                <p className="mt-1">{t("modal.files", { count: selected.images?.length ?? 0 })}</p>
+              <div className="rounded-md border border-border p-3">
+                <p className="text-xs text-muted-foreground">{t("modal.images")}</p>
+                <p className="mt-1 text-foreground">{t("modal.files", { count: selected.images?.length ?? 0 })}</p>
               </div>
             </div>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { Loader2 } from "lucide-react";
 
@@ -10,12 +10,16 @@ function isOnboardingPath(path: string | null): boolean {
   return (
     path.includes("/onboarding") ||
     path.includes("/sign-in") ||
-    path.includes("/sign-up")
+    path.includes("/sign-up") ||
+    path.includes("/login") ||
+    path.includes("/signup")
   );
 }
 
 export function OnboardingGate({ children }: { children: React.ReactNode }) {
-  const { isLoaded, isSignedIn } = useAuth();
+  const { status } = useSession();
+  const isLoaded = status !== "loading";
+  const isSignedIn = status === "authenticated";
   const pathname = usePathname();
   const router = useRouter();
   const [showApp, setShowApp] = React.useState(false);

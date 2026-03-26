@@ -182,8 +182,8 @@ export function MediaOwnerManualRegistrationForm() {
         return;
       }
       toast.success("등록 신청이 완료되었습니다.", {
-        description: "관리자 승인 대기(PENDING) 상태입니다. 검토 화면에서 내용을 다듬을 수 있습니다.",
-        duration: 6000,
+        description: "검토 화면에서 내용을 다듬을 수 있습니다.",
+        duration: 5000,
       });
       if (data.mediaId) {
         router.push(`/${locale}/dashboard/media-owner/medias/${data.mediaId}/review`);
@@ -509,11 +509,11 @@ export function MediaOwnerManualRegistrationForm() {
             제출 중…
           </>
         ) : (
-          "등록 신청 (승인 대기)"
+          "등록 신청"
         )}
       </Button>
       <p className="text-xs text-zinc-500">
-        제출 시 상태는 PENDING이며, 관리자 승인 후 공개(PUBLISHED)됩니다.
+        제출 시 관리자 검토 후 승인 시 공개됩니다.
       </p>
     </form>
   );

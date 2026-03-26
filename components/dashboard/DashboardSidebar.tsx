@@ -62,7 +62,11 @@ function getMenu(role: DashboardSidebarRole): NavItem[] {
   return [
     { label: "홈", href: "/dashboard/advertiser", icon: LayoutDashboard },
     { label: "성과 보기", href: "/dashboard/performance", icon: Activity },
-    { label: "AI 추천 받기", href: "/dashboard/advertiser/recommend", icon: Sparkles },
+    {
+      label: "AI 추천 받기",
+      href: "/dashboard/advertiser/recommendations",
+      icon: Sparkles,
+    },
     { label: "미디어 탐색", href: "/dashboard/advertiser/explore", icon: Map },
     { label: "내 문의함", href: "/dashboard/advertiser/inquiries", icon: Inbox },
     { label: "내 캠페인", comingSoon: true, icon: BriefcaseBusiness },

@@ -7,6 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { ExploreApiItem } from "@/lib/explore/explore-item";
 import { cn } from "@/lib/utils";
+import {
+  convertCurrency,
+  formatCurrency,
+  type SupportedCurrency,
+} from "@/lib/currency";
 
 type Props = {
   open: boolean;
@@ -14,6 +19,7 @@ type Props = {
   items: ExploreApiItem[];
   onInquiry: (item: ExploreApiItem) => void;
   onBulkInquiry?: (items: ExploreApiItem[]) => void;
+  currency: SupportedCurrency;
 };
 
 function getAddress(loc: unknown): string {
@@ -44,9 +50,10 @@ function getLocationParts(loc: unknown): {
   };
 }
 
-function formatKrw(v: number | null): string {
+function formatMoney(v: number | null, currency: SupportedCurrency, locale: string): string {
   if (v == null) return "—";
-  return `${v.toLocaleString()}원`;
+  const converted = convertCurrency(v, "KRW", currency);
+  return formatCurrency(converted, currency, locale === "ko" ? "ko-KR" : "en-US");
 }
 
 function formatDateText(v: string, locale: string): string {
@@ -69,6 +76,7 @@ export function CompareModal({
   items,
   onInquiry,
   onBulkInquiry,
+  currency,
 }: Props) {
   const tv = useTranslations("explore.v2.compare.modal");
   const locale = useLocale();
@@ -149,7 +157,7 @@ export function CompareModal({
           <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-900">
             <p className="text-[11px] text-zinc-500">{isKo ? "최저 월 예산" : "Lowest monthly budget"}</p>
             <p className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-              {formatKrw(lowestPrice)}
+              {formatMoney(lowestPrice, currency, locale)}
             </p>
           </div>
           <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-900">
@@ -229,7 +237,9 @@ export function CompareModal({
                       >
                         <p className="text-xs">
                           <span className="text-zinc-500">{isKo ? "월 비용" : "Monthly"}:</span>{" "}
-                          <span className="font-medium">{formatKrw(it.priceMin)}</span>
+                          <span className="font-medium">
+                            {formatMoney(it.priceMin, currency, locale)}
+                          </span>
                           {lowestPriceValue != null && it.priceMin === lowestPriceValue ? (
                             <Badge className="ml-1 bg-emerald-600 text-white">
                               {isKo ? "최저가" : "Best price"}
@@ -238,7 +248,9 @@ export function CompareModal({
                         </p>
                         <p className="text-xs">
                           <span className="text-zinc-500">{isKo ? "상한 비용" : "Upper"}:</span>{" "}
-                          <span className="font-medium">{formatKrw(it.priceMax)}</span>
+                          <span className="font-medium">
+                            {formatMoney(it.priceMax, currency, locale)}
+                          </span>
                         </p>
                         <p className="text-xs">
                           <span className="text-zinc-500">{isKo ? "규격" : "Size"}:</span>{" "}
@@ -272,7 +284,7 @@ export function CompareModal({
                         <p className="text-xs">
                           <span className="text-zinc-500">{isKo ? "예산 효율" : "Cost efficiency"}:</span>{" "}
                           {it.priceMin != null && dailyExposureParsed
-                            ? `${Math.round(it.priceMin / dailyExposureParsed).toLocaleString()} ${isKo ? "원/노출" : "KRW/exposure"}`
+                            ? `${Math.round(convertCurrency(it.priceMin, "KRW", currency) / dailyExposureParsed).toLocaleString()} ${currency}/exposure`
                             : "—"}
                         </p>
                       </div>

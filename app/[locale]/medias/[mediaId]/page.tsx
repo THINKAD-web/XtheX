@@ -1,13 +1,24 @@
 import Link from "next/link";
-import { SiteHeader } from "@/components/layout/SiteHeader";
+import { cookies } from "next/headers";
+import { getTranslations } from "next-intl/server";
+import { AppSiteChrome } from "@/components/layout/AppSiteChrome";
+import { appMainContainerClass } from "@/lib/layout/app-chrome";
+import { landing } from "@/lib/landing-theme";
 import { prisma } from "@/lib/prisma";
 import { OmnichannelTrigger } from "@/components/campaign/OmnichannelTrigger";
+import { SaveInterestButton } from "@/components/medias/SaveInterestButton";
 import { MediaGallery } from "@/components/medias/MediaGallery";
 import { MediaCaseStudies } from "@/components/medias/MediaCaseStudies";
 import { ViewCountTracker } from "@/components/medias/ViewCountTracker";
 import { MediaCreativeHints } from "@/components/hints/MediaCreativeHints";
 import { getSimilarMediasForMedia } from "@/lib/medias/similar";
 import { SimilarBundleSection } from "@/components/medias/SimilarBundleSection";
+import {
+  convertCurrency,
+  formatCurrency,
+  isSupportedCurrency,
+  type SupportedCurrency,
+} from "@/lib/currency";
 
 const isVideoUrl = (url: string) =>
   /\.(mp4|webm|mov|m4v)$/i.test(url) || url.includes("youtube.com") || url.includes("youtu.be");
@@ -28,20 +39,28 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
   const { locale, mediaId } = await params;
   const sp = (await searchParams) ?? {};
   const isKo = locale === "ko";
+  const t = await getTranslations("publicMediaDetail");
+  const cookieStore = await cookies();
+  const cookieCurrency = cookieStore.get("xthex_currency")?.value ?? "";
+  const displayCurrency: SupportedCurrency = isSupportedCurrency(cookieCurrency)
+    ? cookieCurrency
+    : isKo
+      ? "KRW"
+      : "USD";
 
   if (!isMediaUuid(mediaId)) {
     return (
-      <div className="min-h-screen bg-black px-4 py-12 text-zinc-100">
-        <div className="mx-auto max-w-3xl">
-          <p className="text-sm text-zinc-500">공개된 매체를 찾을 수 없습니다.</p>
+      <AppSiteChrome mainClassName="min-h-[calc(100vh-3.5rem)] bg-zinc-950 text-zinc-50">
+        <div className={`${appMainContainerClass} max-w-3xl py-12`}>
+          <p className="text-sm text-zinc-500">{t("not_found")}</p>
           <Link
             href={`/${locale}/explore`}
             className="mt-4 inline-flex text-sm text-orange-400 hover:underline"
           >
-            ← 탐색 페이지로 돌아가기
+            ← {t("back_to_explore")}
           </Link>
         </div>
-      </div>
+      </AppSiteChrome>
     );
   }
 
@@ -69,17 +88,17 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
 
   if (!media || media.status !== "PUBLISHED") {
     return (
-      <div className="min-h-screen bg-black px-4 py-12 text-zinc-100">
-        <div className="mx-auto max-w-3xl">
-          <p className="text-sm text-zinc-500">공개된 매체를 찾을 수 없습니다.</p>
+      <AppSiteChrome mainClassName="min-h-[calc(100vh-3.5rem)] bg-zinc-950 text-zinc-50">
+        <div className={`${appMainContainerClass} max-w-3xl py-12`}>
+          <p className="text-sm text-zinc-500">{t("not_found")}</p>
           <Link
             href={`/${locale}/explore`}
             className="mt-4 inline-flex text-sm text-orange-400 hover:underline"
           >
-            ← 탐색 페이지로 돌아가기
+            ← {t("back_to_explore")}
           </Link>
         </div>
-      </div>
+      </AppSiteChrome>
     );
   }
 
@@ -116,6 +135,19 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
 
   const inquiryStatus =
     typeof sp.inquiry === "string" ? sp.inquiry : undefined;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://xthex.com";
+  const pageUrl = `${appUrl}/${locale}/medias/${media.id}`;
+  const shareText = encodeURIComponent(`${media.mediaName} - XtheX`);
+  const shareUrl = encodeURIComponent(pageUrl);
+  const xShare = `https://x.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
+  const linkedInShare = `https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`;
+  const kakaoShare = `https://story.kakao.com/share?url=${shareUrl}`;
+  const convertedPrice =
+    media.price != null ? convertCurrency(media.price, "KRW", displayCurrency) : null;
+  const displayPriceLabel =
+    convertedPrice == null
+      ? t("price_on_request")
+      : formatCurrency(convertedPrice, displayCurrency, isKo ? "ko-KR" : "en-US");
 
   const similarEffectMedias = await getSimilarMediasForMedia({
     id: media.id,
@@ -126,12 +158,10 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
   });
 
   return (
-    <>
-      <SiteHeader />
+    <AppSiteChrome mainClassName="min-h-[calc(100vh-3.5rem)] bg-zinc-950 text-zinc-50">
       <ViewCountTracker mediaId={media.id} />
-      <div className="min-h-screen bg-zinc-950 pt-14 text-zinc-50">
-        {/* Hero */}
-        <section className="relative overflow-hidden border-b border-zinc-900 bg-gradient-to-b from-zinc-950 via-zinc-950 to-zinc-900">
+      {/* Hero */}
+      <section className="relative overflow-hidden border-b border-zinc-900 bg-gradient-to-b from-zinc-950 via-zinc-950 to-zinc-900">
           <div className="absolute inset-0 opacity-40">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_#f97316_0,_transparent_55%)]" />
             <img
@@ -140,25 +170,23 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
               className="h-full w-full object-cover mix-blend-overlay blur-sm"
             />
           </div>
-          <div className="relative mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 lg:flex-row lg:items-end">
+          <div className={`relative ${landing.container} flex flex-col gap-6 py-10 lg:flex-row lg:items-end`}>
             {inquiryStatus === "ok" && (
               <div className="absolute left-4 right-4 top-2 z-10 mx-auto max-w-4xl rounded-full border border-emerald-400/60 bg-emerald-500/15 px-4 py-2 text-center text-xs text-emerald-100 backdrop-blur-md">
                 {isKo
-                  ? "문의가 접수되었습니다. 관리자 화면에서 테스트용 문의를 확인할 수 있습니다."
-                  : "Your inquiry has been recorded. It is stored for testing in the admin console."}
+                  ? t("inquiry_ok")
+                  : t("inquiry_ok")}
               </div>
             )}
             {inquiryStatus === "error" && (
               <div className="absolute left-4 right-4 top-2 z-10 mx-auto max-w-4xl rounded-full border border-red-400/60 bg-red-500/10 px-4 py-2 text-center text-xs text-red-100 backdrop-blur-md">
-                {isKo
-                  ? "문의 전송 중 오류가 발생했습니다. 필수 항목을 다시 확인해 주세요."
-                  : "There was an error sending your inquiry. Please check required fields and try again."}
+                {t("inquiry_error")}
               </div>
             )}
             <div className="flex-1 space-y-4">
               <div className="flex items-center gap-2 text-xs text-zinc-400">
                 <Link href={`/${locale}/explore`} className="hover:text-orange-400">
-                  {isKo ? "탐색" : "Explore"}
+                  {t("explore")}
                 </Link>
                 <span>/</span>
                 <span className="uppercase tracking-wide text-orange-400">
@@ -189,37 +217,29 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
                 )}
                 {inquiryCount > 0 && (
                   <span className="ml-1 rounded-full bg-zinc-900/80 px-3 py-1 text-[11px] font-medium text-zinc-200 ring-1 ring-zinc-700">
-                    {isKo
-                      ? `문의 ${inquiryCount}건`
-                      : inquiryCount === 1
-                        ? "1 inquiry"
-                        : `${inquiryCount} inquiries`}
+                    {t("inquiry_count", { count: inquiryCount })}
                   </span>
                 )}
               </div>
             </div>
             <div className="w-full max-w-xs space-y-3 rounded-2xl bg-zinc-900/80 p-4 backdrop-blur-md ring-1 ring-zinc-800">
               <p className="text-xs uppercase tracking-wide text-zinc-500">
-                {isKo ? "Summary" : "Summary"}
+                {t("summary")}
               </p>
               <div className="space-y-1 text-sm">
                 <p className="text-zinc-200">
-                  {location.address ?? (isKo ? "주소 정보 없음" : "No address")}
+                  {location.address ?? t("no_address")}
                   {location.district ? ` · ${location.district}` : ""}
                 </p>
                 <p className="text-zinc-400">
-                  {media.price != null
-                    ? `${media.price.toLocaleString()}${isKo ? "원" : " KRW"}`
-                    : isKo
-                      ? "가격 협의"
-                      : "Price on request"}
+                  {displayPriceLabel}
                   {media.cpm != null
                     ? ` · CPM ${media.cpm.toLocaleString()}${isKo ? "원" : " KRW"}`
                     : ""}
                 </p>
                 {media.targetAudience && (
                   <p className="text-xs text-zinc-400">
-                    {isKo ? "타깃" : "Audience"}: {media.targetAudience}
+                    {t("audience")}: {media.targetAudience}
                   </p>
                 )}
               </div>
@@ -236,8 +256,16 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
                 href={`/${locale}/medias/${media.id}/contact`}
                 className="mt-2 flex w-full items-center justify-center rounded-full bg-orange-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-orange-400"
               >
-                {isKo ? "이 매체로 문의하기" : "Contact about this media"}
+                {t("contact_this_media")}
               </Link>
+              <SaveInterestButton
+                mediaId={media.id}
+                mediaName={media.mediaName}
+                labels={{
+                  save: isKo ? "관심 미디어로 저장" : "Save as Interested Media",
+                  saved: isKo ? "관심 미디어에 저장됨" : "Saved to Interested Media",
+                }}
+              />
               <div className="mt-2">
                 <OmnichannelTrigger mediaId={media.id} locale={locale} />
               </div>
@@ -246,35 +274,59 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
                   href={`/${locale}/explore?center=${location.lat ?? 37.5665},${location.lng ?? 126.978}&zoom=15`}
                   className="flex w-full items-center justify-center rounded-full border border-zinc-700 px-4 py-2 text-xs font-medium text-zinc-100 hover:bg-zinc-800"
                 >
-                  {isKo ? "매체 지도에서 보기" : "View on map"}
+                  {t("view_on_map")}
                 </Link>
                 <Link
                   href={`/${locale}/explore`}
                   className="flex w-full items-center justify-center rounded-full border border-zinc-800 px-4 py-2 text-xs font-medium text-zinc-300 hover:bg-zinc-800/80"
                 >
-                  {isKo ? "다른 매체 둘러보기" : "Browse other media"}
+                  {t("browse_other_media")}
                 </Link>
+                <a
+                  href={xShare}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex w-full items-center justify-center rounded-full border border-zinc-800 px-4 py-2 text-xs font-medium text-zinc-300 hover:bg-zinc-800/80"
+                >
+                  {t("share_x")}
+                </a>
+                <a
+                  href={linkedInShare}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex w-full items-center justify-center rounded-full border border-zinc-800 px-4 py-2 text-xs font-medium text-zinc-300 hover:bg-zinc-800/80"
+                >
+                  {t("share_linkedin")}
+                </a>
+                <a
+                  href={kakaoShare}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex w-full items-center justify-center rounded-full border border-zinc-800 px-4 py-2 text-xs font-medium text-zinc-300 hover:bg-zinc-800/80"
+                >
+                  {t("share_kakao")}
+                </a>
               </div>
             </div>
           </div>
-        </section>
+      </section>
 
-        {/* Body */}
-        <section className="mx-auto max-w-6xl px-4 py-10">
+      {/* Body */}
+      <section className={`${landing.container} py-10`}>
           <div className="grid gap-10 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1.1fr)]">
             {/* Left column – editorial blocks */}
             <div className="space-y-8">
               <article className="space-y-4">
                 <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
-                  {isKo ? "Location & Audience" : "Location & Audience"}
+                  {t("location_audience")}
                 </h2>
                 <div className="grid gap-4 text-sm md:grid-cols-2">
                   <div className="rounded-2xl bg-zinc-900/80 p-4 ring-1 ring-zinc-800">
                     <p className="text-xs text-zinc-500">
-                      {isKo ? "위치" : "Location"}
+                      {t("location")}
                     </p>
                     <p className="mt-1 text-sm text-zinc-100">
-                      {location.address ?? (isKo ? "주소 정보 없음" : "No address")}
+                      {location.address ?? t("no_address")}
                     </p>
                     {location.district && (
                       <p className="mt-0.5 text-xs text-zinc-500">{location.district}</p>
@@ -282,10 +334,10 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
                   </div>
                   <div className="rounded-2xl bg-zinc-900/80 p-4 ring-1 ring-zinc-800">
                     <p className="text-xs text-zinc-500">
-                      {isKo ? "타깃" : "Audience"}
+                      {t("audience")}
                     </p>
                     <p className="mt-1 text-sm text-zinc-100">
-                      {media.targetAudience ?? (isKo ? "타깃 정보 없음" : "No audience info")}
+                      {media.targetAudience ?? t("no_audience_info")}
                     </p>
                   </div>
                 </div>
@@ -293,32 +345,32 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
 
               <article className="space-y-4">
                 <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
-                  {isKo ? "Performance" : "Performance"}
+                  {t("performance")}
                 </h2>
                 <div className="rounded-2xl bg-zinc-900/80 p-4 ring-1 ring-zinc-800">
                   <p className="text-xs text-zinc-500">
-                    {isKo ? "노출 · 트래픽" : "Impressions & traffic"}
+                    {t("impressions_traffic")}
                   </p>
                   <ul className="mt-2 space-y-1 text-xs text-zinc-300">
                     {exposure.daily_traffic && (
                       <li>
-                        {isKo ? "일일 유동인구" : "Daily traffic"}: {exposure.daily_traffic}
+                        {t("daily_traffic")}: {exposure.daily_traffic}
                       </li>
                     )}
                     {exposure.monthly_impressions && (
                       <li>
-                        {isKo ? "월 노출 수" : "Monthly impressions"}:{" "}
+                        {t("monthly_impressions")}:{" "}
                         {exposure.monthly_impressions}
                       </li>
                     )}
                     {exposure.reach && (
                       <li>
-                        {isKo ? "도달률" : "Reach"}: {exposure.reach}
+                        {t("reach")}: {exposure.reach}
                       </li>
                     )}
                     {exposure.frequency && (
                       <li>
-                        {isKo ? "빈도" : "Frequency"}: {exposure.frequency}
+                        {t("frequency")}: {exposure.frequency}
                       </li>
                     )}
                     {!exposure.daily_traffic &&
@@ -326,7 +378,7 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
                       !exposure.reach &&
                       !exposure.frequency && (
                         <li>
-                          {isKo ? "노출 데이터가 없습니다." : "No performance data available."}
+                          {t("no_performance_data")}
                         </li>
                       )}
                   </ul>
@@ -335,25 +387,25 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
 
               <article className="space-y-4">
                 <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
-                  {isKo ? "Editorial Notes" : "Editorial Notes"}
+                  {t("editorial_notes")}
                 </h2>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="rounded-2xl bg-emerald-500/5 p-4 ring-1 ring-emerald-500/30">
                     <p className="text-xs font-semibold text-emerald-300">
-                      {isKo ? "장점" : "Strengths"}
+                      {t("strengths")}
                     </p>
                     <p className="mt-2 text-xs text-emerald-100">
                       {media.pros ??
-                        (isKo ? "등록된 장점이 없습니다." : "No strengths registered.")}
+                        t("no_strengths")}
                     </p>
                   </div>
                   <div className="rounded-2xl bg-amber-500/5 p-4 ring-1 ring-amber-500/30">
                     <p className="text-xs font-semibold text-amber-300">
-                      {isKo ? "유의사항" : "Cautions"}
+                      {t("cautions")}
                     </p>
                     <p className="mt-2 text-xs text-amber-100">
                       {media.cons ??
-                        (isKo ? "등록된 유의사항이 없습니다." : "No cautions registered.")}
+                        t("no_cautions")}
                     </p>
                   </div>
                 </div>
@@ -364,7 +416,7 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
               {similarMedias.length > 0 && (
                 <article className="space-y-4">
                   <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
-                    {isKo ? "비슷한 매체" : "Similar media"}
+                    {t("similar_media")}
                   </h2>
                   <div className="grid gap-4 sm:grid-cols-2">
                     {similarMedias.map((m) => {
@@ -388,7 +440,7 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
                           </div>
                           <div className="mt-3 flex items-center justify-between text-[11px] text-zinc-500">
                             <span className="truncate">
-                              {loc.address ?? (isKo ? "주소 정보 없음" : "No address")}
+                              {loc.address ?? t("no_address")}
                             </span>
                             {m.price != null && (
                               <span className="ml-2 flex-shrink-0 font-medium text-zinc-200">
@@ -455,9 +507,8 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
               )}
             </aside>
           </div>
-        </section>
-      </div>
-    </>
+      </section>
+    </AppSiteChrome>
   );
 }
 

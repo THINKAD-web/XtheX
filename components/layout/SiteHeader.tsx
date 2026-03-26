@@ -1,13 +1,16 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { CurrencySwitcher } from "@/components/CurrencySwitcher";
 import { AuthNav } from "@/components/auth/auth-nav";
 import { landing } from "@/lib/landing-theme";
+import { getLocale } from "next-intl/server";
 
 /**
  * 홈·탐색 등과 동일한 상단 헤더 (고정, h-14).
  */
 export async function SiteHeader() {
+  const locale = await getLocale();
   const tNav = await getTranslations("nav");
   const tExplore = await getTranslations("explore");
   const tFooter = await getTranslations("home.footer");
@@ -52,6 +55,7 @@ export async function SiteHeader() {
         </nav>
         <div className="justify-self-end flex shrink-0 items-center gap-2 sm:gap-3">
           <LanguageSwitcher />
+          <CurrencySwitcher locale={locale} label={tNav("currency")} />
           <AuthNav
             signInLabel={tNav("sign_in")}
             signUpLabel={tNav("sign_up")}

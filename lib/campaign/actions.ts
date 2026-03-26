@@ -9,6 +9,8 @@ export type SaveCampaignDraftInput = {
   channelWeb: boolean;
   channelMobile: boolean;
   name?: string;
+  campaignPeriod?: string;
+  totalBudgetRaw?: string;
 };
 
 export type SaveCampaignDraftResult =
@@ -21,7 +23,7 @@ export type SaveCampaignDraftResult =
 export async function saveCampaignDraft(
   input: SaveCampaignDraftInput,
 ): Promise<SaveCampaignDraftResult> {
-  const { channelDooh, channelWeb, channelMobile, mediaIds, name } = input;
+  const { channelDooh, channelWeb, channelMobile, mediaIds, name, campaignPeriod, totalBudgetRaw } = input;
   const selected = [
     channelDooh && "DOOH",
     channelWeb && "Web",
@@ -44,10 +46,17 @@ export async function saveCampaignDraft(
     userId = user?.id ?? null;
   }
 
+  const parsedBudgetDigits = String(totalBudgetRaw ?? "").replace(/[^\d]/g, "");
+  const totalBudgetKrw =
+    parsedBudgetDigits.length > 0 ? Number.parseInt(parsedBudgetDigits, 10) : null;
+
   const draft = await (prisma as any).campaignDraft.create({
     data: {
       userId,
       name: name?.trim() || null,
+      campaignPeriod: campaignPeriod?.trim() || null,
+      totalBudgetRaw: totalBudgetRaw?.trim() || null,
+      totalBudgetKrw: Number.isFinite(totalBudgetKrw) ? totalBudgetKrw : null,
       channelDooh,
       channelWeb,
       channelMobile,

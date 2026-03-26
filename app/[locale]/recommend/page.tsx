@@ -8,5 +8,5 @@ export const dynamic = "force-dynamic";
 /** 레거시 `/recommend` → 권장 경로로 통일 */
 export default async function RecommendRedirectPage() {
   await gateAdvertiserDashboard();
-  redirect(await getLocalizedPath("/dashboard/advertiser/recommend"));
+  redirect(await getLocalizedPath("/dashboard/advertiser/recommendations"));
 }

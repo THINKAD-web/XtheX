@@ -15,6 +15,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Link } from "@/i18n/navigation";
 import type { ExploreApiItem } from "@/lib/explore/explore-item";
+import { usePreferredCurrency } from "@/components/usePreferredCurrency";
+import { convertCurrency, formatCurrency } from "@/lib/currency";
 
 const schema = z.object({
   message: z.string().min(5).max(8000),
@@ -56,6 +58,7 @@ export function InquiryModal({
 }: Props) {
   const t = useTranslations("explore.v2.inquiry");
   const { data: session, status } = useSession();
+  const preferredCurrency = usePreferredCurrency(locale);
   const [submitting, setSubmitting] = React.useState(false);
 
   const {
@@ -97,6 +100,10 @@ export function InquiryModal({
     try {
       const budget =
         typeof values.budget === "number" && !Number.isNaN(values.budget)
+          ? Math.round(convertCurrency(values.budget, preferredCurrency, "KRW"))
+          : undefined;
+      const inputBudget =
+        typeof values.budget === "number" && !Number.isNaN(values.budget)
           ? values.budget
           : undefined;
 
@@ -124,7 +131,12 @@ export function InquiryModal({
         }
       }
 
-      toast.success(t("toast_ok"));
+      toast.success(t("toast_ok"), {
+        description:
+          budget != null && inputBudget != null
+            ? `${formatCurrency(inputBudget, preferredCurrency, locale === "ko" ? "ko-KR" : "en-US")} → ${formatCurrency(budget, "KRW", "ko-KR")} (KRW 저장)`
+            : undefined,
+      });
       onClose();
     } catch (e) {
       toast.error(t("toast_error"), {
@@ -195,13 +207,14 @@ export function InquiryModal({
                 <Input id="inq-period" {...register("desiredPeriod")} placeholder={t("desired_period_ph")} />
               </div>
               <div className="space-y-1">
-                <Label htmlFor="inq-budget">{t("budget_krw")}</Label>
+                <Label htmlFor="inq-budget">{`${t("budget_krw")} (${preferredCurrency})`}</Label>
                 <Input
                   id="inq-budget"
                   type="number"
                   min={0}
                   step={100000}
                   {...register("budget")}
+                  placeholder={preferredCurrency === "JPY" ? "1000000" : "10000"}
                 />
               </div>
             </div>

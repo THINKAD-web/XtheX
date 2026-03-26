@@ -49,7 +49,7 @@ export function MediaOwnerAiUploadForm() {
       }
 
       toast.success("등록 신청이 완료되었습니다.", {
-        description: "관리자 승인 대기(PENDING) 상태로 저장되었습니다.",
+        description: "관리자 검토 대기 상태로 저장되었습니다.",
       });
 
       if (data.firstMediaId) {
@@ -72,7 +72,7 @@ export function MediaOwnerAiUploadForm() {
   return (
     <div className="space-y-4 rounded-2xl border border-emerald-500/30 bg-zinc-950/80 p-5">
       <p className="text-sm text-zinc-300">
-        제안서를 업로드하면 AI가 필드를 자동 추출하고, 바로 검토/수정 가능한 등록 초안을 생성합니다.
+        업로드 시 AI가 필드를 추출하고, 검토 화면에서 수정할 수 있습니다.
       </p>
       <UploadDropzone files={files} onFilesChange={setFiles} disabled={pending} />
       <div className="flex items-center gap-2">

@@ -97,11 +97,7 @@ export function MediaOwnerRegistrationHub({
             직접 등록하기
           </h2>
           <p className="mt-2 flex-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-            매체명·위치·가격·사양·유동인구·효과 지표·이미지까지 직접 입력합니다. 제출 후{" "}
-            <span className="font-semibold text-blue-700 dark:text-blue-300">
-              관리자 승인(PENDING)
-            </span>
-            을 거쳐 공개됩니다.
+            직접 입력 후 제출하면 관리자 검토를 거쳐 공개됩니다.
           </p>
           <span className="mt-4 text-sm font-semibold text-blue-700 group-hover:underline dark:text-blue-300">
             상세 폼 열기 →
@@ -123,11 +119,7 @@ export function MediaOwnerRegistrationHub({
             AI 제안서 업로드로 등록하기
           </h2>
           <p className="mt-2 flex-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-            제안서 PDF를 업로드하면 AI가 필드를 추출합니다. 이후 검토 화면에서 수정·확인 후 제출하면{" "}
-            <span className="font-semibold text-emerald-700 dark:text-emerald-300">
-              승인 대기(PENDING)
-            </span>
-            상태로 접수됩니다.
+            AI 추출 후 검토·제출 시 관리자 검토 대기로 접수됩니다.
           </p>
           <span className="mt-4 text-sm font-semibold text-emerald-800 group-hover:underline dark:text-emerald-300">
             업로드 시작 →

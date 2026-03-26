@@ -17,6 +17,12 @@ import type { ExploreApiItem } from "@/lib/explore/explore-item";
 import { cn } from "@/lib/utils";
 import { Link } from "@/i18n/navigation";
 import { toast } from "sonner";
+import { usePreferredCurrency } from "@/components/usePreferredCurrency";
+import {
+  convertCurrency,
+  formatCurrency,
+  type SupportedCurrency,
+} from "@/lib/currency";
 
 const ExploreLeafletMap = dynamic(
   () =>
@@ -49,38 +55,78 @@ const DEFAULT_FILTERS: Filters = {
   sort: "createdDesc",
 };
 
-function filtersFromSearchParams(sp: URLSearchParams): Filters {
+function normalizePriceInput(v: string): number | null {
+  if (!v.trim()) return null;
+  const n = Number(v);
+  if (!Number.isFinite(n) || n < 0) return null;
+  return Math.round(n);
+}
+
+function filtersFromSearchParams(
+  sp: URLSearchParams,
+  currency: SupportedCurrency,
+): Filters {
+  const priceMinKrw = sp.get("priceMin");
+  const priceMaxKrw = sp.get("priceMax");
+  const priceMinDisplay =
+    priceMinKrw && Number.isFinite(Number(priceMinKrw))
+      ? String(Math.round(convertCurrency(Number(priceMinKrw), "KRW", currency)))
+      : "";
+  const priceMaxDisplay =
+    priceMaxKrw && Number.isFinite(Number(priceMaxKrw))
+      ? String(Math.round(convertCurrency(Number(priceMaxKrw), "KRW", currency)))
+      : "";
+
   return {
     mediaType: sp.get("mediaType") ?? "ALL",
     q: sp.get("q") ?? "",
     district: sp.get("district") ?? "",
     minTrustScore: sp.get("minTrustScore") ?? "",
-    priceMin: sp.get("priceMin") ?? "",
-    priceMax: sp.get("priceMax") ?? "",
+    priceMin: priceMinDisplay,
+    priceMax: priceMaxDisplay,
     sort: sp.get("sort") ?? "createdDesc",
   };
 }
 
-function buildSearchParams(f: Filters): URLSearchParams {
+function buildSearchParams(
+  f: Filters,
+  currency: SupportedCurrency,
+): URLSearchParams {
   const sp = new URLSearchParams();
   if (f.mediaType && f.mediaType !== "ALL") sp.set("mediaType", f.mediaType);
   if (f.q.trim()) sp.set("q", f.q.trim());
   if (f.district.trim()) sp.set("district", f.district.trim());
   if (f.minTrustScore.trim()) sp.set("minTrustScore", f.minTrustScore.trim());
-  if (f.priceMin.trim()) sp.set("priceMin", f.priceMin.trim());
-  if (f.priceMax.trim()) sp.set("priceMax", f.priceMax.trim());
+  const minInput = normalizePriceInput(f.priceMin);
+  const maxInput = normalizePriceInput(f.priceMax);
+  if (minInput != null) {
+    sp.set("priceMin", String(Math.round(convertCurrency(minInput, currency, "KRW"))));
+  }
+  if (maxInput != null) {
+    sp.set("priceMax", String(Math.round(convertCurrency(maxInput, currency, "KRW"))));
+  }
   if (f.sort && f.sort !== DEFAULT_FILTERS.sort) sp.set("sort", f.sort);
   return sp;
 }
 
 /** Shared filter query for /api/explore (list pagination vs map bundle). */
-function appendExploreFilters(p: URLSearchParams, f: Filters) {
+function appendExploreFilters(
+  p: URLSearchParams,
+  f: Filters,
+  currency: SupportedCurrency,
+) {
   if (f.mediaType && f.mediaType !== "ALL") p.set("mediaType", f.mediaType);
   if (f.q.trim()) p.set("q", f.q.trim());
   if (f.district.trim()) p.set("district", f.district.trim());
   if (f.minTrustScore.trim()) p.set("minTrustScore", f.minTrustScore.trim());
-  if (f.priceMin.trim()) p.set("priceMin", f.priceMin.trim());
-  if (f.priceMax.trim()) p.set("priceMax", f.priceMax.trim());
+  const minInput = normalizePriceInput(f.priceMin);
+  const maxInput = normalizePriceInput(f.priceMax);
+  if (minInput != null) {
+    p.set("priceMin", String(Math.round(convertCurrency(minInput, currency, "KRW"))));
+  }
+  if (maxInput != null) {
+    p.set("priceMax", String(Math.round(convertCurrency(maxInput, currency, "KRW"))));
+  }
   if (f.sort && f.sort !== DEFAULT_FILTERS.sort) p.set("sort", f.sort);
 }
 
@@ -106,6 +152,7 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
   const pathname = usePathname();
   const params = useParams();
   const locale = (params?.locale as string) ?? "ko";
+  const preferredCurrency = usePreferredCurrency(locale);
   const { status } = useSession();
 
   const [view, setView] = React.useState<"list" | "map">("list");
@@ -127,10 +174,10 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
 
   React.useEffect(() => {
     const sp = new URLSearchParams(searchParams?.toString() ?? "");
-    const next = filtersFromSearchParams(sp);
+    const next = filtersFromSearchParams(sp, preferredCurrency);
     setDraft(next);
     setFilters(next);
-  }, [searchParams]);
+  }, [searchParams, preferredCurrency]);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -147,7 +194,7 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
         p.set("take", "20");
         const cur = reset ? null : nextCursorRef.current;
         if (cur) p.set("cursor", cur);
-        appendExploreFilters(p, filters);
+        appendExploreFilters(p, filters, preferredCurrency);
 
         const res = await fetch(`/api/explore?${p.toString()}`);
         if (!res.ok) throw new Error(await res.text());
@@ -169,7 +216,7 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
     return () => {
       cancelled = true;
     };
-  }, [filters]);
+  }, [filters, preferredCurrency]);
 
   React.useEffect(() => {
     if (view !== "map") return;
@@ -181,7 +228,7 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
         const p = new URLSearchParams();
         p.set("take", "500");
         p.set("map", "1");
-        appendExploreFilters(p, filters);
+        appendExploreFilters(p, filters, preferredCurrency);
         const res = await fetch(`/api/explore?${p.toString()}`);
         if (!res.ok) throw new Error(await res.text());
         const json = (await res.json()) as { items: ExploreApiItem[] };
@@ -197,7 +244,7 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
     return () => {
       cancelled = true;
     };
-  }, [view, filters]);
+  }, [view, filters, preferredCurrency]);
 
   async function loadMore() {
     if (!nextCursor || loading) return;
@@ -207,7 +254,7 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
       const p = new URLSearchParams();
       p.set("take", "20");
       p.set("cursor", nextCursorRef.current!);
-      appendExploreFilters(p, filters);
+      appendExploreFilters(p, filters, preferredCurrency);
 
       const res = await fetch(`/api/explore?${p.toString()}`);
       if (!res.ok) throw new Error(await res.text());
@@ -226,7 +273,7 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
   }
 
   function applyFilters() {
-    const sp = buildSearchParams(draft);
+    const sp = buildSearchParams(draft, preferredCurrency);
     const qs = sp.toString();
     router.replace(qs ? `${pathname}?${qs}` : pathname);
   }
@@ -238,7 +285,20 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
 
   const dataForSelection = view === "map" ? mapItems : items;
   const selected = dataForSelection.find((i) => i.id === selectedId) ?? null;
-  const mapRemountKey = buildSearchParams(filters).toString();
+  const mapRemountKey = buildSearchParams(filters, preferredCurrency).toString();
+
+  const formatDisplayMoney = React.useCallback(
+    (krw: number | null) => {
+      if (krw == null) return "—";
+      const converted = convertCurrency(krw, "KRW", preferredCurrency);
+      return formatCurrency(
+        converted,
+        preferredCurrency,
+        locale === "ko" ? "ko-KR" : "en-US",
+      );
+    },
+    [preferredCurrency, locale],
+  );
 
   function openInquiryMany(list: ExploreApiItem[]) {
     if (list.some((it) => isMockMediaId(it.id))) {
@@ -357,7 +417,7 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="mb-1 block text-xs font-medium text-zinc-600">
-                  {t("filters.priceMin")}
+                  {t("filters.priceMin")} ({preferredCurrency})
                 </label>
                 <Input
                   type="number"
@@ -370,7 +430,7 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
               </div>
               <div>
                 <label className="mb-1 block text-xs font-medium text-zinc-600">
-                  {t("filters.priceMax")}
+                  {t("filters.priceMax")} ({preferredCurrency})
                 </label>
                 <Input
                   type="number"
@@ -522,9 +582,7 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
                       <span className="block text-[10px] uppercase tracking-wide text-zinc-500">
                         {tv("card_weekly_price")}
                       </span>
-                      {it.priceMin != null
-                        ? `${it.priceMin.toLocaleString()}원`
-                        : "—"}
+                      {formatDisplayMoney(it.priceMin)}
                     </div>
                   </div>
                   <div className="mt-4 flex flex-wrap gap-2">
@@ -589,6 +647,8 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
                 onSelect={setSelectedId}
                 onInquiry={(it) => openInquiry(it)}
                 remountKey={mapRemountKey}
+                currency={preferredCurrency}
+                locale={locale}
               />
             )}
             <aside className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
@@ -672,6 +732,7 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
         items={items.filter((it) => selectedIds.includes(it.id))}
         onInquiry={(it) => openInquiry(it)}
         onBulkInquiry={(list) => openInquiryMany(list)}
+        currency={preferredCurrency}
       />
 
       {view === "list" && selectedIds.length > 0 ? (

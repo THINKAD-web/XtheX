@@ -1,9 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
 import type { LatLng } from "@/lib/filters/location-latlng";
-import { Link } from "@/i18n/navigation";
+import type { Map as LeafletMap } from "leaflet";
 
 type MarkerItem = {
   code: string;
@@ -22,37 +21,147 @@ type Props = {
   className?: string;
 };
 
-const SEOUL_CENTER: LatLng = { lat: 37.5665, lng: 126.9780 };
+const SEOUL_CENTER: LatLng = { lat: 37.5665, lng: 126.978 };
 
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
 
+function escapeHtml(s: string) {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function buildPopupHtml(m: MarkerItem): string {
+  const lines: string[] = [
+    `<div style="font-size:13px;line-height:1.45;color:#18181b">`,
+    `<div style="font-weight:600">${escapeHtml(m.label)}</div>`,
+    `<div style="font-size:11px;opacity:.72;margin-top:2px">#${escapeHtml(m.code)}</div>`,
+  ];
+  if (m.status) {
+    lines.push(
+      `<div style="margin-top:6px;font-size:11px">상태: <strong>${escapeHtml(m.status)}</strong></div>`,
+    );
+  }
+  if (typeof m.price === "number") {
+    lines.push(
+      `<div style="font-size:11px">가격: ${escapeHtml(String(m.price.toLocaleString()))}원</div>`,
+    );
+  }
+  if (typeof m.viewCount === "number") {
+    lines.push(
+      `<div style="font-size:11px">조회수: ${escapeHtml(String(m.viewCount.toLocaleString()))}회</div>`,
+    );
+  }
+  if (m.updatedAt) {
+    lines.push(
+      `<div style="font-size:11px;opacity:.72;margin-top:2px">업데이트: ${escapeHtml(m.updatedAt)}</div>`,
+    );
+  }
+  if (m.href) {
+    lines.push(
+      `<div style="margin-top:10px">`,
+      `<a href="${escapeHtml(m.href)}" style="display:inline-flex;align-items:center;justify-content:center;height:32px;padding:0 12px;border-radius:6px;background:#059669;color:#fff;font-size:12px;font-weight:600;text-decoration:none">상세/편집 열기</a>`,
+      `</div>`,
+    );
+  }
+  lines.push(`</div>`);
+  return lines.join("");
+}
+
+/**
+ * react-leaflet MapContainer는 React 18 Strict Mode·동적 import 조합에서
+ * 동일 DOM에 Leaflet이 두 번 붙는 경우가 있어, Leaflet만 effect에서 초기화합니다.
+ */
 export function SeoulMiniMap({ markers, className }: Props) {
-  /** Leaflet은 DOM 컨테이너당 1회만 초기화 가능. Strict Mode + rAF로 한 프레임 뒤에만 MapContainer를 올려 이중 초기화를 피함 */
-  const [leafletMountId] = React.useState(
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
+  const mapRef = React.useRef<LeafletMap | null>(null);
+
+  const markersKey = React.useMemo(
     () =>
-      typeof crypto !== "undefined" && "randomUUID" in crypto
-        ? crypto.randomUUID()
-        : `leaflet-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+      JSON.stringify(
+        markers.map((m) => ({
+          c: m.code,
+          la: m.position.lat,
+          ln: m.position.lng,
+          l: m.label,
+          s: m.status ?? null,
+          p: m.price ?? null,
+          v: m.viewCount ?? null,
+          u: m.updatedAt ?? null,
+          h: m.href ?? null,
+          i: m.intensity ?? null,
+        })),
+      ),
+    [markers],
   );
-  const [mapReady, setMapReady] = React.useState(false);
 
   React.useEffect(() => {
-    if (markers.length === 0) {
-      setMapReady(false);
-      return;
-    }
+    if (markers.length === 0) return;
+
+    const el = containerRef.current;
+    if (!el) return;
+
     let cancelled = false;
-    const frame = requestAnimationFrame(() => {
-      if (!cancelled) setMapReady(true);
-    });
+
+    void (async () => {
+      const L = (await import("leaflet")).default;
+      if (cancelled || containerRef.current !== el) return;
+
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+
+      const leafletEl = el as HTMLElement & { _leaflet_id?: number };
+      if (leafletEl._leaflet_id != null) {
+        el.replaceChildren();
+        delete leafletEl._leaflet_id;
+      }
+
+      const map = L.map(el, { scrollWheelZoom: false }).setView(
+        [SEOUL_CENTER.lat, SEOUL_CENTER.lng],
+        11,
+      );
+      mapRef.current = map;
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors",
+      }).addTo(map);
+
+      for (const m of markers) {
+        const intensity = clamp(m.intensity ?? 1, 1, 5);
+        const radius = 6 + intensity * 2;
+        const opacity = 0.35 + intensity * 0.1;
+        L.circleMarker([m.position.lat, m.position.lng], {
+          radius,
+          color: "#f97316",
+          fillColor: "#f97316",
+          fillOpacity: opacity,
+          weight: 2,
+        })
+          .bindPopup(buildPopupHtml(m))
+          .addTo(map);
+      }
+
+      requestAnimationFrame(() => {
+        if (!cancelled && mapRef.current === map) {
+          map.invalidateSize();
+        }
+      });
+    })();
+
     return () => {
       cancelled = true;
-      cancelAnimationFrame(frame);
-      setMapReady(false);
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
     };
-  }, [markers.length]);
+  }, [markers, markersKey]);
 
   if (markers.length === 0) {
     return (
@@ -73,74 +182,12 @@ export function SeoulMiniMap({ markers, className }: Props) {
     className ?? "h-64 w-full overflow-hidden rounded-xl ring-1 ring-zinc-800";
 
   return (
-    <div key={leafletMountId} className={shellClass}>
-      {!mapReady ? (
-        <div className="h-full min-h-[12rem] w-full animate-pulse bg-zinc-100 dark:bg-zinc-900/80" />
-      ) : (
-        <MapContainer
-          key={leafletMountId}
-          center={SEOUL_CENTER}
-          zoom={11}
-          scrollWheelZoom={false}
-          style={{ height: "100%", width: "100%", minHeight: "12rem" }}
-        >
-          <TileLayer
-            attribution="&copy; OpenStreetMap contributors"
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-
-          {markers.map((m) => {
-            const intensity = clamp(m.intensity ?? 1, 1, 5);
-            const radius = 6 + intensity * 2; // 8..16
-            const opacity = 0.35 + intensity * 0.1; // 0.45..0.85
-            return (
-              <CircleMarker
-                key={m.code}
-                center={m.position}
-                radius={radius}
-                pathOptions={{
-                  color: "#f97316",
-                  fillColor: "#f97316",
-                  fillOpacity: opacity,
-                  weight: 2,
-                }}
-              >
-                <Popup>
-                  <div className="text-sm">
-                    <div className="font-semibold">{m.label}</div>
-                    <div className="text-xs opacity-70">#{m.code}</div>
-                    {m.status ? (
-                      <div className="mt-1 text-xs">
-                        상태: <span className="font-medium">{m.status}</span>
-                      </div>
-                    ) : null}
-                    {typeof m.price === "number" ? (
-                      <div className="text-xs">가격: {m.price.toLocaleString()}원</div>
-                    ) : null}
-                    {typeof m.viewCount === "number" ? (
-                      <div className="text-xs">조회수: {m.viewCount.toLocaleString()}회</div>
-                    ) : null}
-                    {m.updatedAt ? (
-                      <div className="text-xs opacity-70">업데이트: {m.updatedAt}</div>
-                    ) : null}
-                    {m.href ? (
-                      <div className="mt-2">
-                        <Link
-                          href={m.href}
-                          className="inline-flex h-8 items-center justify-center rounded-md bg-emerald-600 px-3 text-xs font-semibold text-white hover:bg-emerald-700"
-                        >
-                          상세/편집 열기
-                        </Link>
-                      </div>
-                    ) : null}
-                  </div>
-                </Popup>
-              </CircleMarker>
-            );
-          })}
-        </MapContainer>
-      )}
+    <div className={shellClass}>
+      <div
+        ref={containerRef}
+        className="h-full min-h-[12rem] w-full"
+        style={{ minHeight: "12rem" }}
+      />
     </div>
   );
 }
-

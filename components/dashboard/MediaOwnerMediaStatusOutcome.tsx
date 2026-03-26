@@ -46,8 +46,8 @@ export function MediaOwnerMediaStatusOutcome({
           )}
         >
           {submitted
-            ? "관리자 검토 중 — 곧 결과를 안내드릴게요."
-            : "최종 신청 전 — 검토·수정 후 신청을 완료해 주세요."}
+            ? "관리자 검토 중입니다. 결과는 목록에서 확인할 수 있습니다."
+            : "최종 신청을 완료하면 관리자 검토가 시작됩니다."}
         </p>
       </div>
     );
@@ -55,14 +55,9 @@ export function MediaOwnerMediaStatusOutcome({
 
   if (status === "PUBLISHED") {
     return (
-      <div className="flex max-w-[260px] flex-col gap-1.5">
-        <Badge className="w-fit border-emerald-500/60 bg-emerald-500/15 font-semibold text-emerald-900 dark:border-emerald-400/50 dark:bg-emerald-950/40 dark:text-emerald-100">
-          승인 완료
-        </Badge>
-        <p className="text-[11px] font-medium leading-snug text-emerald-800 dark:text-emerald-300/90">
-          광고주 추천과 미디어 탐색에 노출 중입니다. 공개 페이지에서 노출 형태를 확인할 수 있어요.
-        </p>
-      </div>
+      <p className="max-w-[260px] text-[11px] font-medium leading-snug text-emerald-800 dark:text-emerald-300/90">
+        승인 완료 · 광고주에게 노출 중
+      </p>
     );
   }
 
@@ -77,7 +72,7 @@ export function MediaOwnerMediaStatusOutcome({
             반려
           </Badge>
           <p className="text-[11px] font-medium leading-snug text-rose-900/95 dark:text-rose-200/90">
-            반려되었습니다. 사유를 확인하고 수정한 뒤 다시 검토를 요청해 주세요.
+            이 미디어가 반려되었습니다. 반려 사유를 확인 후 수정해서 재신청해 주세요.
           </p>
           {hasRejectedRecord ? (
             <div className="flex flex-col gap-1">
@@ -88,7 +83,7 @@ export function MediaOwnerMediaStatusOutcome({
                 </p>
               ) : (
                 <p className="text-[11px] text-zinc-500 dark:text-zinc-500">
-                  별도 사유 문구는 남지 않았어요. 필요하면 고객 지원으로 문의해 주세요.
+                  별도 사유가 없습니다. 내용을 보완한 뒤 재신청해 주세요.
                 </p>
               )}
               <Button
@@ -138,7 +133,7 @@ export function MediaOwnerMediaStatusOutcome({
                   reasonText
                 ) : (
                   <span className="text-zinc-500 dark:text-zinc-400">
-                    관리자가 별도 사유를 적지 않았습니다. 내용을 보완한 뒤 다시 신청해 주세요.
+                    별도 사유가 없습니다. 내용을 보완한 뒤 재신청해 주세요.
                   </span>
                 )}
               </div>

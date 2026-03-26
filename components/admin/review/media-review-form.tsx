@@ -427,7 +427,7 @@ export function MediaReviewForm({
         if (result.ok) {
           toast({
             title: "임시 저장되었습니다.",
-            description: "입력 내용이 저장되었습니다. 최종 제출 전까지 계속 수정할 수 있습니다.",
+            description: "최종 제출 전까지 수정할 수 있습니다.",
           });
         } else {
           toast({ title: "저장 실패", description: result.error, variant: "destructive" });
@@ -467,8 +467,7 @@ export function MediaReviewForm({
       }
       toast({
         title: "등록 신청이 완료되었습니다.",
-        description:
-          "관리자 승인 대기 중입니다. 내 미디어 목록에서 상태가 곧바로 반영돼요. 승인 후에는 탐색·추천에 노출됩니다.",
+        description: "관리자 검토 후 결과가 목록에 반영됩니다.",
       });
       router.push(`/${locale}/dashboard/media-owner/medias`);
     });
@@ -484,8 +483,8 @@ export function MediaReviewForm({
       const result = await publishMedia(media.id, buildPayload());
       if (result.ok) {
         toast({
-          title: "미디어가 성공적으로 승인되었습니다.",
-          description: "매체사에게 승인 사실이 전달되었습니다.",
+          title: "미디어가 승인되었습니다.",
+          description: "매체사에게 승인 알림이 전달되었습니다.",
         });
         setRejectOpen(false);
         setRejectReason("");
@@ -547,9 +546,8 @@ export function MediaReviewForm({
         return;
       }
       toast({
-        title: "다시 검토 요청했어요.",
-        description:
-          "관리자가 순서대로 확인합니다. 내 미디어 목록에서 ‘승인 대기’ 상태를 확인해 주세요.",
+        title: "재검토 요청을 보냈습니다.",
+        description: "목록에서 승인 대기 상태를 확인해 주세요.",
       });
       router.push(`/${locale}/dashboard/media-owner/medias`);
       router.refresh();
@@ -575,14 +573,10 @@ export function MediaReviewForm({
                   승인 완료
                 </Badge>
                 <p className="text-base font-semibold text-emerald-50">
-                  축하합니다! 이 미디어가 승인되었습니다.
+                  미디어가 승인되었습니다.
                 </p>
                 <p className="text-sm leading-relaxed text-emerald-100/90">
                   이제 광고주 추천과 미디어 탐색에 노출되고 있습니다.
-                </p>
-                <p className="text-sm leading-relaxed text-zinc-400">
-                  내용을 바꾸려면 미디어 수정 페이지에서 편집해 주세요. 아래에서 실제 공개 페이지도
-                  확인할 수 있어요.
                 </p>
                 <div className="flex flex-wrap gap-2 pt-1">
                   <Link
@@ -598,10 +592,10 @@ export function MediaReviewForm({
             <Card className="border-rose-500/45 bg-rose-950/25 shadow-none ring-1 ring-rose-500/25">
               <CardContent className="space-y-3 pt-6">
                 <Badge className="w-fit border-rose-400/50 bg-rose-500/20 text-rose-100">
-                  반려됨
+                  반려
                 </Badge>
-                <p className="text-sm font-medium text-rose-100">
-                  안내에 맞게 내용을 손본 뒤, 다시 검토를 요청해 주세요.
+                <p className="text-sm font-medium leading-relaxed text-rose-100">
+                  이 미디어가 반려되었습니다. 반려 사유를 확인 후 수정해서 재신청해 주세요.
                 </p>
                 {rejectionInfo.hasRejectedRecord && rejectionInfo.reasonText ? (
                   <div className="rounded-lg border border-rose-500/35 bg-rose-950/45 px-3 py-2.5 text-sm text-rose-50/95">
@@ -612,18 +606,13 @@ export function MediaReviewForm({
                   </div>
                 ) : rejectionInfo.hasRejectedRecord ? (
                   <p className="text-xs text-zinc-500">
-                    별도 반려 사유 문구는 남지 않았어요. 등록 기준에 맞게 다시 정리해 주세요.
+                    별도 사유가 없습니다. 내용을 보완한 뒤 재신청해 주세요.
                   </p>
                 ) : (
                   <p className="text-xs text-zinc-500">
-                    사유가 메모에 없을 수 있어요. 수정 후 아래에서 다시 요청해 주세요.
+                    메모에 사유가 없을 수 있습니다. 수정 후 재신청해 주세요.
                   </p>
                 )}
-                <p className="rounded-lg border border-rose-500/25 bg-rose-950/30 px-3 py-2.5 text-sm leading-relaxed text-rose-100/90">
-                  반려 사유를 반영해 내용을 손본 뒤,{" "}
-                  <span className="font-medium text-rose-50">「수정 후 다시 검토 요청」</span>을 누르기
-                  전에 안내를 꼭 확인해 주세요. 관리자가 다시 검토합니다.
-                </p>
                 <div className="flex flex-wrap gap-2 pt-1">
                   <Link
                     href={`/dashboard/media-owner/medias/${media.id}/edit`}
@@ -659,12 +648,10 @@ export function MediaReviewForm({
                       </Badge>
                     </div>
                     <p className="text-sm font-medium text-zinc-100">
-                      이미 관리자 승인 요청을 완료하셨습니다.
+                      검토 요청이 접수되었습니다.
                     </p>
                     <p className="text-sm leading-relaxed text-zinc-400">
-                      지금은 내용을 수정하거나 다시 제출할 수 없습니다. 담당자가 순서대로 검토하고
-                      있으니, 조금만 기다려 주세요. 승인·반려 결과는 내 미디어 목록에서 확인하실 수
-                      있어요.
+                      수정·재제출은 불가하며, 결과는 목록에서 확인할 수 있습니다.
                     </p>
                     {ownerSubmittedAt ? (
                       <p className="text-xs text-zinc-500">
@@ -690,16 +677,14 @@ export function MediaReviewForm({
                         관리자 승인 대기 중
                       </Badge>
                       <span className="text-xs text-zinc-500">
-                        아래 정보를 확인한 뒤 저장하거나 최종 신청을 진행해 주세요
+                        확인 후 임시 저장 또는 최종 신청
                       </span>
                     </div>
                     <CardTitle className="text-lg text-white">
-                      매체 등록 · 검토 단계
+                      등록 · 검토
                     </CardTitle>
                     <p className="text-sm leading-relaxed text-zinc-400">
-                      <span className="text-zinc-200">최종 등록 신청</span>을 완료하시면 관리자가
-                      내용을 검토한 뒤 승인 여부를 결정합니다. 승인되면 서비스에 노출되며, 보완이
-                      필요하면 반려 안내를 드릴 수 있어요.
+                      최종 신청 시 관리자 검토 후 승인 또는 반려 안내가 진행됩니다.
                     </p>
                   </CardHeader>
                 </Card>
@@ -770,8 +755,8 @@ export function MediaReviewForm({
               <CardTitle className="text-base font-semibold text-white">
                 승인·반려 전 확인 사항
               </CardTitle>
-              <p className="text-sm leading-relaxed text-zinc-300">
-                매체사가 입력한 정보를 검토하고, 부족한 부분을 보완한 뒤 승인 또는 반려해 주세요.
+              <p className="text-sm text-zinc-300">
+                입력 정보를 검토한 뒤 승인 또는 반려해 주세요.
               </p>
               <ul className="list-inside list-disc space-y-1.5 text-sm leading-relaxed text-zinc-400">
                 <li>
@@ -1627,14 +1612,13 @@ export function MediaReviewForm({
                       <div className="space-y-1 border-zinc-800 sm:border-r sm:pr-4">
                         <p className="font-medium text-zinc-200">임시 저장</p>
                         <p className="text-xs leading-relaxed">
-                          나중에 다시 수정할 수 있어요. 아직 관리자에게 검토 요청은 보내지 않습니다.
+                          검토 요청 전까지 수정 가능합니다.
                         </p>
                       </div>
                       <div className="space-y-1 sm:pl-0">
-                        <p className="font-medium text-amber-200/90">최종 등록 신청하기</p>
+                        <p className="font-medium text-amber-200/90">최종 등록 신청</p>
                         <p className="text-xs leading-relaxed">
-                          관리자에게 검토 요청을 보냅니다. 신청 후에는 이 화면에서 내용을 수정할 수
-                          없어요.
+                          신청 후 이 화면에서는 수정할 수 없습니다.
                         </p>
                       </div>
                     </div>
@@ -1717,8 +1701,7 @@ export function MediaReviewForm({
                     <div>
                       <p className="text-sm font-semibold text-rose-100">반려 처리</p>
                       <p className="mt-2 text-sm leading-relaxed text-rose-200/85">
-                        반려 사유를 자세히 입력하면 매체사가 무엇을 수정해야 할지 이해하기 쉽고, 보완 후
-                        다시 신청할 수 있습니다.
+                        사유를 구체적으로 입력하면 매체사가 보완 후 재신청하기 쉽습니다.
                       </p>
                     </div>
                     <div className="space-y-1.5">
@@ -1777,10 +1760,7 @@ export function MediaReviewForm({
               다시 검토 요청
             </h3>
             <p className="mt-3 text-sm leading-relaxed text-zinc-300">
-              반려 사유를 수정한 후 다시 최종 등록 신청을 해주세요. 관리자가 재검토합니다.
-            </p>
-            <p className="mt-2 text-sm text-zinc-500">
-              내용을 충분히 반영했는지 한 번 더 확인한 뒤 보내 주시면 검토가 더 수월합니다.
+              반려 사유를 반영하여 수정한 후 다시 검토를 요청하시겠습니까?
             </p>
             <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
               <Button

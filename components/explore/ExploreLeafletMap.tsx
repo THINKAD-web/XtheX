@@ -4,6 +4,11 @@ import * as React from "react";
 import L from "leaflet";
 import type { ExploreApiItem } from "@/lib/explore/explore-item";
 import { useTranslations } from "next-intl";
+import {
+  convertCurrency,
+  formatCurrency,
+  type SupportedCurrency,
+} from "@/lib/currency";
 
 /** Leaflet CSS is imported globally in `app/globals.css`. */
 
@@ -42,9 +47,14 @@ function getLatLng(location: unknown): { lat: number; lng: number } | null {
   return null;
 }
 
-function formatWeeklyPrice(it: ExploreApiItem): string {
+function formatWeeklyPrice(
+  it: ExploreApiItem,
+  currency: SupportedCurrency,
+  locale: string,
+): string {
   if (it.priceMin == null) return "—";
-  return `${it.priceMin.toLocaleString()}원`;
+  const converted = convertCurrency(it.priceMin, "KRW", currency);
+  return formatCurrency(converted, currency, locale === "ko" ? "ko-KR" : "en-US");
 }
 
 function buildPopupEl(
@@ -56,6 +66,8 @@ function buildPopupEl(
     inquiry: string;
   },
   onInquiry: () => void,
+  currency: SupportedCurrency,
+  locale: string,
 ): HTMLElement {
   const wrap = document.createElement("div");
   wrap.className = "max-w-[240px] space-y-2 text-sm text-zinc-900";
@@ -89,7 +101,7 @@ function buildPopupEl(
   weeklyLabel.className = "font-medium text-zinc-500";
   weeklyLabel.textContent = `${labels.weekly} `;
   const weeklyVal = document.createElement("span");
-  weeklyVal.textContent = formatWeeklyPrice(it);
+  weeklyVal.textContent = formatWeeklyPrice(it, currency, locale);
   rowWeekly.append(weeklyLabel, weeklyVal);
 
   meta.append(rowType, rowDaily, rowWeekly);
@@ -116,6 +128,8 @@ type Props = {
   onInquiry: (item: ExploreApiItem) => void;
   /** New map instance when filters / dataset identity changes. */
   remountKey: string;
+  currency: SupportedCurrency;
+  locale: string;
 };
 
 /**
@@ -128,6 +142,8 @@ export function ExploreLeafletMap({
   onSelect,
   onInquiry,
   remountKey,
+  currency,
+  locale,
 }: Props) {
   const tv = useTranslations("explore.v2");
   const holderRef = React.useRef<HTMLDivElement | null>(null);
@@ -209,7 +225,13 @@ export function ExploreLeafletMap({
       const icon = it.id === selectedId ? markerIconSelected : markerIcon;
       const m = L.marker([ll.lat, ll.lng], { icon });
       m.on("click", () => onSelectRef.current(it.id));
-      const popupEl = buildPopupEl(it, labels, () => onInquiryRef.current(it));
+      const popupEl = buildPopupEl(
+        it,
+        labels,
+        () => onInquiryRef.current(it),
+        currency,
+        locale,
+      );
       m.bindPopup(popupEl, { minWidth: 200, maxWidth: 280 });
       m.addTo(layer);
     }

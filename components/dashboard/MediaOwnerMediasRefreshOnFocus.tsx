@@ -25,7 +25,7 @@ export function MediaOwnerMediasRefreshOnFocus() {
       try {
         if (typeof sessionStorage !== "undefined" && !sessionStorage.getItem(SESSION_TOAST_KEY)) {
           sessionStorage.setItem(SESSION_TOAST_KEY, "1");
-          toast.message("관리자가 최근에 미디어를 처리했을 수 있습니다.", {
+          toast.message("관리자가 미디어를 처리했습니다.", {
             description: "목록이 업데이트되었습니다.",
             duration: 3200,
           });

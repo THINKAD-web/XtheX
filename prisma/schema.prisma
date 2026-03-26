@@ -71,6 +71,13 @@ enum InquiryStatus {
   CLOSED
 }
 
+enum CurrencyCode {
+  KRW
+  USD
+  EUR
+  JPY
+}
+
 model Media {
   id                String         @id @default(uuid()) @db.Uuid
   mediaName         String
@@ -96,6 +103,12 @@ model Media {
   /** 업로드 직후 AI 심사 요약 (한국어) */
   aiReviewComment   String?
   aiReviewScore     Int?
+  /** 추천 전용 점수(0-100), 없으면 런타임 휴리스틱으로 계산 */
+  aiMatchScore      Int?
+  /** 글로벌 추천용 국가 코드(ISO-3166-1 alpha-2) */
+  globalCountryCode String?
+  /** 가격 표기 통화 (기본 KRW) */
+  currency          CurrencyCode @default(KRW)
   /** 노출 가능 기간 (매체사 등록) */
   availabilityStart DateTime?
   availabilityEnd   DateTime?
@@ -206,6 +219,9 @@ model CampaignDraft {
   id            String   @id @default(uuid()) @db.Uuid
   userId        String?  @db.Uuid
   name          String?
+  campaignPeriod String?
+  totalBudgetRaw String?
+  totalBudgetKrw Int?
   channelDooh   Boolean  @default(true)
   channelWeb    Boolean  @default(false)
   channelMobile Boolean  @default(false)

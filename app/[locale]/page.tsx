@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { SiteHeader } from "@/components/layout/SiteHeader";
+import { AppSiteChrome } from "@/components/layout/AppSiteChrome";
 import { CountUp } from "@/components/count-up";
 import { StatsSection } from "@/components/stats-section";
 import { Link } from "@/i18n/navigation";
@@ -183,8 +183,7 @@ export default async function Home({
 }) {
   const { locale } = await params;
   return (
-    <>
-      <SiteHeader />
+    <AppSiteChrome>
       <main>
         <HomeHeroDaypart />
         <MediaMixSearchSection />
@@ -211,6 +210,6 @@ export default async function Home({
         <CtaBanner />
         <FaqSection />
       </main>
-    </>
+    </AppSiteChrome>
   );
 }

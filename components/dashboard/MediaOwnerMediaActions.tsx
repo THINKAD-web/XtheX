@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { toast } from "sonner";
-import { Pencil, Trash2 } from "lucide-react";
+import { ExternalLink, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -51,7 +51,20 @@ export function MediaOwnerMediaActions({ mediaId, status, disabled }: Props) {
   }
 
   return (
-    <div className="flex items-center justify-end gap-2">
+    <div className="flex flex-wrap items-center justify-end gap-2">
+      {status === "PUBLISHED" ? (
+        <Link
+          href={`/medias/${mediaId}`}
+          className={cn(
+            "inline-flex h-9 items-center justify-center rounded-md border border-emerald-600/50 bg-emerald-50 px-3 text-sm font-medium text-emerald-900 hover:bg-emerald-100 dark:border-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-100 dark:hover:bg-emerald-950/70",
+            (disabled || pending) && "pointer-events-none opacity-50",
+          )}
+          title="광고주에게 보이는 공개 페이지"
+        >
+          <ExternalLink className="mr-2 h-4 w-4 shrink-0" />
+          공개 보기
+        </Link>
+      ) : null}
       <Link
         href={editHref}
         className={cn(

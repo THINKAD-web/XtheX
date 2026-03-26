@@ -26,8 +26,13 @@ export const metadata: Metadata = {
   description:
     "XtheX is a global outdoor advertising marketplace where partners upload media proposals and brands discover, match, and contract.",
   applicationName: "XtheX",
-  // Adjust to your production domain later (e.g. https://xthex.com)
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
+  metadataBase: (() => {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
+    if (appUrl) return new URL(appUrl);
+    const vercelUrl = process.env.VERCEL_URL?.trim();
+    if (vercelUrl) return new URL(`https://${vercelUrl}`);
+    return new URL("https://xthex.com");
+  })(),
   openGraph: {
     title: "XtheX - Global Outdoor Ad Marketplace",
     description:

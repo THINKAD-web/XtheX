@@ -168,8 +168,6 @@ async function CtaBanner() {
         <HomeRoleCtas
           mediaLabel={t("cta_partner")}
           advertiserLabel={t("cta_explore")}
-          mediaSignedInHref="/dashboard/media-owner"
-          advertiserSignedInHref="/explore"
           mediaClassName="inline-flex h-11 min-w-[200px] items-center justify-center rounded-lg bg-white px-8 text-sm font-semibold text-blue-700 shadow-xl transition-all duration-200 hover:brightness-105 hover:bg-blue-50 hover:shadow-2xl"
           advertiserClassName="inline-flex h-11 min-w-[200px] items-center justify-center rounded-lg border-2 border-white/90 bg-transparent px-8 text-sm font-semibold text-white transition-all duration-200 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
         />

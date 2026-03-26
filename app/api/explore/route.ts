@@ -10,10 +10,17 @@ const querySchema = z.object({
   q: z.string().optional(),
   priceMin: z.coerce.number().int().nonnegative().optional(),
   priceMax: z.coerce.number().int().nonnegative().optional(),
+  /** 지역·구/주소 키워드 */
+  district: z.string().optional(),
+  /** 노출·신뢰도 하한 (0–100, trustScore) */
+  minTrustScore: z.coerce.number().int().min(0).max(100).optional(),
   size: z.string().optional(),
   sort: z.string().optional(),
-  take: z.coerce.number().int().min(1).max(50).optional(),
+  /** List: up to 50. Map bundle: up to 500 when map=1 */
+  take: z.coerce.number().int().min(1).max(500).optional(),
   cursor: z.string().optional(), // id
+  /** When set, return more rows and only medias with lat/lng in locationJson (map pins) */
+  map: z.enum(["1", "true"]).optional(),
 });
 
 export async function GET(req: Request) {
@@ -24,12 +31,29 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Invalid query" }, { status: 400 });
   }
 
-  const { mediaType, q, priceMin, priceMax, size, sort, take = 20, cursor } = parsed.data;
+  const {
+    mediaType,
+    q,
+    priceMin,
+    priceMax,
+    district,
+    minTrustScore,
+    size,
+    sort,
+    take: takeRaw,
+    cursor,
+    map: mapParam,
+  } = parsed.data;
+
+  const mapMode = mapParam === "1" || mapParam === "true";
+  const take = mapMode
+    ? Math.min(takeRaw ?? 500, 500)
+    : Math.min(takeRaw ?? 20, 50);
 
   const where: Prisma.MediaWhereInput = { status: MediaStatus.PUBLISHED };
 
   if (mediaType && mediaType !== "ALL") {
-    if (Object.values(MediaCategory).includes(mediaType as any)) {
+    if (Object.values(MediaCategory).includes(mediaType as MediaCategory)) {
       where.category = mediaType as MediaCategory;
     }
   }
@@ -39,6 +63,38 @@ export async function GET(req: Request) {
     where.price = { gte: priceMin };
   } else if (typeof priceMax === "number") {
     where.price = { lte: priceMax };
+  }
+  if (typeof minTrustScore === "number") {
+    where.trustScore = { gte: minTrustScore };
+  }
+  if (district?.trim()) {
+    const term = district.trim();
+    const districtFilter: Prisma.MediaWhereInput = {
+      OR: [
+        {
+          locationJson: {
+            path: ["district"],
+            string_contains: term,
+            mode: "insensitive",
+          },
+        },
+        {
+          locationJson: {
+            path: ["address"],
+            string_contains: term,
+            mode: "insensitive",
+          },
+        },
+      ],
+    };
+    const prevAnd = where.AND;
+    const andArr: Prisma.MediaWhereInput[] = Array.isArray(prevAnd)
+      ? [...prevAnd]
+      : prevAnd
+        ? [prevAnd]
+        : [];
+    andArr.push(districtFilter);
+    where.AND = andArr;
   }
   if (q && q.trim()) {
     const term = q.trim();
@@ -51,7 +107,33 @@ export async function GET(req: Request) {
     if (audHits.length > 0) {
       or.push({ audienceTags: { hasSome: audHits } });
     }
-    where.OR = or;
+    const qBlock: Prisma.MediaWhereInput = { OR: or };
+    const prevAnd = where.AND;
+    const andArr: Prisma.MediaWhereInput[] = Array.isArray(prevAnd)
+      ? [...prevAnd]
+      : prevAnd
+        ? [prevAnd]
+        : [];
+    andArr.push(qBlock);
+    where.AND = andArr;
+  }
+
+  /** Map view: only rows with coordinates (Leaflet markers) */
+  if (mapMode) {
+    const geoBlock: Prisma.MediaWhereInput = {
+      AND: [
+        { locationJson: { path: ["lat"], gte: -90, lte: 90 } },
+        { locationJson: { path: ["lng"], gte: -180, lte: 180 } },
+      ],
+    };
+    const prevAnd = where.AND;
+    const andArr: Prisma.MediaWhereInput[] = Array.isArray(prevAnd)
+      ? [...prevAnd]
+      : prevAnd
+        ? [prevAnd]
+        : [];
+    andArr.push(geoBlock);
+    where.AND = andArr;
   }
 
   // Bounds filter: bounds=swLat,swLng,neLat,neLng
@@ -61,9 +143,6 @@ export async function GET(req: Request) {
     if (parts.length === 4 && parts.every((n) => Number.isFinite(n))) {
       const [swLat, swLng, neLat, neLng] = parts as [number, number, number, number];
       if (swLat < neLat && swLng < neLng) {
-        // eslint-disable-next-line no-console
-        console.log("Applying bounds filter (Media):", { swLat, swLng, neLat, neLng });
-
         const and: Prisma.MediaWhereInput[] = Array.isArray(where.AND)
           ? [...where.AND]
           : where.AND
@@ -101,6 +180,8 @@ export async function GET(req: Request) {
         ? [{ price: "desc" }, { createdAt: "desc" }]
         : sort === "trustDesc"
           ? [{ trustScore: "desc" }, { createdAt: "desc" }]
+          : sort === "aiDesc"
+            ? [{ aiReviewScore: "desc" }, { createdAt: "desc" }]
           : [{ createdAt: "desc" }, { id: "desc" }];
 
   const medias = await prisma.media.findMany({
@@ -121,6 +202,9 @@ export async function GET(req: Request) {
       category: true,
       price: true,
       cpm: true,
+      exposureJson: true,
+      trustScore: true,
+      aiReviewScore: true,
       images: true,
       sampleImages: true,
       createdAt: true,
@@ -129,6 +213,13 @@ export async function GET(req: Request) {
 
   const httpOnly = (urls: string[]) =>
     urls.filter((u) => /^https?:\/\//i.test(String(u).trim()));
+
+  function formatDailyExposure(exposureJson: unknown): string | null {
+    if (!exposureJson || typeof exposureJson !== "object") return null;
+    const o = exposureJson as Record<string, unknown>;
+    const v = o.daily_traffic ?? o.daily_impressions;
+    return v != null ? String(v) : null;
+  }
 
   let items = medias.map((m) => ({
     id: m.id,
@@ -139,13 +230,21 @@ export async function GET(req: Request) {
     size: "",
     priceMin: m.price ?? null,
     priceMax: m.price ?? null,
+    trustScore: m.trustScore ?? null,
+    aiReviewScore: m.aiReviewScore ?? null,
+    dailyExposure: formatDailyExposure(m.exposureJson),
     images: [...httpOnly(m.sampleImages ?? []), ...(m.images ?? [])].slice(0, 8),
     createdAt: m.createdAt.toISOString(),
   }));
 
   // 발행(PUBLISHED) 매체가 없을 때만: 데모용 여러 핀·카드 (실데이터와 혼합되지 않음)
   if (items.length === 0 && !idCursor) {
-    items = EXPLORE_EMPTY_DB_MOCKS.map((row) => ({ ...row }));
+    items = EXPLORE_EMPTY_DB_MOCKS.map((row) => ({
+      ...row,
+      trustScore: 82,
+      aiReviewScore: 78,
+      dailyExposure: "데모",
+    }));
   }
 
   const nextCursor =

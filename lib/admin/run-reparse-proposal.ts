@@ -1,46 +1,13 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
-  extractMediaFromProposal,
-  ExtractedMediaDataZod,
-  type ExtractedMediaData,
-} from "@/lib/ai/extract-media-from-proposal";
-import {
   isLocalProposalUrl,
   readUploadedProposalFile,
 } from "@/lib/admin/proposal-local-storage";
-import { enrichExtractedMediaData } from "@/lib/admin/enrich-extracted-media";
+import type { ExtractedMediaData } from "@/lib/ai/extract-media-from-proposal";
+import type { MediaReviewFormPayload } from "@/lib/media/media-review-form-payload";
 
-export type MediaReviewFormPayload = {
-  mediaName: string;
-  description: string | null;
-  category: string;
-  locationJson: {
-    address?: string | null;
-    district?: string | null;
-    city?: string | null;
-    lat?: number | null;
-    lng?: number | null;
-    map_link?: string | null;
-  };
-  price: number | null;
-  cpm: number | null;
-  exposureJson: {
-    daily_traffic?: number | string | null;
-    monthly_impressions?: number | string | null;
-    reach?: number | string | null;
-    frequency?: number | string | null;
-  } | null;
-  targetAudience: string | null;
-  images: string[];
-  tags: string[];
-  audienceTags: string[];
-  pros: string | null;
-  cons: string | null;
-  trustScore: number | null;
-  sampleImages: string[];
-  sampleDescriptions: string[];
-};
+export type { MediaReviewFormPayload };
 
 export type ReparseRequestHints = {
   address?: string;
@@ -74,6 +41,7 @@ function extractedToPayload(extracted: ExtractedMediaData): MediaReviewFormPaylo
     mediaName: extracted.media_name,
     description: extracted.description ?? null,
     category: extracted.category,
+    subCategory: extracted.sub_category ?? null,
     locationJson: {
       address: loc.address ?? null,
       district: loc.district ?? null,
@@ -83,7 +51,22 @@ function extractedToPayload(extracted: ExtractedMediaData): MediaReviewFormPaylo
       map_link: loc.map_link ?? null,
     },
     price: toIntOrNull(extracted.price),
+    priceNote: extracted.price_note ?? null,
+    widthM: extracted.width_m ?? null,
+    heightM: extracted.height_m ?? null,
+    resolution: extracted.resolution ?? null,
+    operatingHours: extracted.operating_hours ?? null,
+    dailyFootfall: extracted.daily_footfall ?? toIntOrNull(extracted.exposure?.daily_traffic),
+    weekdayFootfall: extracted.weekday_footfall ?? null,
+    targetAge: extracted.target_age ?? null,
+    impressions:
+      extracted.impressions ?? toIntOrNull(extracted.exposure?.monthly_impressions),
+    reach: extracted.reach ?? toIntOrNull(extracted.exposure?.reach),
+    frequency: extracted.frequency ?? toIntOrNull(extracted.exposure?.frequency),
     cpm: toIntOrNull(extracted.cpm),
+    engagementRate: extracted.engagement_rate ?? null,
+    visibilityScore: extracted.visibility_score ?? null,
+    effectMemo: extracted.effect_memo ?? null,
     exposureJson: extracted.exposure
       ? {
           daily_traffic: extracted.exposure.daily_traffic ?? null,
@@ -101,6 +84,7 @@ function extractedToPayload(extracted: ExtractedMediaData): MediaReviewFormPaylo
     trustScore: extracted.trust_score ?? null,
     sampleImages: extracted.sampleImages ?? [],
     sampleDescriptions: extracted.sampleDescriptions ?? [],
+    extractedImages: extracted.extracted_images ?? extracted.images ?? [],
   };
 }
 
@@ -160,6 +144,11 @@ export async function runReparseProposalForMediaId(
   options?: RunReparseOptions,
 ): Promise<RunReparseResult> {
   try {
+    const [{ extractMediaFromProposal, ExtractedMediaDataZod }, { enrichExtractedMediaData }] =
+      await Promise.all([
+        import("@/lib/ai/extract-media-from-proposal"),
+        import("@/lib/admin/enrich-extracted-media"),
+      ]);
     const media = await prisma.media.findUnique({ where: { id: mediaId } });
     if (!media) {
       return { ok: false, error: "미디어를 찾을 수 없습니다." };

@@ -23,6 +23,9 @@
 # local AI upload proposal binaries (dev)
 /.data/
 
+# media owner uploads (local dev)
+/public/uploads/
+
 # misc
 .DS_Store
 *.pem

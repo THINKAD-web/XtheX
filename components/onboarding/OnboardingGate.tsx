@@ -16,6 +16,11 @@ function isOnboardingPath(path: string | null): boolean {
   );
 }
 
+/** middleware + 서버 게이트로 보호되므로 UI를 스피너 뒤에 숨기지 않음 */
+function isDashboardPath(path: string | null): boolean {
+  return path != null && path.startsWith("/dashboard");
+}
+
 export function OnboardingGate({ children }: { children: React.ReactNode }) {
   const { status } = useSession();
   const isLoaded = status !== "loading";
@@ -45,6 +50,30 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
     }
 
     let cancelled = false;
+
+    if (pathname != null && isDashboardPath(pathname)) {
+      setShowApp(true);
+      (async () => {
+        try {
+          const res = await fetch("/api/onboarding/status", {
+            credentials: "include",
+          });
+          const data = (await res.json()) as { completed?: boolean };
+          if (cancelled) return;
+          if (data.completed) {
+            sessionStorage.setItem("xthex_onboarding_ok", "1");
+          } else {
+            router.replace("/onboarding/role");
+          }
+        } catch {
+          /* 온보딩 API 실패 시 대시보드 유지 (서버 게이트가 이미 통과) */
+        }
+      })();
+      return () => {
+        cancelled = true;
+      };
+    }
+
     (async () => {
       try {
         const res = await fetch("/api/onboarding/status", {
@@ -80,7 +109,8 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
     isSignedIn &&
     !showApp &&
     pathname &&
-    !isOnboardingPath(pathname)
+    !isOnboardingPath(pathname) &&
+    !isDashboardPath(pathname)
   ) {
     return (
       <div className="flex min-h-[50vh] flex-col items-center justify-center gap-2 bg-zinc-50 dark:bg-zinc-950">

@@ -589,7 +589,9 @@ export function AdminMediasClient({ locale, initialMedias }: Props) {
                           ? "border-amber-500/50 text-amber-400"
                           : m.status === "PUBLISHED"
                             ? "border-emerald-500/50 text-emerald-400"
-                            : "border-zinc-600 text-zinc-400"
+                            : m.status === "REJECTED"
+                              ? "border-red-500/50 text-red-400"
+                              : "border-zinc-600 text-zinc-400"
                       }
                     >
                       {m.status}

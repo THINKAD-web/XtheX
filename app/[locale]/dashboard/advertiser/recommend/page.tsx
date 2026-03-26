@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { RecommendExperience } from "@/components/recommend/RecommendExperience";
@@ -7,8 +8,16 @@ import { landing } from "@/lib/landing-theme";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const metadata: Metadata = {
+  title: "AI Recommendations | XtheX",
+  description: "Get AI-driven media recommendations tailored to your campaign goals.",
+  robots: { index: false, follow: false },
+};
 
-export default async function AdvertiserRecommendPage() {
+type PageProps = { params: Promise<{ locale: string }> };
+
+export default async function AdvertiserRecommendPage({ params }: PageProps) {
+  await params;
   await gateAdvertiserDashboard();
   const t = await getTranslations("dashboard.advertiser.recommend");
 

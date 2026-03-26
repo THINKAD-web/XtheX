@@ -2,6 +2,8 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/site-footer";
 import { getAuthSession } from "@/lib/auth/session";
 import { ensureAdminUserFromSession } from "@/lib/auth/ensure-admin-from-session";
+import { DashboardSidebarLayout } from "@/components/dashboard/DashboardSidebarLayout";
+import { gateAdminDashboard } from "@/lib/auth/dashboard-gate";
 
 type Props = { children: React.ReactNode };
 
@@ -14,11 +16,14 @@ export default async function AdminLayout({ children }: Props) {
   if (session?.user) {
     await ensureAdminUserFromSession();
   }
+  await gateAdminDashboard();
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <SiteHeader />
-      <div className="flex-1 pt-14">{children}</div>
+      <div className="flex-1 pt-14">
+        <DashboardSidebarLayout role="ADMIN">{children}</DashboardSidebarLayout>
+      </div>
       <SiteFooter />
     </div>
   );

@@ -27,6 +27,40 @@
 - 선택: `XAI_MODEL=grok-3-mini` (기본) 또는 콘솔 **Models**에 나온 이름 (`grok-3`, `grok-4-fast-non-reasoning` 등). `grok-2-latest`는 더 이상 없음.
 - 하위호환: `OPENAI_API_KEY`만 있으면 OpenAI로 동일 추출
 
+### 운영 프롬프트 정책 (중요)
+
+AI 추출 품질은 `SYSTEM_PROMPT`가 좌우합니다. 아래 원칙을 유지하세요.
+
+1. **스키마 고정**
+   - 출력 JSON 키/순서는 고정합니다.
+   - 누락/불확실 값은 `null` 또는 `[]`로 반환(환각 금지).
+
+2. **한국어 원문 보존**
+   - 주소/역명/행정구역/상권명은 원문 한국어를 유지합니다.
+   - 임의 번역 금지.
+
+3. **수치 필드 엄격화**
+   - 숫자 필드는 반드시 number 타입.
+   - 범위(`~`)는 중앙값을 쓰고 원문 범위를 `price_note` 또는 `effect_memo`에 남깁니다.
+
+4. **좌표/이미지 보수 처리**
+   - 위도·경도는 문서에 명시된 경우만 채웁니다.
+   - `extracted_images`는 신뢰 가능한 URL/참조만, 최대 10개.
+   - 근거 부족 시 빈 배열 유지.
+
+5. **충돌 우선순위**
+   - 표/스펙 시트 > 본문 설명 > 캡션/각주
+   - 값 충돌 시 더 구체적·최신 값 사용, 메모에 흔적 남김.
+
+현재 코드 반영 위치:
+- `lib/ai/extract-media-from-proposal.ts` (단일 추출/폴백)
+- `lib/ai/grok-proposal-structured.ts` (다건 `media_items` 추출)
+
+프롬프트 수정 시 체크리스트:
+- `npm run dev` 재시작
+- 관리자 업로드로 샘플 PDF 2~3건 재검증
+- 필수 필드 채움률 확인(`media_name`, 주소, 좌표, 가격, cpm, impressions)
+
 ## Vision(페이지 이미지 분석) — xAI만
 
 1. **1차**: 제안서 **텍스트만**으로 Grok 구조화 추출(가격·CPM·표 정확도 유지).
@@ -83,3 +117,16 @@ PDF_VISION_DISABLE=1                      # Vision 끄기
 ## API
 
 - `POST /api/admin/upload-proposal` — `FormData`: 필드 **`files`** (여러 개 가능, 파일마다 초안 1건), 선택 **`adminMemo`** (공통 메모).
+
+## QA 체크리스트 (관리자 AI 업로드/검토)
+
+- [ ] `/admin/ai-upload`에서 PDF 업로드 후 초안 생성 확인
+- [ ] 추출 결과 prefill 확인 (`sub_category`, `price_per_month`, `width_m/height_m`, `operating_hours`, `daily_footfall`, `impressions`, `visibility_score`, `effect_memo`)
+- [ ] `/admin/review/[mediaId]` 섹션 UI 확인 (기본/위치/가격·사양/유동·타겟/효과/이미지)
+- [ ] 필수 검증 확인 (매체명/주소/위경도/월 가격 누락 시 저장 차단)
+- [ ] 지도 동작 확인 (핀 드래그 + 지도 클릭 좌표 반영)
+- [ ] 이미지 선택 UX 확인 (`X/10개`, 전체 선택/해제, 개별 체크)
+- [ ] 저장 후 DB 반영 확인 (`locationJson`, `exposureJson`, `parseHistory.reviewFormV2`)
+- [ ] 카테고리·서브카테고리 UX 확인 (추천값/배지/툴팁 원본값·현재값)
+- [ ] 발행 플로우 확인 (`저장 및 미디어 생성` 후 `/admin/medias` 이동)
+- [ ] 시스템 프롬프트 반영 확인 (`extract-media-from-proposal`, `grok-proposal-structured`)

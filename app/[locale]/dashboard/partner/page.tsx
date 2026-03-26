@@ -8,6 +8,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { UserMenu } from "@/components/auth/user-menu";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 type PageProps = { params: Promise<{ locale: string }> };
 

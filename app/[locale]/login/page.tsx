@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { AppSiteChrome } from "@/components/layout/AppSiteChrome";
 import {
@@ -5,6 +6,11 @@ import {
   appMainContainerClass,
 } from "@/lib/layout/app-chrome";
 import { LoginForm } from "@/components/auth/login-form";
+
+export const metadata: Metadata = {
+  title: "Login | XtheX",
+  description: "Sign in to XtheX to explore media, send inquiries, and manage workflows.",
+};
 
 function LoginFallback() {
   return (

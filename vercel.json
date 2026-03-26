@@ -4,5 +4,37 @@
       "path": "/api/cron/weekly-report",
       "schedule": "0 0 * * 1"
     }
-  ]
+  ],
+  "functions": {
+    "app/api/admin/upload-proposal/route.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "app/api/admin/reparse-proposal/route.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "app/api/reparse-media/route.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "app/api/review-proposal/[id]/route.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "app/api/**/*.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    }
+  },
+  "outputFileTracingExcludes": {
+    "**/*": [
+      ".next/cache/**/*",
+      "public/uploads/**/*",
+      "node_modules/@next/swc-linux-x64-gnu/**/*",
+      "node_modules/@next/swc-linux-x64-musl/**/*",
+      "node_modules/leaflet/**/*",
+      "node_modules/react-leaflet/**/*"
+    ]
+  }
 }

@@ -14,11 +14,11 @@ export async function SiteHeader() {
 
   return (
     <header className="fixed left-0 right-0 top-0 z-50 border-b border-border bg-background/90 backdrop-blur-md">
-      <div className={`flex h-14 items-center gap-4 ${landing.container}`}>
-        <Link href="/" className="shrink-0 text-lg font-bold tracking-tight text-foreground">
+      <div className={`grid h-14 grid-cols-[auto_1fr_auto] items-center gap-4 ${landing.container}`}>
+        <Link href="/" className="justify-self-start shrink-0 text-lg font-bold tracking-tight text-foreground">
           XtheX
         </Link>
-        <nav className="hidden min-w-0 flex-1 items-center gap-1 overflow-x-auto text-sm sm:flex sm:gap-4">
+        <nav className="hidden min-w-0 justify-self-center items-center gap-1 overflow-x-auto text-sm sm:flex sm:gap-5">
           <Link
             href="/"
             className="whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground"
@@ -50,7 +50,7 @@ export async function SiteHeader() {
             {tFooter("terms")}
           </Link>
         </nav>
-        <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
+        <div className="justify-self-end flex shrink-0 items-center gap-2 sm:gap-3">
           <LanguageSwitcher />
           <AuthNav
             signInLabel={tNav("sign_in")}

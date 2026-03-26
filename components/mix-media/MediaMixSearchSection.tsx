@@ -2,10 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
+import { toast as sonnerToast } from "sonner";
 import { Loader2, SendHorizontal, ImagePlus, X, MapPin, Save, ExternalLink, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { useToast } from "@/components/ui/use-toast";
 import type {
   MixMediaResponse,
@@ -244,10 +246,14 @@ function buildMapMarkers(
   return Array.from(byId.values());
 }
 
+const DEMO_TOAST_KEY = "xthex_mix_demo_login_toast";
+
 export function MediaMixSearchSection() {
   const { status } = useSession();
   const isSignedIn = status === "authenticated";
   const { toast } = useToast();
+  const router = useRouter();
+  const tMix = useTranslations("home.mediaMix");
   const [query, setQuery] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -281,6 +287,20 @@ export function MediaMixSearchSection() {
   }, []);
 
   const submit = async () => {
+    if (!isSignedIn && typeof window !== "undefined") {
+      if (!sessionStorage.getItem(DEMO_TOAST_KEY)) {
+        sessionStorage.setItem(DEMO_TOAST_KEY, "1");
+        sonnerToast(tMix("demo_toast_title"), {
+          description: tMix("demo_toast_description"),
+          action: {
+            label: tMix("demo_toast_login"),
+            onClick: () => router.push("/login"),
+          },
+          duration: 12_000,
+        });
+      }
+    }
+
     setError(null);
     setResult(null);
     setSelectedProposalId(null);
@@ -528,9 +548,31 @@ export function MediaMixSearchSection() {
           힌트도 반영합니다.
         </p>
 
+        {!isSignedIn ? (
+          <div
+            className={cn(
+              "mx-auto mt-6 flex max-w-2xl flex-col items-center justify-center gap-2 rounded-xl border px-4 py-3 text-center transition-all duration-300 animate-in fade-in-0 slide-in-from-bottom-2 sm:flex-row sm:text-left",
+              isDayUi
+                ? "border-amber-200/90 bg-amber-50/90 text-amber-950 shadow-sm"
+                : "border-amber-500/30 bg-amber-950/40 text-amber-100",
+            )}
+          >
+            <p className="text-sm font-medium">{tMix("demo_watermark")}</p>
+            <Link
+              href="/login"
+              className={cn(
+                "shrink-0 text-sm font-semibold underline-offset-2 transition-colors hover:underline",
+                isDayUi ? "text-blue-700" : "text-cyan-300",
+              )}
+            >
+              {tMix("demo_toast_login")}
+            </Link>
+          </div>
+        ) : null}
+
         <div
           className={cn(
-            "mt-10 overflow-hidden rounded-2xl border shadow-xl lg:mt-12",
+            "mt-10 overflow-hidden rounded-2xl border shadow-xl transition-opacity duration-300 lg:mt-12",
             isDayUi
               ? "border-zinc-200 bg-white text-zinc-900 shadow-zinc-200/40"
               : "border-zinc-700/80 bg-zinc-900/95 text-zinc-100 shadow-black/40",

@@ -5,6 +5,7 @@ import { useRouter } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { toast } from "sonner";
 import {
   ChevronLeft,
   ChevronRight,
@@ -13,6 +14,7 @@ import {
   FileText,
   MapPin,
 } from "lucide-react";
+import { PendingRoleAfterAuth } from "@/components/onboarding/PendingRoleAfterAuth";
 
 const STEPS_ADV = 3;
 const STEPS_MEDIA = 3;
@@ -32,17 +34,21 @@ export function OnboardingWizardClient({
   const complete = async (href: string) => {
     setFinishing(true);
     try {
-      await fetch("/api/onboarding/complete", {
+      const res = await fetch("/api/onboarding/complete", {
         method: "POST",
         credentials: "include",
       });
+      if (!res.ok) {
+        toast.error("온보딩 완료 처리에 실패했습니다. 다시 시도해 주세요.");
+        return;
+      }
       if (typeof window !== "undefined") {
         sessionStorage.setItem("xthex_onboarding_ok", "1");
         if (dontShowAgain) {
           localStorage.setItem("xthex_skip_onboarding_hint", "1");
         }
       }
-      router.push(href);
+      router.replace(href);
     } finally {
       setFinishing(false);
     }
@@ -70,6 +76,7 @@ export function OnboardingWizardClient({
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
+      <PendingRoleAfterAuth />
       {stepper}
 
       <Card className="border-zinc-200 shadow-lg dark:border-zinc-700">
@@ -142,7 +149,7 @@ export function OnboardingWizardClient({
               <Button
                 className="w-full"
                 disabled={finishing}
-                onClick={() => complete("/dashboard/campaigns")}
+                onClick={() => complete("/dashboard/advertiser")}
               >
                 {finishing ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -220,7 +227,7 @@ export function OnboardingWizardClient({
                 className="w-full"
                 variant="outline"
                 disabled={finishing}
-                onClick={() => complete("/dashboard/partner")}
+                onClick={() => complete("/dashboard/media-owner")}
               >
                 {finishing ? (
                   <Loader2 className="h-4 w-4 animate-spin" />

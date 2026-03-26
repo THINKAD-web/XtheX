@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { UserRole } from "@prisma/client";
 import { getCurrentUser } from "@/lib/auth/rbac";
 import { OnboardingWizardClient } from "@/components/onboarding/OnboardingWizardClient";
 
@@ -14,6 +15,15 @@ export default async function OnboardingWizardPage({ searchParams }: Props) {
     redirect("/sign-in");
   }
   if (user.onboardingCompleted) {
+    if (user.role === UserRole.MEDIA_OWNER) {
+      redirect("/dashboard/media-owner");
+    }
+    if (user.role === UserRole.ADVERTISER) {
+      redirect("/dashboard/advertiser");
+    }
+    if (user.role === UserRole.ADMIN) {
+      redirect("/admin");
+    }
     redirect("/");
   }
   const sp = await searchParams;

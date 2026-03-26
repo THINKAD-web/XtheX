@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { UserRole, ProposalStatus } from "@prisma/client";
 import { prisma, isDatabaseConfigured } from "@/lib/prisma";
 import { findUserById, DatabaseConnectionError } from "@/lib/auth/find-user-by-clerk";
@@ -19,6 +20,12 @@ import { cn } from "@/lib/utils";
 
 const panel =
   "rounded-2xl border border-border bg-card text-card-foreground shadow-sm ring-1 ring-black/[0.04] dark:ring-white/[0.08]";
+
+export const metadata: Metadata = {
+  title: "Admin Dashboard | XtheX",
+  description: "Manage platform operations, proposals, and users.",
+  robots: { index: false, follow: false },
+};
 
 export default async function AdminPage({
   params,

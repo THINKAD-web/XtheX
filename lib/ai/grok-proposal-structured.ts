@@ -108,13 +108,36 @@ const locationSchema = z.object({
 
 const mediaItemSchema = z.object({
   media_name: z.string(),
+  description: z.string().nullable().optional(),
+  sub_category: z.string().nullable().optional(),
+  tags: z.array(z.string()).optional().default([]),
   media_type: z.string(),
   location: locationSchema.optional().nullable(),
+  full_address: z.string().nullable().optional(),
+  district: z.string().nullable().optional(),
+  city: z.string().nullable().optional(),
+  latitude: z.union([z.number(), z.string(), z.null()]).optional(),
+  longitude: z.union([z.number(), z.string(), z.null()]).optional(),
   dimensions: z.string().nullable().optional(),
   daily_impressions: z.union([z.number(), z.string(), z.null()]).optional(),
+  daily_footfall: z.union([z.number(), z.string(), z.null()]).optional(),
+  weekday_footfall: z.union([z.number(), z.string(), z.null()]).optional(),
   cpm: z.union([z.number(), z.string(), z.null()]).optional(),
   price_per_week: z.union([z.number(), z.string(), z.null()]).optional(),
   price_per_month: z.union([z.number(), z.string(), z.null()]).optional(),
+  price_note: z.string().nullable().optional(),
+  width_m: z.union([z.number(), z.string(), z.null()]).optional(),
+  height_m: z.union([z.number(), z.string(), z.null()]).optional(),
+  resolution: z.string().nullable().optional(),
+  operating_hours: z.string().nullable().optional(),
+  target_age: z.string().nullable().optional(),
+  impressions: z.union([z.number(), z.string(), z.null()]).optional(),
+  reach: z.union([z.number(), z.string(), z.null()]).optional(),
+  frequency: z.union([z.number(), z.string(), z.null()]).optional(),
+  engagement_rate: z.union([z.number(), z.string(), z.null()]).optional(),
+  visibility_score: z.union([z.number(), z.string(), z.null()]).optional(),
+  effect_memo: z.string().nullable().optional(),
+  extracted_images: z.array(z.string()).optional().default([]),
   available_period: z.string().nullable().optional(),
   target_demographics: z.string().nullable().optional(),
   special_features: z.array(z.string()).optional().default([]),
@@ -288,6 +311,7 @@ function itemToExtracted(
 ): ExtractedMediaData {
   const loc = item.location ?? {};
   let address = resolveFullAddress(loc);
+  if (item.full_address?.trim()) address = item.full_address.trim();
   const visionBlob = [
     item.media_name,
     ...(item.sample_image_descriptions ?? []),
@@ -310,13 +334,25 @@ function itemToExtracted(
 
   const latRaw = loc.latitude;
   const lngRaw = loc.longitude;
+  const latDirectRaw = item.latitude;
+  const lngDirectRaw = item.longitude;
   const lat =
+    typeof latDirectRaw === "number"
+      ? latDirectRaw
+      : latDirectRaw != null && latDirectRaw !== ""
+        ? parseFloat(String(latDirectRaw))
+        :
     typeof latRaw === "number"
       ? latRaw
       : latRaw != null && latRaw !== ""
         ? parseFloat(String(latRaw))
         : null;
   const lng =
+    typeof lngDirectRaw === "number"
+      ? lngDirectRaw
+      : lngDirectRaw != null && lngDirectRaw !== ""
+        ? parseFloat(String(lngDirectRaw))
+        :
     typeof lngRaw === "number"
       ? lngRaw
       : lngRaw != null && lngRaw !== ""
@@ -330,8 +366,17 @@ function itemToExtracted(
   const impParsed = parseNumericWithRangeNote(item.daily_impressions);
   const cpmParsed = parseNumericWithRangeNote(item.cpm);
   const dailyImp = impParsed.value;
+  const dailyFootfall = numOrNull(item.daily_footfall) ?? dailyImp;
+  const weekdayFootfall = numOrNull(item.weekday_footfall);
   const { priceKrwForDb: price, priceNote } = resolvePrices(item);
   const cpm = cpmParsed.value;
+  const widthM = numOrNull(item.width_m);
+  const heightM = numOrNull(item.height_m);
+  const impressions = numOrNull(item.impressions);
+  const reachNum = numOrNull(item.reach);
+  const freqNum = numOrNull(item.frequency);
+  const engagementRate = numOrNull(item.engagement_rate);
+  const visibilityScore = numOrNull(item.visibility_score);
 
   const periodNorm = normalizeAvailablePeriod(item.available_period ?? undefined);
   const mergedAdditionalNotes = [
@@ -369,6 +414,10 @@ function itemToExtracted(
 
   const normalizedFeatures = normalizeSpecialFeatures(item);
   const tagSet = new Set<string>();
+  for (const t of item.tags ?? []) {
+    const s = String(t).trim();
+    if (s) tagSet.add(s);
+  }
   for (const f of normalizedFeatures) {
     const t = String(f).trim();
     if (t) tagSet.add(t);
@@ -395,25 +444,48 @@ function itemToExtracted(
   return {
     media_name: item.media_name?.trim() || `매체 ${index + 1}`,
     category: mapMediaType(item.media_type),
-    description: descLines.length ? descLines.join("\n") : null,
+    description:
+      item.description?.trim() || (descLines.length ? descLines.join("\n") : null),
+    sub_category: item.sub_category ?? null,
     location: {
       address: address?.trim() || null,
-      district: loc.district?.trim() || null,
-      city: loc.city?.trim() || null,
+      district: item.district?.trim() || loc.district?.trim() || null,
+      city: item.city?.trim() || loc.city?.trim() || null,
       lat: latOk ? lat : null,
       lng: lngOk ? lng : null,
       map_link: null,
     },
+    full_address: address?.trim() || null,
+    district: item.district?.trim() || loc.district?.trim() || null,
+    city: item.city?.trim() || loc.city?.trim() || null,
+    latitude: latOk ? lat : null,
+    longitude: lngOk ? lng : null,
     price,
+    price_per_month: numOrNull(item.price_per_month) ?? price,
+    price_note: item.price_note ?? priceNote,
+    width_m: widthM,
+    height_m: heightM,
+    resolution: item.resolution ?? null,
+    operating_hours: item.operating_hours ?? periodNorm ?? null,
+    daily_footfall: dailyFootfall,
+    weekday_footfall: weekdayFootfall,
+    target_age: item.target_age ?? null,
+    impressions: impressions,
+    reach: reachNum,
+    frequency: freqNum,
     cpm,
+    engagement_rate: engagementRate,
+    visibility_score: visibilityScore,
+    effect_memo: item.effect_memo ?? null,
     exposure: {
-      daily_traffic: dailyImp,
-      monthly_impressions: null,
-      reach: null,
-      frequency: null,
+      daily_traffic: dailyFootfall,
+      monthly_impressions: impressions,
+      reach: reachNum,
+      frequency: freqNum,
     },
     target_audience: item.target_demographics ?? null,
     images: imageUrls,
+    extracted_images: item.extracted_images?.slice(0, 10) ?? [],
     tags,
     audience_tags,
     pros:
@@ -509,45 +581,51 @@ function extractJson(text: string): unknown {
   }
 }
 
-const SYSTEM_PROMPT = `You are an expert Korean outdoor advertising media analyst. Extract EVERY media item from the uploaded proposal PDF with maximum accuracy.
+const SYSTEM_PROMPT = `You are a senior Korean OOH/DOOH proposal analyzer.
+Extract EVERY media unit from the PDF text with maximum factual accuracy.
 
-## LOCATION FIRST (최우선)
-PDF 전체를 먼저 스캔해서 **위치 정보를 최우선으로** 추출해라. 각 media_items 항목마다 **full_address, district, city, latitude, longitude**를 반드시 채워라. 주소가 명시되지 않았더라도 '현장', '위치', '설치장소', '샘플사진', '지도', '소재지', '설치위치' 키워드 근처 문장에서 추론해서 채워라.
-예: '강남역 1번 출구 앞' → district: '강남구', city: '서울특별시 강남구', full_address: '서울특별시 강남구 강남대로 123 (강남역 1번 출구 앞)'.
-표지·개요·매체명 옆 괄호·'설치위치'·'소재지'·'위치' 열·지도 캡처 옆 텍스트를 우선한다. **첨부 사진 캡션, '현장사진', '현장 사진', '샘플이미지', 'Location', 'ADDRESS'** 근처 문단에 주소·역명·빌딩명이 있으면 **반드시 해당 매체 location과 연계**해 채워라. 본문에 도로명이 없으면 **district + city**만이라도 채우고, full_address에는 "{시} {구} (상세주소 문서미기재)" 형태라도 넣어라. 위도·경도는 문서에 **숫자로 명시된 경우만** 넣고 추측 금지.
-
-## Internal reasoning (do this mentally before JSON — do not print this block)
-0. **주소 최우선:** 위 LOCATION FIRST 규칙을 적용해 모든 항목의 location을 채운다.
-1. Treat this document as a **Korean OOH media proposal**. Preserve **all Korean terms, brand names, station names, and numbers exactly as written** (원문 유지). Do not translate Korean to English in field values.
-2. Read **every page**; prioritize **tables** and **numeric columns** (CPM, 월/주 단가, 노출, 규격).
-3. Split **each distinct media product** into its own object in media_items (mixed formats in one PDF → multiple items).
-4. **Same medium, multiple locations** (e.g. 강남역 지하철 PSD 3개소): output **one media_items entry per location**. Distinguish **media_name** with suffix **"(강남역 1/3)"**, **"(강남역 2/3)"**, **"(강남역 3/3)"** (역·상권명 + N/M).
-5. If **daily_impressions** or **cpm** is a **range** (e.g. "1.2만~1.8만", "12만~18만"): put the **median** in the numeric field and set **additional_notes** to include **"범위: 원문좌~우"** (e.g. 범위: 1.2만~1.8만). Same for price ranges in additional_notes.
-6. **available_period:** Fuzzy phrases like **"즉시 ~ 3개월"**, **"즉시~6개월 이내"** → normalize to **"즉시 시작, 최대 N개월"** in the JSON string.
-7. **target_demographics:** Keep **full descriptive phrases** verbatim — e.g. **"20대 여성"** plus **"강남 오피스 출퇴근자"**, **"쇼핑몰 방문자"**, **"역 환승 동선"**; do **not** collapse to age/gender only when the doc gives richer wording. Join with comma or slash if needed.
-8. **Pricing rule:** If the document states **only monthly** price → **price_per_month**; **price_per_week** null or estimated. If **only weekly** → inverse. Never duplicate unless both explicit.
-9. **Location:** 항상 location 객체를 채운다. full_address 우선; 없으면 city+district 조합.
-10. **숫자·표·가격**은 반드시 **본문 텍스트**에서 추출하세요. (이미지 분석은 별도 단계에서 처리되므로 여기서는 **sample_image_descriptions**를 비워 두거나 텍스트에만 언급된 시각 자료가 있으면 한 줄만 적어도 됩니다.)
-
-## Output
-Output **ONLY** valid JSON — no markdown, no code fences, no commentary.
+Output JSON only (no markdown). Never hallucinate: unknown => null or [].
+Preserve Korean wording exactly when present.
 
 JSON shape:
 {
   "media_items": [
     {
       "media_name": "string",
+      "description": "string",
+      "sub_category": "string",
+      "tags": ["string"],
       "media_type": "빌보드 | 지하철 | 버스정류장 | 디지털사이니지 | 엘리베이터 | 택시 | 기타",
+      "full_address": "string",
+      "district": "string",
+      "city": "string",
+      "latitude": number,
+      "longitude": number,
       "location": { "full_address", "district", "city", "latitude", "longitude" },
+      "price_note": "string",
       "dimensions": "string",
+      "width_m": number,
+      "height_m": number,
+      "resolution": "string",
+      "operating_hours": "string",
+      "daily_footfall": number,
+      "weekday_footfall": number,
+      "target_age": "string",
+      "impressions": number,
+      "reach": number,
+      "frequency": number,
       "daily_impressions": number,
       "cpm": number,
+      "engagement_rate": number,
+      "visibility_score": number,
+      "effect_memo": "string",
       "price_per_week": number or null,
       "price_per_month": number or null,
       "available_period": "string",
       "target_demographics": "string",
       "special_features": ["LED","AR","3D","디지털","모션",...],
       "contract_terms": "string",
+      "extracted_images": ["https://..."],
       "sample_image_descriptions": [],
       "additional_notes": "string"
     }
@@ -557,7 +635,13 @@ JSON shape:
   "contact_info": "string"
 }
 
-Rules: latitude/longitude only if explicit in text; else null. Use 0 only for counts when truly zero; prefer null for unknown prices.
+Rules:
+- latitude/longitude only when explicit in source text/table.
+- numeric fields must be numbers (no units in number fields).
+- if range values appear (price/cpm/impressions), use midpoint and record original range in additional_notes.
+- prefer tables/spec sheets over narrative text on conflicts.
+- extracted_images: include only reliable URL-like references from source context; max 10.
+- if multiple placements exist, split into separate media_items.
 
 Example 1 (Gangnam billboard):
 {"media_items":[{"media_name":"강남대로 코너 빌보드","media_type":"빌보드","location":{"full_address":"서울 강남구 강남대로 396","district":"강남구","city":"서울","latitude":null,"longitude":null},"dimensions":"14m x 7m","daily_impressions":320000,"cpm":12000,"price_per_week":null,"price_per_month":45000000,"available_period":"2026-04~2026-06","target_demographics":"20-40대 직장인","special_features":["야간조명","대로변"],"contract_terms":"월 단위","sample_image_descriptions":[],"additional_notes":""}],"overall_summary":"강남 핵심 상권 빌보드","media_owner":"OOH코리아","contact_info":"02-1234-5678"}

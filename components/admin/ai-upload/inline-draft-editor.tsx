@@ -76,6 +76,7 @@ export function InlineDraftEditor({ draftId, locale, onClose }: Props) {
       <MediaReviewForm
         media={toFormMedia(media)}
         locale={locale}
+        mode="admin_review"
         embedMode
         onRequestClose={onClose}
       />

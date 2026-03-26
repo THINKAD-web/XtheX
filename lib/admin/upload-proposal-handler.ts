@@ -1,17 +1,12 @@
 import { UserRole } from "@prisma/client";
 import { getCurrentUser } from "@/lib/auth/rbac";
 import { prisma } from "@/lib/prisma";
-import { MediaStatus, Prisma } from "@prisma/client";
+import { MediaCategory, MediaStatus, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-import {
-  extractAllMediaFromProposalPdf,
-  toMediaCreateInput,
-} from "@/lib/ai/extract-media-from-proposal";
 import {
   LOCAL_PROPOSAL_PREFIX,
   saveUploadedProposalFile,
 } from "@/lib/admin/proposal-local-storage";
-import { enrichExtractedMediaData } from "@/lib/admin/enrich-extracted-media";
 import type { UploadDraftPreview } from "@/lib/admin/upload-draft-preview";
 import type { UserMediaSamplesResult } from "@/lib/admin/process-user-media-samples";
 
@@ -23,12 +18,33 @@ const ALLOWED_TYPES = [
 const ALLOWED_EXT = [".pdf", ".ppt", ".pptx"];
 const MAX_BYTES = 50 * 1024 * 1024;
 
+type MediaCreateLike = {
+  mediaName: string;
+  category: MediaCategory;
+  description: string | null;
+  locationJson: object;
+  price: number | null;
+  cpm: number | null;
+  exposureJson?: object | null;
+  targetAudience: string | null;
+  images: string[];
+  sampleImages?: string[];
+  sampleDescriptions?: string[];
+  tags?: string[];
+  audienceTags?: string[];
+  pros: string | null;
+  cons: string | null;
+  trustScore: number | null;
+  proposalFileUrl: string | null;
+  adminMemo: string | null;
+};
+
 /**
  * DB/Prisma 클라이언트에 sampleDescriptions·sampleImages·audienceTags 컬럼이
  * 없거나 구버전일 때도 초안 생성이 되도록, 코어 컬럼만 사용하고 나머지는 병합.
  */
 function buildMediaDraftCreatePayload(
-  input: ReturnType<typeof toMediaCreateInput>,
+  input: MediaCreateLike,
   createdById: string,
 ): Prisma.MediaUncheckedCreateInput {
   const sampleDescs = input.sampleDescriptions ?? [];
@@ -168,6 +184,11 @@ async function createDraftsFromProposalFile(
   dbUserId: string,
   userMediaAugment: UserMediaSamplesResult | null,
 ): Promise<UploadDraftPreview[]> {
+  const [{ extractAllMediaFromProposalPdf, toMediaCreateInput }, { enrichExtractedMediaData }] =
+    await Promise.all([
+      import("@/lib/ai/extract-media-from-proposal"),
+      import("@/lib/admin/enrich-extracted-media"),
+    ]);
   const buffer = Buffer.from(await file.arrayBuffer());
   const items = await extractAllMediaFromProposalPdf(
     buffer,

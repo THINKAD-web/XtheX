@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth/rbac";
@@ -18,6 +19,18 @@ function dateLocale(locale: string) {
   if (locale === "zh") return "zh-CN";
   if (locale === "es") return "es-ES";
   return "en-US";
+}
+
+export const metadata: Metadata = {
+  title: "Admin Inquiries | XtheX",
+  description: "Monitor inquiry lifecycle and advertiser-media interactions.",
+  robots: { index: false, follow: false },
+};
+
+function statusBadge(status: string) {
+  if (status === "REPLIED") return "bg-emerald-600/10 text-emerald-800";
+  if (status === "CLOSED") return "bg-zinc-600/10 text-zinc-800";
+  return "bg-amber-500/10 text-amber-900";
 }
 
 export default async function AdminInquiriesPage({
@@ -56,21 +69,23 @@ export default async function AdminInquiriesPage({
   const sp = (await searchParams) ?? {};
   const q = typeof sp.q === "string" ? sp.q.trim() : "";
   const order = typeof sp.order === "string" ? sp.order : "createdDesc";
+  const status = typeof sp.status === "string" ? sp.status : "ALL";
 
   const inquiries = await prisma.inquiry.findMany({
-    where: q
-      ? {
-          OR: [
-            { name: { contains: q, mode: "insensitive" } },
-            { email: { contains: q, mode: "insensitive" } },
-            {
-              media: {
-                mediaName: { contains: q, mode: "insensitive" },
-              },
-            },
-          ],
-        }
-      : undefined,
+    where: {
+      ...(status !== "ALL" ? { status: status as any } : {}),
+      ...(q
+        ? {
+            OR: [
+              { message: { contains: q, mode: "insensitive" } },
+              { contactEmail: { contains: q, mode: "insensitive" } },
+              { contactPhone: { contains: q, mode: "insensitive" } },
+              { advertiser: { email: { contains: q, mode: "insensitive" } } },
+              { media: { mediaName: { contains: q, mode: "insensitive" } } },
+            ],
+          }
+        : {}),
+    },
     orderBy:
       order === "budgetDesc"
         ? [{ budget: "desc" }, { createdAt: "desc" }]
@@ -81,6 +96,12 @@ export default async function AdminInquiriesPage({
         select: {
           id: true,
           mediaName: true,
+        },
+      },
+      advertiser: {
+        select: {
+          id: true,
+          email: true,
         },
       },
     },
@@ -110,6 +131,16 @@ export default async function AdminInquiriesPage({
                 <option value="createdDesc">{ti("orderCreated")}</option>
                 <option value="budgetDesc">{ti("orderBudget")}</option>
               </select>
+              <select
+                name="status"
+                defaultValue={status}
+                className="h-8 rounded-md border border-zinc-300 bg-white px-2 text-xs text-zinc-800 focus:border-zinc-500 focus:outline-none"
+              >
+                <option value="ALL">ALL</option>
+                <option value="PENDING">PENDING</option>
+                <option value="REPLIED">REPLIED</option>
+                <option value="CLOSED">CLOSED</option>
+              </select>
               <button
                 type="submit"
                 className="inline-flex h-8 items-center rounded-md bg-zinc-900 px-3 text-xs font-medium text-white hover:bg-zinc-800"
@@ -132,6 +163,7 @@ export default async function AdminInquiriesPage({
               <TableRow>
                 <TableHead>{ti("col_media")}</TableHead>
                 <TableHead>{ti("col_contact")}</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead>{ti("col_budget")}</TableHead>
                 <TableHead>{ti("col_message")}</TableHead>
                 <TableHead>{ti("col_time")}</TableHead>
@@ -141,23 +173,28 @@ export default async function AdminInquiriesPage({
               {inquiries.map((row) => (
                 <TableRow key={row.id}>
                   <TableCell className="text-sm">
-                    {row.media ? (
-                      <Link
-                        href={`/${locale}/medias/${row.media.id}`}
-                        className="text-blue-600 hover:underline"
-                      >
-                        {row.media.mediaName}
-                      </Link>
-                    ) : (
-                      <span className="text-zinc-400">{ti("no_media")}</span>
-                    )}
+                    <Link
+                      href={`/${locale}/medias/${row.media.id}`}
+                      className="text-blue-600 hover:underline"
+                    >
+                      {row.media.mediaName}
+                    </Link>
                   </TableCell>
                   <TableCell className="text-sm text-zinc-700">
-                    <div className="font-medium">{row.name}</div>
-                    <div className="text-xs text-zinc-500">{row.email}</div>
-                    {row.company && (
-                      <div className="text-xs text-zinc-500">{row.company}</div>
+                    <div className="font-medium">{row.advertiser.email}</div>
+                    {row.contactEmail && (
+                      <div className="text-xs text-zinc-500">{row.contactEmail}</div>
                     )}
+                    {row.contactPhone && (
+                      <div className="text-xs text-zinc-500">{row.contactPhone}</div>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-xs">
+                    <span
+                      className={`inline-flex rounded-full px-2 py-1 font-medium ${statusBadge(row.status)}`}
+                    >
+                      {row.status}
+                    </span>
                   </TableCell>
                   <TableCell className="text-sm text-zinc-700">
                     {row.budget != null
@@ -175,7 +212,7 @@ export default async function AdminInquiriesPage({
               {inquiries.length === 0 && (
                 <TableRow>
                   <TableCell
-                    colSpan={5}
+                    colSpan={6}
                     className="py-10 text-center text-zinc-500"
                   >
                     {ti("empty")}

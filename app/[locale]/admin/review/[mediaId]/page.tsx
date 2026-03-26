@@ -52,7 +52,7 @@ export default async function AdminReviewPage({
 
   return (
     <div className="min-h-screen bg-black text-zinc-100">
-      <div className="mx-auto max-w-3xl px-4 py-8">
+      <div className="mx-auto max-w-6xl px-4 py-8">
         <div className="mb-6 flex flex-wrap items-center gap-4">
           <Link
             href={`/${locale}/admin/ai-upload`}
@@ -102,7 +102,7 @@ export default async function AdminReviewPage({
           </CardHeader>
         </Card>
 
-        <MediaReviewForm media={media} locale={locale} />
+        <MediaReviewForm media={media} locale={locale} mode="admin_review" />
       </div>
     </div>
   );

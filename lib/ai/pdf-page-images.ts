@@ -3,7 +3,6 @@
  * pdfjs-dist(legacy) + node-canvas + sharp (1024 이하, 압축).
  */
 import { join } from "path";
-import { createCanvas } from "canvas";
 
 /** 이미지·매체 관련 키워드 (우선 렌더) */
 const PAGE_IMAGE_HINT =
@@ -95,6 +94,7 @@ export async function renderPdfPagesForVision(
     maxVisionPages?: number;
   },
 ): Promise<PdfVisionPageImage[]> {
+  const { createCanvas } = await import("canvas");
   const envMax = Number(process.env.PDF_VISION_MAX_PAGES);
   const defaultMax = Math.min(8, options?.maxVisionPages ?? 8);
   const effectiveMax = Number.isFinite(envMax)

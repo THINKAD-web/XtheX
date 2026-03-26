@@ -2,8 +2,10 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { findUserById } from "@/lib/auth/find-user-by-clerk";
 import { getAuthSession } from "@/lib/auth/session";
-import { reviewProposalById } from "@/lib/ai/reviewProposal";
 import { UserRole } from "@prisma/client";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function POST(
   _req: Request,
@@ -32,6 +34,7 @@ export async function POST(
   }
 
   try {
+    const { reviewProposalById } = await import("@/lib/ai/reviewProposal");
     const result = await reviewProposalById(id);
     return NextResponse.json({ ok: true, result });
   } catch (e) {

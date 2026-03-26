@@ -22,7 +22,7 @@ export type ExploreEmptyDbMock = {
 export const EXPLORE_EMPTY_DB_MOCKS: ExploreEmptyDbMock[] = [
   {
     id: "mock-media-1",
-    title: "MOCK 강남대로 디지털 보드",
+    title: "데모 강남대로 디지털 보드",
     description: "강남역 사거리 인근 테스트용 디지털 보드 매체입니다.",
     location: {
       address: "서울 강남구 강남대로 390",
@@ -39,7 +39,7 @@ export const EXPLORE_EMPTY_DB_MOCKS: ExploreEmptyDbMock[] = [
   },
   {
     id: "mock-media-2",
-    title: "MOCK 홍대입구 옥상 빌보드",
+    title: "데모 홍대입구 옥상 빌보드",
     description: "홍대 상권 데모용 고정식 빌보드입니다.",
     location: {
       address: "서울 마포구 양화로 160",
@@ -56,7 +56,7 @@ export const EXPLORE_EMPTY_DB_MOCKS: ExploreEmptyDbMock[] = [
   },
   {
     id: "mock-media-3",
-    title: "MOCK 서울역 KTX 통로 디지털",
+    title: "데모 서울역 KTX 통로 디지털",
     description: "환승 동선 데모 — 교통 허브 타깃.",
     location: {
       address: "서울 용산구 청파로 378",
@@ -73,7 +73,7 @@ export const EXPLORE_EMPTY_DB_MOCKS: ExploreEmptyDbMock[] = [
   },
   {
     id: "mock-media-4",
-    title: "MOCK 명동 중앙길 스트리트 퍼니처",
+    title: "데모 명동 중앙길 스트리트 퍼니처",
     description: "보행자 전용 구역 데모 매체.",
     location: {
       address: "서울 중구 명동8길",

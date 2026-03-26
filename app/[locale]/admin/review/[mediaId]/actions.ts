@@ -4,37 +4,14 @@ import { MediaStatus, UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth/rbac";
 import { revalidatePath } from "next/cache";
-import { mergeAudienceTagsForStorage } from "@/lib/media/audience-tags";
-export type MediaReviewFormPayload = {
-  mediaName: string;
-  description: string | null;
-  category: string;
-  locationJson: {
-    address?: string | null;
-    district?: string | null;
-    city?: string | null;
-    lat?: number | null;
-    lng?: number | null;
-    map_link?: string | null;
-  };
-  price: number | null;
-  cpm: number | null;
-  exposureJson: {
-    daily_traffic?: number | string | null;
-    monthly_impressions?: number | string | null;
-    reach?: number | string | null;
-    frequency?: number | string | null;
-  } | null;
-  targetAudience: string | null;
-  images: string[];
-  tags: string[];
-  audienceTags: string[];
-  pros: string | null;
-  cons: string | null;
-  trustScore: number | null;
-  sampleImages: string[];
-  sampleDescriptions: string[];
-};
+import { revalidateMediaReviewSurfaces } from "@/lib/admin/revalidate-media-public";
+import type { MediaReviewFormPayload } from "@/lib/media/media-review-form-payload";
+import {
+  getMediaUpdateDataFromReviewPayload,
+  validateMediaReviewPayload,
+} from "@/lib/media/persist-media-review-payload";
+
+export type { MediaReviewFormPayload } from "@/lib/media/media-review-form-payload";
 
 async function requireAdminAndMedia(mediaId: string) {
   const dbUser = await getCurrentUser();
@@ -63,6 +40,7 @@ export type MediaDraftForReviewClient = {
   trustScore: number | null;
   sampleImages: string[];
   sampleDescriptions: string[];
+  parseHistory: object | null;
   status: string;
   adminMemo: string | null;
   createdBy: { id: string; email: string; name: string | null } | null;
@@ -104,6 +82,7 @@ export async function getMediaDraftForReview(
         trustScore: media.trustScore,
         sampleImages: media.sampleImages ?? [],
         sampleDescriptions: media.sampleDescriptions ?? [],
+        parseHistory: (media.parseHistory as object | null) ?? null,
         status: media.status,
         adminMemo: media.adminMemo,
         createdBy: media.createdBy,
@@ -116,53 +95,20 @@ export async function getMediaDraftForReview(
   }
 }
 
-function toIntOrNull(v: unknown): number | null {
-  if (v === null || v === undefined || v === "") return null;
-  const n = Number(v);
-  return Number.isNaN(n) ? null : Math.round(n);
-}
-
 export type UpdateResult = { ok: true } | { ok: false; error: string };
 
 export async function updateMediaDraft(
   mediaId: string,
-  payload: MediaReviewFormPayload
+  payload: MediaReviewFormPayload,
 ): Promise<UpdateResult> {
   try {
     await requireAdminAndMedia(mediaId);
+    const err = validateMediaReviewPayload(payload);
+    if (err) return { ok: false, error: err };
 
-    const exposure =
-      payload.exposureJson &&
-      (Object.keys(payload.exposureJson).length > 0 ||
-        Object.values(payload.exposureJson).some((v) => v != null))
-        ? (payload.exposureJson as object)
-        : undefined;
-
-    const audienceTagsMerged = mergeAudienceTagsForStorage(
-      payload.targetAudience,
-      payload.audienceTags,
-    );
     await prisma.media.update({
       where: { id: mediaId },
-      data: {
-        mediaName: payload.mediaName,
-        description: payload.description ?? null,
-        category: payload.category as "BILLBOARD" | "DIGITAL_BOARD" | "TRANSIT" | "STREET_FURNITURE" | "WALL" | "ETC",
-        locationJson: payload.locationJson as object,
-        price: toIntOrNull(payload.price),
-        cpm: toIntOrNull(payload.cpm),
-        exposureJson: exposure,
-        targetAudience: payload.targetAudience ?? null,
-        images: payload.images ?? [],
-        tags: payload.tags ?? [],
-        audienceTags: audienceTagsMerged,
-        pros: payload.pros ?? null,
-        cons: payload.cons ?? null,
-        trustScore: payload.trustScore != null ? Math.min(100, Math.max(0, Math.round(payload.trustScore))) : null,
-        sampleImages: payload.sampleImages ?? [],
-        sampleDescriptions: payload.sampleDescriptions ?? [],
-        status: MediaStatus.DRAFT,
-      },
+      data: getMediaUpdateDataFromReviewPayload(payload),
     });
 
     revalidatePath("/admin");
@@ -178,49 +124,23 @@ export async function updateMediaDraft(
 
 export async function publishMedia(
   mediaId: string,
-  payload: MediaReviewFormPayload
+  payload: MediaReviewFormPayload,
 ): Promise<UpdateResult> {
   try {
     await requireAdminAndMedia(mediaId);
+    const err = validateMediaReviewPayload(payload);
+    if (err) return { ok: false, error: err };
 
-    const exposure =
-      payload.exposureJson &&
-      (Object.keys(payload.exposureJson).length > 0 ||
-        Object.values(payload.exposureJson).some((v) => v != null))
-        ? (payload.exposureJson as object)
-        : undefined;
-
-    const audienceTagsMergedPub = mergeAudienceTagsForStorage(
-      payload.targetAudience,
-      payload.audienceTags,
-    );
     await prisma.media.update({
       where: { id: mediaId },
-      data: {
-        mediaName: payload.mediaName,
-        description: payload.description ?? null,
-        category: payload.category as "BILLBOARD" | "DIGITAL_BOARD" | "TRANSIT" | "STREET_FURNITURE" | "WALL" | "ETC",
-        locationJson: payload.locationJson as object,
-        price: toIntOrNull(payload.price),
-        cpm: toIntOrNull(payload.cpm),
-        exposureJson: exposure,
-        targetAudience: payload.targetAudience ?? null,
-        images: payload.images ?? [],
-        tags: payload.tags ?? [],
-        audienceTags: audienceTagsMergedPub,
-        pros: payload.pros ?? null,
-        cons: payload.cons ?? null,
-        trustScore: payload.trustScore != null ? Math.min(100, Math.max(0, Math.round(payload.trustScore))) : null,
-        sampleImages: payload.sampleImages ?? [],
-        sampleDescriptions: payload.sampleDescriptions ?? [],
-        status: MediaStatus.PUBLISHED,
-      },
+      data: getMediaUpdateDataFromReviewPayload(payload, MediaStatus.PUBLISHED),
     });
 
     revalidatePath("/admin");
     revalidatePath("/admin/medias");
     revalidatePath(`/admin/review/${mediaId}`);
     revalidatePath("/admin/ai-upload");
+    revalidateMediaReviewSurfaces(mediaId);
     return { ok: true };
   } catch (e) {
     const message = e instanceof Error ? e.message : "공개 처리에 실패했습니다.";

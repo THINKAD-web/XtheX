@@ -1,13 +1,19 @@
 import { CampaignStatus } from "@prisma/client";
+import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { DashboardChrome } from "@/components/dashboard/DashboardChrome";
 import { gateAdvertiserDashboard } from "@/lib/auth/dashboard-gate";
 import { landing } from "@/lib/landing-theme";
 import { prisma } from "@/lib/prisma";
+import { DashboardStatsSection } from "@/components/dashboard/DashboardStatsSection";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const metadata: Metadata = {
+  title: "Advertiser Dashboard | XtheX",
+  description: "Track inquiries, campaigns, and performance as an advertiser.",
+  robots: { index: false, follow: false },
+};
 
 function statusLabel(
   status: CampaignStatus,
@@ -50,7 +56,6 @@ export default async function AdvertiserDashboardPage() {
   });
 
   return (
-    <DashboardChrome>
       <main className={`${landing.container} space-y-10 py-10 lg:space-y-12 lg:py-14`}>
         <section className="relative overflow-hidden rounded-3xl border border-sky-200/60 bg-gradient-to-br from-white via-sky-50/50 to-emerald-50/40 p-8 shadow-lg dark:border-zinc-700 dark:from-zinc-900 dark:via-zinc-900/90 dark:to-emerald-950/30 dark:shadow-black/30 lg:p-10">
           <div
@@ -69,17 +74,27 @@ export default async function AdvertiserDashboardPage() {
           </p>
         </section>
 
+        <DashboardStatsSection role="ADVERTISER" />
+
         <section aria-labelledby="advertiser-quick-actions">
           <h2 id="advertiser-quick-actions" className="sr-only">
             Quick actions
           </h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Link
               href="/campaigns/new"
               className={`${landing.card} flex min-h-[120px] flex-col justify-center border-sky-200/50 bg-white/90 text-center dark:border-sky-900/30`}
             >
               <span className="text-sm font-semibold text-blue-700 dark:text-sky-300">
                 {t("quick_new_campaign")}
+              </span>
+            </Link>
+            <Link
+              href="/dashboard/advertiser/explore"
+              className={`${landing.card} flex min-h-[120px] flex-col justify-center border-cyan-200/50 bg-white/90 text-center dark:border-cyan-900/30`}
+            >
+              <span className="text-sm font-semibold text-cyan-800 dark:text-cyan-300">
+                {t("quick_explore_map")}
               </span>
             </Link>
             <Link
@@ -156,6 +171,5 @@ export default async function AdvertiserDashboardPage() {
           )}
         </section>
       </main>
-    </DashboardChrome>
   );
 }

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { signIn, getSession } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +12,8 @@ import {
 } from "@/lib/auth/post-auth-redirect";
 
 type Props = {
-  signupHref: string;
+  /** 기본 `/signup` — `role`, `callbackUrl` 쿼리가 있으면 자동으로 전달합니다. */
+  signupHref?: string;
   title: string;
   emailLabel: string;
   passwordLabel: string;
@@ -34,8 +35,17 @@ export function LoginForm({
   noAccount,
   googleEnabled,
 }: Props) {
-  const router = useRouter();
   const searchParams = useSearchParams();
+  const signupHrefWithParams = React.useMemo(() => {
+    const base = signupHref ?? "/signup";
+    const sp = new URLSearchParams();
+    const role = searchParams.get("role");
+    const cb = searchParams.get("callbackUrl");
+    if (role) sp.set("role", role);
+    if (cb) sp.set("callbackUrl", cb);
+    const q = sp.toString();
+    return q ? `${base}?${q}` : base;
+  }, [searchParams, signupHref]);
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
@@ -48,19 +58,26 @@ export function LoginForm({
     try {
       const result = await signIn("credentials", {
         redirect: false,
-        email: email.trim(),
+        email: email.trim().toLowerCase(),
         password,
       });
       if (result?.error) {
         setError("이메일 또는 비밀번호가 올바르지 않습니다.");
         return;
       }
-      const session = await getSession();
-      const role = session?.user?.role;
+
       const cb = safeInternalCallbackUrl(searchParams.get("callbackUrl"));
+      /** credentials 로그인 직후 클라이언트 세션이 한 박자 늦을 수 있음 → 짧게 폴링 후 이동 */
+      let role: string | undefined;
+      for (let i = 0; i < 15; i++) {
+        const session = await getSession();
+        role = session?.user?.role;
+        if (role != null || session?.user?.id) break;
+        await new Promise((r) => setTimeout(r, 80));
+      }
       const target = cb ?? postAuthRedirectPath(role);
-      router.push(target);
-      router.refresh();
+      /** 전체 로드로 세션 쿠키가 확실히 반영되게 (미들웨어·리다이렉트 꼬임 방지) */
+      window.location.assign(target);
     } catch {
       setError("로그인 중 오류가 발생했습니다.");
     } finally {
@@ -158,7 +175,10 @@ export function LoginForm({
 
       <p className="text-center text-sm text-muted-foreground">
         {noAccount}{" "}
-        <Link href={signupHref} className="font-medium text-primary hover:underline">
+        <Link
+          href={signupHrefWithParams}
+          className="font-medium text-primary hover:underline"
+        >
           회원가입
         </Link>
       </p>

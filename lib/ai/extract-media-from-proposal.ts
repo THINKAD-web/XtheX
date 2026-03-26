@@ -45,12 +45,34 @@ export const extractedMediaDataSchema = z.object({
   media_name: z.string(),
   category: extractedCategorySchema,
   description: z.string().nullable().optional(),
+  sub_category: z.string().nullable().optional(),
   location: extractedLocationSchema.nullable().optional(),
+  full_address: z.string().nullable().optional(),
+  district: z.string().nullable().optional(),
+  city: z.string().nullable().optional(),
+  latitude: z.number().nullable().optional(),
+  longitude: z.number().nullable().optional(),
   price: z.number().int().nonnegative().nullable().optional(),
+  price_per_month: z.number().int().nonnegative().nullable().optional(),
+  price_note: z.string().nullable().optional(),
+  width_m: z.number().nullable().optional(),
+  height_m: z.number().nullable().optional(),
+  resolution: z.string().nullable().optional(),
+  operating_hours: z.string().nullable().optional(),
+  daily_footfall: z.number().nullable().optional(),
+  weekday_footfall: z.number().nullable().optional(),
+  target_age: z.string().nullable().optional(),
+  impressions: z.number().nullable().optional(),
+  reach: z.number().nullable().optional(),
+  frequency: z.number().nullable().optional(),
   cpm: z.number().int().nonnegative().nullable().optional(),
+  engagement_rate: z.number().nullable().optional(),
+  visibility_score: z.number().int().min(0).max(100).nullable().optional(),
+  effect_memo: z.string().nullable().optional(),
   exposure: extractedExposureSchema.nullable().optional(),
   target_audience: z.string().nullable().optional(),
   images: z.array(z.string()).default([]),
+  extracted_images: z.array(z.string()).default([]),
   /** Vision+Supabase 제안서 샘플 + 사용자 업로드 URL */
   sampleImages: z.array(z.string()).default([]),
   /** 사용자 업로드 사진 설명 (Vision) */
@@ -83,17 +105,43 @@ export function toMediaCreateInput(
     mediaName: data.media_name,
     category: data.category as MediaCategory,
     description: data.description ?? null,
-    locationJson: (data.location ?? {}) as object,
-    price: data.price ?? null,
+    locationJson: ({
+      ...(data.location ?? {}),
+      address: data.full_address ?? data.location?.address ?? null,
+      district: data.district ?? data.location?.district ?? null,
+      city: data.city ?? data.location?.city ?? null,
+      lat: data.latitude ?? data.location?.lat ?? null,
+      lng: data.longitude ?? data.location?.lng ?? null,
+      width_m: data.width_m ?? null,
+      height_m: data.height_m ?? null,
+      resolution: data.resolution ?? null,
+      operating_hours: data.operating_hours ?? null,
+      sub_category: data.sub_category ?? null,
+    }) as object,
+    price: data.price_per_month ?? data.price ?? null,
     cpm: data.cpm ?? null,
-    exposureJson: (data.exposure ?? undefined) as object | undefined,
-    targetAudience: data.target_audience ?? null,
-    images: data.images ?? [],
+    exposureJson: ({
+      ...(data.exposure ?? {}),
+      daily_traffic: data.daily_footfall ?? data.exposure?.daily_traffic ?? null,
+      weekday_traffic: data.weekday_footfall ?? null,
+      monthly_impressions:
+        data.impressions ?? data.exposure?.monthly_impressions ?? null,
+      reach: data.reach ?? data.exposure?.reach ?? null,
+      frequency: data.frequency ?? data.exposure?.frequency ?? null,
+      cpm: data.cpm ?? null,
+      engagement_rate: data.engagement_rate ?? null,
+      visibility_score: data.visibility_score ?? null,
+      target_age: data.target_age ?? null,
+      price_note: data.price_note ?? null,
+      effect_memo: data.effect_memo ?? null,
+    }) as object,
+    targetAudience: data.target_audience ?? data.target_age ?? null,
+    images: (data.extracted_images?.length ? data.extracted_images : data.images) ?? [],
     sampleImages: data.sampleImages ?? [],
     sampleDescriptions: data.sampleDescriptions ?? [],
     tags: data.tags ?? [],
     audienceTags: data.audience_tags ?? [],
-    pros: data.pros ?? null,
+    pros: data.pros ?? data.effect_memo ?? null,
     cons: data.cons ?? null,
     trustScore: data.trust_score ?? null,
     proposalFileUrl: overrides.proposalFileUrl ?? null,
@@ -113,28 +161,67 @@ function extractJsonObject(text: string): unknown | null {
   }
 }
 
-const SYSTEM_PROMPT = `You extract structured data from Korean outdoor advertising (OOH) media proposal PDF text.
-Output ONLY a single valid JSON object (no markdown, no code fence) with exactly these keys:
+const SYSTEM_PROMPT = `You are a senior OOH/DOOH media intelligence extractor specialized in Korean proposal PDFs.
+Your job is to extract structured media data with maximum factual accuracy.
+
+Return ONLY ONE valid JSON object (no markdown, no code fence, no commentary).
+Use EXACT keys and order below:
 {
-  "media_name": string (required, concise Korean name of the media/site),
-  "category": one of BILLBOARD | DIGITAL_BOARD | TRANSIT | STREET_FURNITURE | WALL | ETC,
-  "description": string or null,
-  "location": { "address", "district", "lat", "lng", "map_link" } or null
-    — lat/lng: ONLY if the document text explicitly states numbers (e.g. 37.4979, 127.0276, or "위도 37.5"). Otherwise null. Do not guess coordinates.
-    — address/district: from text when present; do not invent street names.
-    — map_link: only if an http(s) URL appears in the text; else null,
-  "price": integer KRW total or monthly if clear, else null,
-  "cpm": integer KRW if stated, else null,
-  "exposure": { "daily_traffic", "monthly_impressions", "reach", "frequency" } as strings or numbers, null fields ok,
-  "target_audience": string or null,
-  "images": string[] — ONLY complete http(s) URLs literally present in the extracted PDF text. If the PDF only has embedded photos (no URL in text), use empty array []. Never use placeholder phrases like "현장 사진".
-  "tags": string[] (Korean keywords, 3–8 items),
-  "pros": string or null,
-  "cons": string or null,
-  "trust_score": integer 0-100 estimate from document quality/clarity,
-  "additional": string or null (other admin-relevant notes)
+  "media_name": string,
+  "description": string|null,
+  "sub_category": string|null,
+  "tags": string[],
+  "full_address": string|null,
+  "district": string|null,
+  "city": string|null,
+  "latitude": number|null,
+  "longitude": number|null,
+  "price_per_month": number|null,
+  "price_note": string|null,
+  "width_m": number|null,
+  "height_m": number|null,
+  "resolution": string|null,
+  "operating_hours": string|null,
+  "daily_footfall": number|null,
+  "weekday_footfall": number|null,
+  "target_age": string|null,
+  "impressions": number|null,
+  "reach": number|null,
+  "frequency": number|null,
+  "cpm": number|null,
+  "engagement_rate": number|null,
+  "visibility_score": number|null,
+  "effect_memo": string|null,
+  "extracted_images": string[],
+  "category": "BILLBOARD"|"DIGITAL_BOARD"|"TRANSIT"|"STREET_FURNITURE"|"WALL"|"ETC",
+  "location": { "address","district","city","lat","lng","map_link" }|null,
+  "price": number|null,
+  "exposure": { "daily_traffic","monthly_impressions","reach","frequency" }|null,
+  "target_audience": string|null,
+  "images": string[],
+  "sampleImages": string[],
+  "sampleDescriptions": string[],
+  "audience_tags": string[],
+  "pros": string|null,
+  "cons": string|null,
+  "trust_score": number|null,
+  "additional": string|null
 }
-Use Korean where natural.`;
+
+Hard rules:
+1) Never hallucinate. If uncertain, use null (or [] for arrays).
+2) Numeric fields must be numbers (no unit text inside number fields).
+3) Keep Korean entities exactly as source text when present.
+4) Coordinates ONLY when explicitly present in source text/table.
+5) extracted_images must contain only reliable URL-like references from source context; otherwise [].
+6) If source provides ranges (price/CPM/impressions), use midpoint and mention range in price_note or effect_memo.
+7) Prefer tables/spec sheets over narrative text when values conflict.
+
+Korean PDF handling:
+- Prioritize values around keywords: 위치, 주소, 소재지, 설치위치, 규격, 가격, 단가, 노출, 도달, 빈도, CPM, 유동인구.
+- Preserve district/city naming in Korean.
+
+Output JSON only.`;
 
 async function callLlmExtract(
   documentText: string,
@@ -206,8 +293,29 @@ function mockExtractedData(adminMemo?: string): ExtractedMediaData {
       lng: 127.02762,
       map_link: "추정: https://maps.google.com/?q=37.49794,127.02762",
     },
+    full_address: "서울특별시 강남구 강남대로 408, 강남역 4번 출구 앞",
+    district: "강남구",
+    city: "서울특별시",
+    latitude: 37.49794,
+    longitude: 127.02762,
     price: 25000000,
+    price_per_month: 25000000,
+    price_note: "성수기 단가 변동 가능",
+    sub_category: "LED 전광판",
+    width_m: 12,
+    height_m: 7,
+    resolution: "3840x2160",
+    operating_hours: "06:00-24:00",
+    daily_footfall: 250000,
+    weekday_footfall: 180000,
+    target_age: "20-39세",
+    impressions: 7500000,
+    reach: 42,
+    frequency: 4.2,
     cpm: 9500,
+    engagement_rate: 2.8,
+    visibility_score: 88,
+    effect_memo: "야간 가시성 우수, 통근·상권 유입 강점",
     exposure: {
       daily_traffic: "추정: 250000명/일",
       monthly_impressions: "약 7500000회",
@@ -216,6 +324,7 @@ function mockExtractedData(adminMemo?: string): ExtractedMediaData {
     },
     target_audience: "20~30대 직장인, 대학생, 프리랜서",
     images: ["MOCK: 전경 이미지", "MOCK: 야간 노출 이미지"],
+    extracted_images: [],
     sampleImages: [],
     sampleDescriptions: [],
     tags: ["MOCK", "강남역", "디지털보드"],

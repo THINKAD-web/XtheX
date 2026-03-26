@@ -50,7 +50,11 @@ enum MediaCategory {
 
 enum MediaStatus {
   DRAFT
+  /** 매체사 업로드 후 AI/관리자 검토 대기 */
+  PENDING
   PUBLISHED
+  /** 관리자 거부 */
+  REJECTED
   ARCHIVED
 }
 
@@ -59,6 +63,12 @@ enum CampaignStatus {
   SUBMITTED
   APPROVED
   REJECTED
+}
+
+enum InquiryStatus {
+  PENDING
+  REPLIED
+  CLOSED
 }
 
 model Media {
@@ -83,6 +93,12 @@ model Media {
   trustScore        Int?           // 0–100
   viewCount         Int            @default(0)
   status            MediaStatus    @default(DRAFT)
+  /** 업로드 직후 AI 심사 요약 (한국어) */
+  aiReviewComment   String?
+  aiReviewScore     Int?
+  /** 노출 가능 기간 (매체사 등록) */
+  availabilityStart DateTime?
+  availabilityEnd   DateTime?
   adminMemo         String?
   proposalFileUrl   String?        // S3/storage 원본 PDF 링크
   /** 재파싱 전 폼 스냅샷 히스토리 { backups: [...], lastReparseAt } */
@@ -121,6 +137,7 @@ model User {
   mediaCreated   Media[]         @relation("MediaCreatedBy")
   campaignDrafts CampaignDraft[] @relation("CampaignDraftsByUser")
   campaigns      Campaign[]      @relation("CampaignsByUser")
+  inquiriesSent  Inquiry[]      @relation("InquiryByAdvertiser")
 }
 
 model Account {
@@ -272,19 +289,27 @@ model Matching {
 }
 
 model Inquiry {
-  id        String   @id @default(uuid()) @db.Uuid
-  mediaId   String?  @db.Uuid
-  name      String
-  email     String
-  company   String?
-  budget    Int?
-  message   String
-  locale    String?
-  createdAt DateTime @default(now())
+  id            String        @id @default(uuid()) @db.Uuid
+  advertiserId  String        @db.Uuid
+  mediaId       String        @db.Uuid
+  message       String        @db.Text
+  desiredPeriod String?
+  budget        Int?          // KRW
+  contactEmail  String?
+  contactPhone  String?
+  status        InquiryStatus @default(PENDING)
+  adminMemo     String?       @db.Text
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 
-  media Media? @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+  advertiser User  @relation("InquiryByAdvertiser", fields: [advertiserId], references: [id], onDelete: Cascade)
+  media      Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
 
+  @@index([advertiserId])
   @@index([mediaId])
+  @@index([status])
+  @@index([advertiserId, createdAt])
+  @@index([mediaId, createdAt])
 }
 
 // --- Advanced keyword targeting for DOOH ---

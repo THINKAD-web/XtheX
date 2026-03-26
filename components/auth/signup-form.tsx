@@ -6,7 +6,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { postAuthRedirectPath } from "@/lib/auth/post-auth-redirect";
+import {
+  postAuthRedirectPath,
+  safeInternalCallbackUrl,
+} from "@/lib/auth/post-auth-redirect";
 
 const ROLES = ["ADVERTISER", "MEDIA_OWNER"] as const;
 
@@ -40,6 +43,8 @@ export function SignupForm({
   const router = useRouter();
   const searchParams = useSearchParams();
   const paramRole = searchParams.get("role")?.toUpperCase();
+  const callbackUrlParam = searchParams.get("callbackUrl");
+  const safeAfterAuth = safeInternalCallbackUrl(callbackUrlParam);
   const initialRole =
     paramRole === "MEDIA_OWNER" || paramRole === "ADVERTISER"
       ? paramRole
@@ -51,6 +56,16 @@ export function SignupForm({
   const [role, setRole] = React.useState<(typeof ROLES)[number]>(initialRole);
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
+
+  const loginHrefWithParams = React.useMemo(() => {
+    const sp = new URLSearchParams();
+    const role = searchParams.get("role");
+    const cb = searchParams.get("callbackUrl");
+    if (role) sp.set("role", role);
+    if (cb) sp.set("callbackUrl", cb);
+    const q = sp.toString();
+    return q ? `${loginHref}?${q}` : loginHref;
+  }, [searchParams, loginHref]);
 
   React.useEffect(() => {
     if (paramRole === "MEDIA_OWNER" || paramRole === "ADVERTISER") {
@@ -95,7 +110,9 @@ export function SignupForm({
         return;
       }
       const session = await getSession();
-      router.push(postAuthRedirectPath(session?.user?.role));
+      const dest =
+        safeAfterAuth ?? postAuthRedirectPath(session?.user?.role);
+      router.push(dest);
       router.refresh();
     } catch {
       setError("요청 중 오류가 발생했습니다.");
@@ -206,7 +223,10 @@ export function SignupForm({
 
       <p className="text-center text-sm text-muted-foreground">
         {hasAccount}{" "}
-        <Link href={loginHref} className="font-medium text-primary hover:underline">
+        <Link
+          href={loginHrefWithParams}
+          className="font-medium text-primary hover:underline"
+        >
           로그인
         </Link>
       </p>

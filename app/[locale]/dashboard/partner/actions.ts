@@ -18,6 +18,11 @@ async function ensureDbUser() {
   return user;
 }
 
+/** 매체 제안서 제출: 매체사 계정 + 관리자(테스트/검수용) */
+function canSubmitPartnerProposal(role: UserRole): boolean {
+  return role === UserRole.MEDIA_OWNER || role === UserRole.ADMIN;
+}
+
 export async function createMediaProposal(input: unknown) {
   const t = await getTranslations("dashboard.partner");
   let dbUser;
@@ -26,8 +31,8 @@ export async function createMediaProposal(input: unknown) {
   } catch {
     throw new Error(t("errors.submit_failed"));
   }
-  if (dbUser.role !== UserRole.MEDIA_OWNER) {
-    throw new Error(t("errors.submit_failed"));
+  if (!canSubmitPartnerProposal(dbUser.role)) {
+    throw new Error(t("errors.media_owner_only"));
   }
 
   let parsed: MediaProposalFormValues;
@@ -100,10 +105,6 @@ async function analyzeWithGrok(input: {
 }) {
   const apiKey = process.env.GROK_API_KEY;
 
-  // 디버깅용 환경 변수 로그
-  // eslint-disable-next-line no-console
-  console.log("읽은 GROK_API_KEY:", apiKey ? "[set]" : "키 없음");
-
   if (!apiKey) {
     return { ok: false as const, error: "GROK_API_KEY not set" };
   }
@@ -147,10 +148,6 @@ async function analyzeWithGrok(input: {
       ],
     };
 
-    // 디버깅용 요청 바디 로그
-    // eslint-disable-next-line no-console
-    console.log("Grok 요청 body:", JSON.stringify(body, null, 2));
-
     // 4) Grok API 호출 (response_format 완전 제거)
     const res = await fetch("https://api.x.ai/v1/chat/completions", {
       method: "POST",
@@ -164,7 +161,6 @@ async function analyzeWithGrok(input: {
     // 5) HTTP 에러 처리 + 상세 로그
     if (!res.ok) {
       const errorBody = await res.text();
-      // eslint-disable-next-line no-console
       console.error("Grok 400 상세 에러:", res.status, errorBody);
       throw new Error(`Grok API error: ${res.status} - ${errorBody}`);
     }
@@ -186,10 +182,6 @@ async function analyzeWithGrok(input: {
       throw new Error("Failed to parse Grok JSON content");
     }
 
-    // 원본 JSON 로그
-    // eslint-disable-next-line no-console
-    console.log("Grok 응답 JSON:", parsedJson);
-
     // 7) 스키마 검증
     const validated = grokAnalysisSchema.parse(parsedJson);
 
@@ -210,7 +202,6 @@ async function analyzeWithGrok(input: {
 
     return { ok: true as const };
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Grok error:", error);
     // 실패 시 상태를 FAILED 로 표시
     try {
@@ -219,7 +210,6 @@ async function analyzeWithGrok(input: {
         data: { status: ProposalStatus.FAILED },
       });
     } catch (updateError) {
-      // eslint-disable-next-line no-console
       console.error("Grok FAILED status update error:", updateError);
     }
     return {
@@ -242,10 +232,10 @@ export async function createProposal(input: SimpleProposalInput) {
     };
   }
 
-  if (dbUser.role !== UserRole.MEDIA_OWNER) {
+  if (!canSubmitPartnerProposal(dbUser.role)) {
     return {
       ok: false as const,
-      error: t("errors.submit_failed"),
+      error: t("errors.media_owner_only"),
     };
   }
 

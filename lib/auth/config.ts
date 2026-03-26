@@ -78,13 +78,18 @@ export const authOptions: NextAuthOptions = {
       }
       const uid = (token.sub ?? token.id) as string | undefined;
       if (uid) {
-        const row = await prisma.user.findUnique({
-          where: { id: uid },
-          select: { role: true, email: true },
-        });
-        if (row) {
-          token.role = row.role;
-          if (row.email) token.email = row.email;
+        try {
+          const row = await prisma.user.findUnique({
+            where: { id: uid },
+            select: { role: true, email: true },
+          });
+          if (row) {
+            token.role = row.role;
+            if (row.email) token.email = row.email;
+          }
+        } catch {
+          // DB 다운·DATABASE_URL 누락 시 JWT 갱신이 500 HTML을 반환해
+          // CLIENT_FETCH_ERROR(HTML 파싱 실패)로 이어지므로 기존 토큰 유지
         }
       }
       return token;

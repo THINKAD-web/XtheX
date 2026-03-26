@@ -1,7 +1,7 @@
-import { UserRole } from "@prisma/client";
-import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth/rbac";
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { prisma } from "@/lib/prisma";
+import { gateAdminDashboard } from "@/lib/auth/dashboard-gate";
 import { createDemoMedias } from "./actions";
 import { AdminMediasClient } from "@/components/admin/AdminMediasClient";
 import { AdminMediasDaypartShell } from "@/components/admin/AdminMediasDaypartShell";
@@ -9,36 +9,59 @@ import { AdminMediasToolbar } from "@/components/admin/AdminMediasToolbar";
 import { AdminMediasTrendingDaypart } from "@/components/admin/AdminMediasTrendingDaypart";
 import { TrendingMediasSection } from "@/components/medias/TrendingMediasSection";
 import { DoohCampaignOnboardingModal } from "@/components/onboarding/DoohCampaignOnboardingModal";
+import { AdminMediasList } from "@/components/admin/AdminMediasList";
+import {
+  buildAdminMediasWhere,
+  fetchAdminMediasListPage,
+  type AdminMediasReviewFilter,
+} from "@/lib/admin/admin-medias-list-query";
+import { serializeAdminMediaListRow } from "@/lib/admin/format-admin-media-list-row";
 
-export default async function AdminMediasPage({
-  params,
-}: {
+export const runtime = "nodejs";
+export const metadata: Metadata = {
+  title: "Admin Media Review | XtheX",
+  description: "Review, approve, and manage all media listings.",
+  robots: { index: false, follow: false },
+};
+
+const PAGE_SIZE = 15;
+
+function parseReviewFilter(raw: string | undefined): AdminMediasReviewFilter {
+  if (
+    raw === "all" ||
+    raw === "pending" ||
+    raw === "published" ||
+    raw === "rejected"
+  ) {
+    return raw;
+  }
+  return "pending";
+}
+
+type PageProps = {
   params: Promise<{ locale: string }>;
-}) {
-  const t = await getTranslations("admin");
-  const tm = await getTranslations("admin.medias");
-  const user = await getCurrentUser();
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-zinc-50 p-6">
-        <div className="mx-auto max-w-5xl rounded-lg border border-zinc-200 bg-white p-6">
-          <p className="text-sm text-zinc-700">{t("common.signIn")}</p>
-        </div>
-      </div>
-    );
-  }
+  searchParams?: Promise<{ review?: string; page?: string; q?: string }>;
+};
 
-  if (user.role !== UserRole.ADMIN) {
-    return (
-      <div className="min-h-screen bg-zinc-50 p-6">
-        <div className="mx-auto max-w-5xl rounded-lg border border-zinc-200 bg-white p-6">
-          <p className="text-sm text-zinc-700">{t("common.adminOnly")}</p>
-        </div>
-      </div>
-    );
-  }
+export default async function AdminMediasPage({ params, searchParams }: PageProps) {
+  const tm = await getTranslations("admin.medias");
+  await gateAdminDashboard();
 
   const { locale } = await params;
+  const sp = (await searchParams) ?? {};
+  const review = parseReviewFilter(
+    typeof sp.review === "string" ? sp.review : undefined,
+  );
+  const page = Math.max(1, parseInt(String(sp.page ?? "1"), 10) || 1);
+  const q = typeof sp.q === "string" ? sp.q : "";
+
+  const where = buildAdminMediasWhere(review, q.trim() || undefined);
+  const { total, rows: listRows } = await fetchAdminMediasListPage({
+    where,
+    page,
+    pageSize: PAGE_SIZE,
+  });
+
   const medias = await prisma.media.findMany({
     orderBy: { updatedAt: "desc" },
     take: 100,
@@ -57,7 +80,7 @@ export default async function AdminMediasPage({
 
   return (
     <AdminMediasDaypartShell>
-      <div className="mx-auto max-w-5xl px-4 py-8">
+      <div className="mx-auto max-w-[1400px] px-4 py-8">
         <DoohCampaignOnboardingModal locale={locale} />
 
         <AdminMediasToolbar
@@ -69,6 +92,17 @@ export default async function AdminMediasPage({
             demoMedias: tm("demoMedias"),
           }}
         />
+
+        <div className="mb-10">
+          <AdminMediasList
+            rows={listRows.map(serializeAdminMediaListRow)}
+            filter={review}
+            page={page}
+            pageSize={PAGE_SIZE}
+            total={total}
+            q={q}
+          />
+        </div>
 
         <AdminMediasTrendingDaypart>
           <TrendingMediasSection locale={locale} />

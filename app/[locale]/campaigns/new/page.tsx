@@ -40,7 +40,11 @@ export default async function NewCampaignPlaceholderPage({
   const t = await getTranslations("dashboard.advertiser");
   const sp = (await searchParams) ?? {};
 
-  const rawMediaIds = typeof sp.mediaIds === "string" ? sp.mediaIds : "";
+  const rawMediaIds = Array.isArray(sp.mediaIds)
+    ? sp.mediaIds.join(",")
+    : typeof sp.mediaIds === "string"
+      ? sp.mediaIds
+      : "";
   const fromList = rawMediaIds
     .split(",")
     .map((v) => v.trim())

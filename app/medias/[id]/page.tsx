@@ -229,8 +229,8 @@ export default async function PublicMediaDetailPage({
                     ? "이 미디어를 포함한 캠페인 초안을 바로 만들 수 있습니다."
                     : "Create a campaign draft with this media immediately."}
                 </p>
-                <Link href={`/campaigns/new?mediaIds=${media.id}`} className="block">
-                  <Button className="h-12 w-full bg-blue-600 text-base font-semibold hover:bg-blue-500">
+                <Link href={`/campaigns/new?page=recommend&mediaIds=${media.id}`} className="block">
+                  <Button className="h-14 w-full bg-blue-600 text-lg font-semibold hover:bg-blue-500">
                     {isKo ? "이 미디어로 캠페인 만들기" : "Create campaign with this media"}
                   </Button>
                 </Link>

@@ -2,24 +2,13 @@
 
 import * as React from "react";
 import { HomeRoleCtas } from "@/components/home/home-role-ctas";
-import { Monitor } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
 import { landing } from "@/lib/landing-theme";
 import { useLocalDaypart } from "@/hooks/use-local-daypart";
 import { cn } from "@/lib/utils";
 import { Link } from "@/i18n/navigation";
-
-const FLOAT_ICONS = [
-  { top: "12%", left: "8%", size: 24, opacity: 0.4 },
-  { top: "18%", right: "15%", size: 20, opacity: 0.35 },
-  { top: "45%", left: "12%", size: 28, opacity: 0.3 },
-  { top: "70%", left: "20%", size: 22, opacity: 0.4 },
-  { top: "25%", right: "25%", size: 18, opacity: 0.35 },
-  { top: "60%", right: "10%", size: 26, opacity: 0.3 },
-  { top: "80%", right: "22%", size: 20, opacity: 0.4 },
-  { top: "35%", left: "5%", size: 16, opacity: 0.35 },
-] as const;
+import Image from "next/image";
 
 export function HomeHeroDaypart() {
   const t = useTranslations("home.hero");
@@ -40,48 +29,28 @@ export function HomeHeroDaypart() {
       className={cn(
         "relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 pb-28 pt-32 sm:pb-32 sm:pt-36 lg:pb-36 lg:pt-40",
         isDay
-          ? "bg-gradient-to-b from-sky-50 via-white to-zinc-50 text-zinc-900"
-          : "bg-zinc-950 text-white",
+          ? "text-zinc-900"
+          : "text-white",
       )}
     >
-      <div
-        className="absolute inset-0 opacity-30"
-        style={{
-          backgroundImage: isDay
-            ? `
-            linear-gradient(to bottom, rgba(59,130,246,0.06) 0%, transparent 45%, rgba(59,130,246,0.04) 100%),
-            linear-gradient(90deg, rgba(59,130,246,0.07) 1px, transparent 1px),
-            linear-gradient(rgba(59,130,246,0.05) 1px, transparent 1px)
-          `
-            : `
-            linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, transparent 50%, rgba(0,0,0,0.3) 100%),
-            linear-gradient(90deg, rgba(59,130,246,0.08) 1px, transparent 1px),
-            linear-gradient(rgba(59,130,246,0.06) 1px, transparent 1px)
-          `,
-          backgroundSize: "80px 80px, 60px 60px, 60px 60px",
-        }}
+      {/* Background Image */}
+      <Image
+        src="/images/hero-billboard.jpg"
+        alt="Times Square Billboard"
+        fill
+        className="object-cover"
+        priority
+        quality={80}
       />
-      <div className="pointer-events-none absolute inset-0">
-        {FLOAT_ICONS.map((pos, i) => (
-          <div
-            key={i}
-            className={cn(
-              "absolute",
-              isDay ? "text-blue-500/50" : "text-blue-400/60",
-            )}
-            style={{
-              top: pos.top,
-              left: "left" in pos ? pos.left : undefined,
-              right: "right" in pos ? pos.right : undefined,
-              width: pos.size,
-              height: pos.size,
-              opacity: pos.opacity,
-            }}
-          >
-            <Monitor className="h-full w-full" />
-          </div>
-        ))}
-      </div>
+      {/* Overlay */}
+      <div
+        className={cn(
+          "absolute inset-0 z-[1]",
+          isDay
+            ? "bg-gradient-to-b from-white/80 via-white/60 to-white/90"
+            : "bg-gradient-to-b from-zinc-950/85 via-zinc-950/70 to-zinc-950/90",
+        )}
+      />
 
       <div
         className={cn(
@@ -102,26 +71,22 @@ export function HomeHeroDaypart() {
 
         <h1
           className={cn(
-            "text-balance text-4xl font-bold tracking-tight lg:text-5xl",
-            isDay ? "text-zinc-900" : landing.h1OnDark,
+            "text-balance text-4xl font-bold tracking-tight lg:text-6xl drop-shadow-lg",
+            isDay ? "text-zinc-900" : "text-white",
           )}
         >
           {t("title")}
         </h1>
         <p
           className={cn(
-            "mx-auto mt-8 max-w-2xl text-pretty text-lg leading-relaxed lg:text-xl lg:leading-relaxed",
-            isDay ? "text-zinc-600" : "text-zinc-300",
+            "mx-auto mt-8 max-w-2xl text-pretty text-lg leading-relaxed lg:text-xl lg:leading-relaxed drop-shadow-md",
+            isDay ? "text-zinc-700" : "text-zinc-200",
           )}
         >
           {t("subtitle")}
         </p>
 
         <div className="mt-10 flex flex-col items-center gap-6">
-          {/*
-            HomeRoleCtas는 내부에서 loading / 인증 / 비로그인을 모두 처리합니다.
-            동일 트리 위치에 인스턴스를 하나만 두어 React 훅 순서 경고를 방지합니다.
-          */}
           <HomeRoleCtas
             mediaLabel={t("cta_partner")}
             advertiserLabel={t("cta_explore")}

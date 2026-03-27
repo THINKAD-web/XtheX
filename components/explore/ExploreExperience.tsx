@@ -157,13 +157,13 @@ function isMockMediaId(id: string): boolean {
 function mediaTypePlaceholder(mediaType: string) {
   switch (mediaType) {
     case "BILLBOARD":
-      return { bg: "bg-orange-100 dark:bg-orange-950/40", Icon: Building2 };
+      return { bg: "bg-gradient-to-br from-orange-100 to-amber-50", Icon: Building2 };
     case "DIGITAL_BOARD":
-      return { bg: "bg-blue-100 dark:bg-blue-950/40", Icon: Monitor };
+      return { bg: "bg-gradient-to-br from-blue-100 to-cyan-50", Icon: Monitor };
     case "TRANSIT":
-      return { bg: "bg-green-100 dark:bg-green-950/40", Icon: TrainFront };
+      return { bg: "bg-gradient-to-br from-green-100 to-emerald-50", Icon: TrainFront };
     default:
-      return { bg: "bg-zinc-100 dark:bg-zinc-800", Icon: LayoutGrid };
+      return { bg: "bg-gradient-to-br from-zinc-100 to-slate-50", Icon: LayoutGrid };
   }
 }
 

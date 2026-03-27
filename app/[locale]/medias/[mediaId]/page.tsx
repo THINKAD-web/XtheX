@@ -14,6 +14,7 @@ import { ViewCountTracker } from "@/components/medias/ViewCountTracker";
 import { MediaCreativeHints } from "@/components/hints/MediaCreativeHints";
 import { getSimilarMediasForMedia } from "@/lib/medias/similar";
 import { SimilarBundleSection } from "@/components/medias/SimilarBundleSection";
+import { AddToOmniCartButton } from "@/components/medias/AddToOmniCartButton";
 import {
   convertCurrency,
   formatCurrency,
@@ -319,8 +320,14 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
                   saved: isKo ? "관심 미디어에 저장됨" : "Saved to Interested Media",
                 }}
               />
-              <div className="mt-2">
+              <div className="mt-2 flex flex-wrap items-center gap-2">
                 <OmnichannelTrigger mediaId={media.id} locale={locale} />
+                <AddToOmniCartButton
+                  mediaId={media.id}
+                  mediaName={media.mediaName}
+                  category={media.category}
+                  price={media.price}
+                />
               </div>
               <div className="mt-2 flex flex-col gap-2">
                 <Link

@@ -8,6 +8,7 @@ import { FaqSection } from "@/components/FaqSection";
 import { TrendingMediasSection } from "@/components/medias/TrendingMediasSection";
 import { RealtimeMiniDashboardSection } from "@/components/campaign/RealtimeMiniDashboardSection";
 import { LivePerformanceDashboardSection } from "@/components/campaign/LivePerformanceDashboardSection";
+import { DashboardTabSection } from "@/components/home/DashboardTabSection";
 import { SUCCESS_CASES } from "@/lib/case-studies/success-cases";
 import { SuccessCaseGallery } from "@/components/case-studies/SuccessCaseGallery";
 import { MediaMixSearchSection } from "@/components/mix-media/MediaMixSearchSection";
@@ -223,8 +224,11 @@ export default async function Home({
         <MediaMixSearchSection />
         <HomeSolidDaypartWrapper>
           <TrendingMediasSection locale={locale} />
-          <RealtimeMiniDashboardSection locale={locale} />
-          <LivePerformanceDashboardSection locale={locale} />
+          <DashboardTabSection
+            locale={locale}
+            realtimeSlot={<RealtimeMiniDashboardSection locale={locale} />}
+            performanceSlot={<LivePerformanceDashboardSection locale={locale} />}
+          />
           <SuccessCaseGallery
             locale={locale}
             cases={SUCCESS_CASES}

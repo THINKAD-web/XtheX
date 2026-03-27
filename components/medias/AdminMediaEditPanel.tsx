@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Save, X, Loader2, Plus, Trash2 } from "lucide-react";
+import { Pencil, Save, X, Loader2, Plus, Trash2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -43,13 +43,17 @@ export type AdminMediaData = {
   tags: string[];
   pros: string | null;
   cons: string | null;
+  sampleImages?: string[];
 };
 
 export function AdminMediaEditPanel({ media }: { media: AdminMediaData }) {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
+  const [uploading, setUploading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [images, setImages] = React.useState<string[]>(media.sampleImages ?? []);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const [form, setForm] = React.useState(() => buildForm(media));
 
@@ -81,8 +85,48 @@ export function AdminMediaEditPanel({ media }: { media: AdminMediaData }) {
 
   function handleOpen() {
     setForm(buildForm(media));
+    setImages(media.sampleImages ?? []);
     setError(null);
     setOpen(true);
+  }
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      Array.from(files).forEach((file) => {
+        formData.append("mediaSamples", file);
+      });
+
+      const res = await fetch("/api/admin/media-samples", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("업로드 실패");
+
+      const data = await res.json();
+      if (data.urls && data.urls.length > 0) {
+        setImages((prev) => [...prev, ...data.urls]);
+      }
+      if (data.warnings && data.warnings.length > 0) {
+        setError(data.warnings.join(", "));
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "업로드 실패");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  function removeImage(index: number) {
+    setImages((prev) => prev.filter((_, i) => i !== index));
   }
 
   function set(key: keyof typeof form, value: string) {
@@ -122,6 +166,7 @@ export function AdminMediaEditPanel({ media }: { media: AdminMediaData }) {
         tags: parseTags(form.tags),
         pros: form.pros || null,
         cons: form.cons || null,
+        sampleImages: images,
         exposureJson: {
           daily_traffic: parseNum(form.daily_traffic),
           monthly_impressions: parseNum(form.monthly_impressions),
@@ -366,6 +411,56 @@ export function AdminMediaEditPanel({ media }: { media: AdminMediaData }) {
                   />
                 </Field>
               </div>
+            </Section>
+
+            {/* Images */}
+            <Section title="매체 이미지">
+              {images.length > 0 && (
+                <div className="grid grid-cols-3 gap-2 mb-3">
+                  {images.map((url, i) => (
+                    <div key={i} className="relative group">
+                      <img
+                        src={url}
+                        alt={`이미지 ${i + 1}`}
+                        className="h-20 w-full rounded-md object-cover border border-zinc-700"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(i)}
+                        className="absolute -top-1.5 -right-1.5 rounded-full bg-red-500 p-0.5 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-zinc-600 bg-zinc-900/50 px-4 py-4 text-sm text-zinc-400 hover:border-orange-500 hover:bg-zinc-900 hover:text-orange-400 transition-colors disabled:opacity-50"
+              >
+                {uploading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    업로드 중...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4" />
+                    이미지 추가 (최대 5장)
+                  </>
+                )}
+              </button>
             </Section>
 
             {/* Pros & Cons */}

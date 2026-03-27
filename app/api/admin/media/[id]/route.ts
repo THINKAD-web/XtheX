@@ -14,6 +14,7 @@ const updateSchema = z.object({
   tags: z.array(z.string()).optional(),
   pros: z.string().max(3000).nullable().optional(),
   cons: z.string().max(3000).nullable().optional(),
+  sampleImages: z.array(z.string().url()).max(10).optional(),
   exposureJson: z
     .object({
       daily_traffic: z.number().nullable().optional(),

@@ -8,10 +8,13 @@ const RSS_SOURCES = [
 ];
 
 function extractTag(xml: string, tag: string): string {
-  const match = xml.match(
-    new RegExp(`<${tag}[^>]*>(?:<!\\[CDATA\\[)?(.*?)(?:\\]\\]>)?<\\/${tag}>`, "s"),
-  );
-  return match?.[1]?.trim() ?? "";
+  const cdataMatch = xml.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>`, "i"));
+  if (cdataMatch) return cdataMatch[1].trim();
+  const plainMatch = xml.match(new RegExp(`<${tag}[^>]*>([^<]*)<\\/${tag}>`, "i"));
+  if (plainMatch) return plainMatch[1].trim();
+  const afterMatch = xml.match(new RegExp(`<${tag}[^/]*/?>\\s*([^<\\s][^<]*)`, "i"));
+  if (afterMatch) return afterMatch[1].trim();
+  return "";
 }
 
 function parseItems(xml: string, sourceName: string) {

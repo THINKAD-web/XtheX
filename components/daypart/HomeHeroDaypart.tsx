@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { HomeRoleCtas } from "@/components/home/home-role-ctas";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
 import { landing } from "@/lib/landing-theme";
 import { useLocalDaypart } from "@/hooks/use-local-daypart";
@@ -10,11 +10,42 @@ import { cn } from "@/lib/utils";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 
+const SPOTS: Record<string, string[]> = {
+  ko: ["타임스스퀘어", "시부야 교차로", "강남 대형 전광판", "상하이 루자쭈이"],
+  en: ["Times Square", "Shibuya Crossing", "Gangnam LED", "Shanghai Lujiazui"],
+  ja: ["タイムズスクエア", "渋谷スクランブル", "江南LED", "上海陸家嘴"],
+  zh: ["时代广场", "涩谷十字路口", "江南LED广告", "上海陆家嘴"],
+};
+
+const SPOT_PREFIX: Record<string, string> = {
+  ko: "지금 바로 ",
+  en: "Right now at ",
+  ja: "今すぐ ",
+  zh: "现在就在 ",
+};
+
 export function HomeHeroDaypart() {
   const t = useTranslations("home.hero");
+  const locale = useLocale();
   const { status, data: session } = useSession();
   const part = useLocalDaypart();
   const isDay = part === "day";
+
+  const [spotIdx, setSpotIdx] = React.useState(0);
+  const [fade, setFade] = React.useState(true);
+  const spots = SPOTS[locale] ?? SPOTS.en;
+  const prefix = SPOT_PREFIX[locale] ?? SPOT_PREFIX.en;
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setFade(false);
+      setTimeout(() => {
+        setSpotIdx((prev) => (prev + 1) % spots.length);
+        setFade(true);
+      }, 500);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [spots.length]);
 
   const displayName =
     session?.user?.name?.trim() ||
@@ -69,6 +100,15 @@ export function HomeHeroDaypart() {
         >
           {t("title")}
         </h1>
+        <p
+          className={cn(
+            "mt-2 text-xl font-bold transition-opacity duration-500 lg:text-2xl",
+            fade ? "opacity-100" : "opacity-0",
+          )}
+        >
+          <span className="text-zinc-300">{prefix}</span>
+          <span className="text-cyan-300">{spots[spotIdx]}</span>
+        </p>
         <p
           className="mx-auto mt-8 max-w-2xl text-pretty text-lg leading-relaxed lg:text-xl lg:leading-relaxed drop-shadow-md text-zinc-100"
         >

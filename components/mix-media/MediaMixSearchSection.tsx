@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { toast as sonnerToast } from "sonner";
 import { Loader2, SendHorizontal, ImagePlus, X, MapPin, Save, ExternalLink, LayoutDashboard, Maximize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -246,6 +246,29 @@ function buildMapMarkers(
   return Array.from(byId.values());
 }
 
+const QUICK_QUESTIONS: Record<string, string[]> = {
+  ko: [
+    "일본 도쿄에서 게임 출시 광고, 예산 1억원 4주",
+    "뉴욕 타임스스퀘어 한국 브랜드 광고 견적",
+    "서울 강남 20대 여성 타겟 카페 브랜드 4주",
+  ],
+  en: [
+    "Tokyo OOH campaign for game launch, $80K 4 weeks",
+    "Times Square billboard for Korean brand, budget quote",
+    "Seoul Gangnam 20s female target, café brand 4 weeks",
+  ],
+  ja: [
+    "東京でゲームリリース広告、予算1億ウォン4週間",
+    "ニューヨーク・タイムズスクエア韓国ブランド広告",
+    "ソウル江南20代女性ターゲット、カフェブランド4週間",
+  ],
+  zh: [
+    "东京游戏发布广告，预算1亿韩元4周",
+    "纽约时代广场韩国品牌广告报价",
+    "首尔江南20岁女性目标客群，咖啡品牌4周",
+  ],
+};
+
 const DEMO_TOAST_KEY = "xthex_mix_demo_login_toast";
 
 export function MediaMixSearchSection() {
@@ -254,6 +277,7 @@ export function MediaMixSearchSection() {
   const { toast } = useToast();
   const router = useRouter();
   const tMix = useTranslations("home.mediaMix");
+  const locale = useLocale();
   const [query, setQuery] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -652,6 +676,24 @@ export function MediaMixSearchSection() {
               예: 20대 여성 타겟, 예산 5000만원, 서울 강남 중심 4주, 카페 브랜드
               젊고 트렌디한 느낌
             </p>
+          </div>
+          <div className={cn(
+            "flex flex-wrap gap-2 border-b px-4 py-3",
+            isDayUi ? "border-zinc-100" : "border-zinc-800",
+          )}>
+            {(QUICK_QUESTIONS[locale] ?? QUICK_QUESTIONS.en).map((q) => (
+              <button
+                key={q}
+                type="button"
+                onClick={() => {
+                  setQuery(q);
+                  setTimeout(() => submit(), 100);
+                }}
+                className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-800/40 dark:bg-blue-950/30 dark:text-blue-300 dark:hover:bg-blue-900/40"
+              >
+                {q}
+              </button>
+            ))}
           </div>
           <textarea
             className={cn(

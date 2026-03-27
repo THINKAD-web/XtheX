@@ -6,6 +6,7 @@ import { CountUp } from "@/components/count-up";
 import { landing } from "@/lib/landing-theme";
 import { useLandingLightChrome } from "@/hooks/use-landing-light-chrome";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 const DEFAULT_ITEMS: Array<{
   end: number;
@@ -15,11 +16,11 @@ const DEFAULT_ITEMS: Array<{
   label: string;
 }> = [
   {
-    end: 1000,
+    end: 16,
     suffix: "+",
-    duration: 2.5,
+    duration: 2,
     icon: Users,
-    label: "매체사 등록",
+    label: "등록 매체",
   },
   {
     end: 95,
@@ -29,18 +30,18 @@ const DEFAULT_ITEMS: Array<{
     label: "AI 검토 정확도",
   },
   {
-    end: 50,
+    end: 4,
     suffix: "+",
-    duration: 2,
+    duration: 1.5,
     icon: Globe,
-    label: "개국 이상 커버리지",
+    label: "국가 커버리지",
   },
   {
-    end: 10000,
-    suffix: "+",
-    duration: 2.5,
+    end: 4,
+    suffix: "개 언어",
+    duration: 1.5,
     icon: FileText,
-    label: "매월 제안서 처리",
+    label: "다국어 지원",
   },
 ];
 
@@ -137,12 +138,7 @@ export function StatsSection({
                 <Icon className="h-7 w-7" />
               </div>
               <span
-                className={cn(
-                  "text-3xl font-bold tabular-nums sm:text-4xl",
-                  isLight
-                    ? "text-zinc-900 dark:text-zinc-900"
-                    : "text-zinc-900 dark:text-zinc-50",
-                )}
+                className="bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent text-3xl font-bold tabular-nums sm:text-4xl"
               >
                 <CountUp
                   end={end}

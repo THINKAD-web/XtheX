@@ -16,18 +16,25 @@ function extractTag(xml: string, tag: string): string {
 
 function parseItems(xml: string, sourceName: string) {
   const itemMatches = xml.match(/<item[\s\S]*?<\/item>/g) ?? [];
-  return itemMatches.slice(0, 20).map((item) => ({
-    title: extractTag(item, "title").slice(0, 255),
-    excerpt: extractTag(item, "description")
+  return itemMatches.slice(0, 20).map((item) => {
+    const rawExcerpt = extractTag(item, "description")
       .replace(/<[^>]+>/g, "")
-      .slice(0, 500),
-    link: extractTag(item, "link"),
-    pubDate: new Date(extractTag(item, "pubDate") || Date.now()),
-    source: sourceName,
-    category: "Industry News",
-    locale: "en",
-    published: true,
-  }));
+      .trim();
+    const excerpt =
+      rawExcerpt.length > 150 ? rawExcerpt.slice(0, 150) + "..." : rawExcerpt;
+
+    return {
+      title: extractTag(item, "title").slice(0, 255),
+      excerpt,
+      content: "",
+      link: extractTag(item, "link"),
+      pubDate: new Date(extractTag(item, "pubDate") || Date.now()),
+      source: sourceName,
+      category: "Industry News",
+      locale: "en",
+      published: true,
+    };
+  });
 }
 
 export async function GET(req: NextRequest) {
@@ -60,6 +67,7 @@ export async function GET(req: NextRequest) {
             update: {
               title: item.title,
               excerpt: item.excerpt,
+              content: "",
               pubDate: item.pubDate,
             },
             create: item,

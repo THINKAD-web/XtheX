@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getTranslations, getLocale } from "next-intl/server";
 import { AppSiteChrome } from "@/components/layout/AppSiteChrome";
 import { landing } from "@/lib/landing-theme";
@@ -72,6 +72,10 @@ export default async function NewsDetailPage({ params }: Props) {
 
   const article = await getArticle(slug, locale);
   if (!article) notFound();
+
+  if (article.link) {
+    redirect(article.link);
+  }
 
   const categoryLabels: Record<string, string> = {
     "Industry News": t("industry_news"),

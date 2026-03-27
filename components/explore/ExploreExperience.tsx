@@ -12,6 +12,9 @@ import {
   Map as MapIcon,
   MessageCircle,
   SlidersHorizontal,
+  Building2,
+  Monitor,
+  TrainFront,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -149,6 +152,26 @@ function getAddress(loc: unknown): string {
 
 function isMockMediaId(id: string): boolean {
   return id.startsWith("mock-");
+}
+
+function mediaTypePlaceholder(mediaType: string) {
+  switch (mediaType) {
+    case "BILLBOARD":
+      return { bg: "bg-orange-100 dark:bg-orange-950/40", Icon: Building2 };
+    case "DIGITAL_BOARD":
+      return { bg: "bg-blue-100 dark:bg-blue-950/40", Icon: Monitor };
+    case "TRANSIT":
+      return { bg: "bg-green-100 dark:bg-green-950/40", Icon: TrainFront };
+    default:
+      return { bg: "bg-zinc-100 dark:bg-zinc-800", Icon: LayoutGrid };
+  }
+}
+
+function computeCpm(priceMin: number | null, dailyExposure: string | null): number | null {
+  if (priceMin == null || !dailyExposure) return null;
+  const exposure = Number(dailyExposure.replace(/[^0-9]/g, ""));
+  if (!exposure || exposure <= 0) return null;
+  return Math.round((priceMin / (exposure * 30)) * 1000);
 }
 
 type Variant = "public" | "dashboard";
@@ -674,7 +697,7 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
                 <article
                   key={it.id}
                   className={cn(
-                    "flex flex-col overflow-hidden rounded-2xl border bg-white shadow-sm transition hover:shadow-md dark:bg-zinc-900",
+                    "flex flex-col overflow-hidden rounded-2xl border bg-white shadow-sm transition-all duration-200 hover:shadow-lg hover:scale-[1.01] dark:bg-zinc-900",
                     isSelected
                       ? "border-emerald-300 ring-2 ring-emerald-400/40 dark:border-emerald-700"
                       : "border-zinc-200 hover:border-blue-300/60 dark:border-zinc-700",
@@ -689,9 +712,17 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <div className="flex h-full items-center justify-center text-xs text-zinc-400">
-                      No image
-                    </div>
+                    (() => {
+                      const ph = mediaTypePlaceholder(String(it.mediaType));
+                      return (
+                        <div className={cn("flex h-full flex-col items-center justify-center gap-2", ph.bg)}>
+                          <ph.Icon className="h-10 w-10 text-zinc-400 dark:text-zinc-500" />
+                          <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                            {String(it.mediaType).replace(/_/g, " ")}
+                          </span>
+                        </div>
+                      );
+                    })()
                   )}
                   {it.aiReviewScore != null && (
                     <Badge className="absolute right-2 top-2 bg-emerald-600 text-white">
@@ -722,9 +753,19 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
                     <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-700 dark:bg-blue-950/40 dark:text-blue-200">
                       {String(it.mediaType)}
                     </Badge>
-                    <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                      {formatDisplayMoney(it.priceMin)}
-                    </p>
+                    <div className="text-right">
+                      <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                        {formatDisplayMoney(it.priceMin)}
+                      </p>
+                      {(() => {
+                        const cpm = computeCpm(it.priceMin, it.dailyExposure);
+                        return cpm != null ? (
+                          <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                            ₩{cpm.toLocaleString()} CPM
+                          </p>
+                        ) : null;
+                      })()}
+                    </div>
                   </div>
                   <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
                     <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
@@ -746,7 +787,7 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
                       {it.trustScore != null ? `${it.trustScore}` : "—"}
                     </div>
                   </div>
-                  <div className="mt-4 flex flex-wrap gap-2">
+                  <div className="mt-auto flex flex-wrap gap-2 pt-4">
                     {status === "authenticated" ? (
                       <Button
                         type="button"

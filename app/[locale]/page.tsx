@@ -211,7 +211,7 @@ export default async function Home({
         <HomeHeroDaypart />
         <BetaNoticebar />
         {/* 크로스보더 성공 사례 */}
-        <section className="border-b border-zinc-100 bg-white py-8 dark:border-zinc-800 dark:bg-zinc-950">
+        <section className="border-b border-zinc-100 bg-white py-10 dark:border-zinc-800 dark:bg-zinc-950">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <p className="mb-4 text-center text-xs font-semibold uppercase tracking-widest text-zinc-400">
               {locale.startsWith("ko") ? "실제 진행 사례" : locale.startsWith("ja") ? "実績事例" : locale.startsWith("zh") ? "真实案例" : "Real Cases"}
@@ -266,6 +266,9 @@ export default async function Home({
         <Partners />
         <Testimonials />
         <CtaBanner />
+        <div className="mx-auto max-w-4xl px-4">
+          <hr className="border-t border-zinc-200 dark:border-zinc-800" />
+        </div>
         <FaqSection />
       </main>
     </AppSiteChrome>

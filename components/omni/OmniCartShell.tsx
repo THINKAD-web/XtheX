@@ -474,6 +474,15 @@ export function OmniCartShell() {
                 </div>
               ) : (
                 <div className="space-y-5">
+                  <div className="rounded-lg bg-blue-50 border border-blue-200 px-3 py-2 text-sm dark:bg-blue-950/30 dark:border-blue-800/40">
+                    <p className="font-medium text-blue-800 dark:text-blue-200">
+                      {items.length}개 매체 선택됨
+                    </p>
+                    <p className="text-xs text-blue-600 dark:text-blue-400 mt-0.5">
+                      캠페인 제출하면 각 매체사에 알림이 전송됩니다
+                    </p>
+                  </div>
+
                   <div className="rounded-xl border border-cyan-500/20 bg-gradient-to-r from-cyan-500/8 to-blue-600/8 px-4 py-3.5 dark:from-cyan-950/40 dark:to-blue-950/30">
                     <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                       예상 비용

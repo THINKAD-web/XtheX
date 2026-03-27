@@ -361,7 +361,6 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
                 }}
               />
               <div className="mt-2 flex flex-wrap items-center gap-2">
-                <OmnichannelTrigger mediaId={media.id} locale={locale} />
                 <AddToOmniCartButton
                   mediaId={media.id}
                   mediaName={media.mediaName}

@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 const RSS_SOURCES = [
-  { url: "https://www.mediapost.com/rss/ooh/", source: "MediaPost" },
-  { url: "https://www.oaaa.org/feed/", source: "OAAA" },
-  { url: "https://www.campaignlive.co.uk/feed/", source: "Campaign Live" },
+  { url: "https://www.adweek.com/category/ooh/feed/", source: "Adweek OOH" },
+  { url: "https://www.campaignasia.com/rss/news", source: "Campaign Asia" },
+  { url: "https://www.creativereview.co.uk/feed/", source: "Creative Review" },
 ];
 
 function extractTag(xml: string, tag: string): string {
@@ -52,8 +52,11 @@ export async function GET(req: NextRequest) {
   for (const { url, source } of RSS_SOURCES) {
     try {
       const res = await fetch(url, {
-        headers: { "User-Agent": "XtheX-NewsBot/1.0" },
-        signal: AbortSignal.timeout(8000),
+        headers: {
+          "User-Agent": "Mozilla/5.0 (compatible; XtheX-NewsBot/1.0)",
+          "Accept": "application/rss+xml, application/xml, text/xml, */*",
+        },
+        signal: AbortSignal.timeout(10000),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const xml = await res.text();

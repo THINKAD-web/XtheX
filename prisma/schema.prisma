@@ -121,10 +121,27 @@ model Media {
   createdById       String?       @db.Uuid
 
   createdBy User? @relation("MediaCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
-  inquiries Inquiry[]
+  inquiries   Inquiry[]
+  caseStudies CaseStudy[]
 
   @@index([status, category])
   @@index([createdById])
+}
+
+model CaseStudy {
+  id          String   @id @default(uuid()) @db.Uuid
+  mediaId     String   @db.Uuid
+  title       String
+  description String?  @db.Text
+  client      String?
+  result      String?  @db.Text
+  images      String[] @default([])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@index([mediaId])
 }
 
 model User {

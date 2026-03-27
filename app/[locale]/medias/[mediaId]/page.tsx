@@ -17,6 +17,9 @@ import { SimilarBundleSection } from "@/components/medias/SimilarBundleSection";
 import { AddToOmniCartButton } from "@/components/medias/AddToOmniCartButton";
 import { ShareButtons } from "@/components/medias/ShareButtons";
 import { MediaDetailStickyBar } from "@/components/medias/MediaDetailStickyBar";
+import { AdminMediaEditPanel } from "@/components/medias/AdminMediaEditPanel";
+import { AdminCaseStudyModal } from "@/components/medias/AdminCaseStudyModal";
+import { getCurrentUser } from "@/lib/auth/rbac";
 import {
   convertCurrency,
   formatCurrency,
@@ -201,7 +204,7 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
         })
       : Promise.resolve(0);
 
-  const [similarMedias, inquiryCount] = await Promise.all([
+  const [similarMedias, inquiryCount, caseStudies, currentUser] = await Promise.all([
     prisma.media.findMany({
       where: {
         id: { not: media.id },
@@ -212,7 +215,14 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
       take: 4,
     }),
     inquiryCountPromise,
+    prisma.caseStudy.findMany({
+      where: { mediaId: media.id },
+      orderBy: { createdAt: "desc" },
+    }),
+    getCurrentUser().catch(() => null),
   ]);
+
+  const isAdmin = currentUser?.role === "ADMIN";
 
   const inquiryStatus =
     typeof sp.inquiry === "string" ? sp.inquiry : undefined;
@@ -584,7 +594,18 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
               </article>
             )}
 
-            <MediaCaseStudies caseStudies={[]} locale={locale} />
+            <MediaCaseStudies
+              caseStudies={caseStudies.map((cs) => ({
+                titleKo: cs.title,
+                titleEn: cs.title,
+                descriptionKo: [cs.client ? `클라이언트: ${cs.client}` : "", cs.description ?? ""].filter(Boolean).join(" · "),
+                descriptionEn: [cs.client ? `Client: ${cs.client}` : "", cs.description ?? ""].filter(Boolean).join(" · "),
+                result: cs.result ?? undefined,
+                imageUrl: cs.images[0] ?? undefined,
+              }))}
+              locale={locale}
+              adminButton={isAdmin ? <AdminCaseStudyModal mediaId={media.id} /> : undefined}
+            />
 
             {similarMedias.length > 0 && (
               <article className="space-y-4">
@@ -682,6 +703,24 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
         </div>
       </section>
       <MediaDetailStickyBar mediaId={media.id} mediaName={media.mediaName} />
+      {isAdmin && (
+        <AdminMediaEditPanel
+          media={{
+            id: media.id,
+            mediaName: media.mediaName,
+            description: media.description,
+            price: media.price,
+            cpm: media.cpm,
+            exposureJson: (media.exposureJson ?? {}) as any,
+            locationJson: (media.locationJson ?? {}) as any,
+            targetAudience: media.targetAudience,
+            audienceTags: media.audienceTags ?? [],
+            tags: media.tags ?? [],
+            pros: media.pros,
+            cons: media.cons,
+          }}
+        />
+      )}
     </AppSiteChrome>
   );
 }

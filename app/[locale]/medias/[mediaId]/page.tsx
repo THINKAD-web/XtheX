@@ -19,6 +19,8 @@ import { ShareButtons } from "@/components/medias/ShareButtons";
 import { MediaDetailStickyBar } from "@/components/medias/MediaDetailStickyBar";
 import { AdminMediaEditPanel } from "@/components/medias/AdminMediaEditPanel";
 import { AdminCaseStudyModal } from "@/components/medias/AdminCaseStudyModal";
+import { AvailabilityCalendar } from "@/components/medias/AvailabilityCalendar";
+import { BookingRequestModal } from "@/components/medias/BookingRequestModal";
 import { getCurrentUser } from "@/lib/auth/rbac";
 import {
   convertCurrency,
@@ -167,6 +169,7 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
       audienceTags: true,
       tags: true,
       trustScore: true,
+      availabilityJson: true,
     },
   });
 
@@ -562,6 +565,45 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
                   </div>
                 </div>
               </div>
+            </article>
+
+            {/* Availability Calendar + Booking */}
+            <article className="space-y-4">
+              <AvailabilityCalendar
+                mediaId={media.id}
+                availabilityData={
+                  Array.isArray(media.availabilityJson)
+                    ? (media.availabilityJson as { date: string; status: "available" | "booked" | "inquiry" }[])
+                    : undefined
+                }
+                labels={{
+                  title: t("availability_section"),
+                  available: t("available"),
+                  booked: t("booked"),
+                  inquiry: t("inquiry_needed"),
+                  days: [t("sun"), t("mon"), t("tue"), t("wed"), t("thu"), t("fri"), t("sat")],
+                }}
+              />
+              <BookingRequestModal
+                mediaId={media.id}
+                mediaName={media.mediaName}
+                locale={locale}
+                labels={{
+                  bookNow: t("book_now"),
+                  title: t("booking_title"),
+                  campaignPeriod: t("campaign_period"),
+                  startDate: t("start_date"),
+                  endDate: t("end_date"),
+                  budget: t("budget_label"),
+                  notes: t("additional_notes"),
+                  notesPlaceholder: t("additional_notes_placeholder"),
+                  submit: t("submit_booking"),
+                  success: t("booking_success"),
+                  error: t("booking_error"),
+                  loginRequired: t("login_required"),
+                  contactEmail: t("contact_email"),
+                }}
+              />
             </article>
 
             {/* Pros & Cons */}

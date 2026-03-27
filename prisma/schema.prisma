@@ -112,6 +112,8 @@ model Media {
   /** 노출 가능 기간 (매체사 등록) */
   availabilityStart DateTime?
   availabilityEnd   DateTime?
+  /** Per-day availability: [{ date: "2025-04-01", status: "available"|"booked"|"inquiry" }, …] */
+  availabilityJson  Json?
   adminMemo         String?
   proposalFileUrl   String?        // S3/storage 원본 PDF 링크
   /** 재파싱 전 폼 스냅샷 히스토리 { backups: [...], lastReparseAt } */

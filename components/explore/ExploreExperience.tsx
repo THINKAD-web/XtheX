@@ -18,6 +18,8 @@ import { cn } from "@/lib/utils";
 import { Link } from "@/i18n/navigation";
 import { toast } from "sonner";
 import { usePreferredCurrency } from "@/components/usePreferredCurrency";
+import { useOmniCart } from "@/hooks/useOmniCart";
+import { exploreMediaTypeToCategory } from "@/lib/omni-cart/category";
 import {
   convertCurrency,
   formatCurrency,
@@ -154,6 +156,7 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
   const locale = (params?.locale as string) ?? "ko";
   const preferredCurrency = usePreferredCurrency(locale);
   const { status } = useSession();
+  const { add: addToCart } = useOmniCart();
 
   const [view, setView] = React.useState<"list" | "map">("list");
   const [items, setItems] = React.useState<ExploreApiItem[]>([]);
@@ -377,13 +380,13 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
                   setDraft((d) => ({ ...d, mediaType: e.target.value }))
                 }
               >
-                <option value="ALL">ALL</option>
-                <option value="BILLBOARD">BILLBOARD</option>
-                <option value="DIGITAL_BOARD">DIGITAL_BOARD</option>
-                <option value="TRANSIT">TRANSIT</option>
-                <option value="STREET_FURNITURE">STREET_FURNITURE</option>
-                <option value="WALL">WALL</option>
-                <option value="ETC">ETC</option>
+                <option value="ALL">{tv("filter_all")}</option>
+                <option value="BILLBOARD">{locale?.startsWith("ko") ? "대형 광고판" : locale?.startsWith("ja") ? "大型広告板" : locale?.startsWith("zh") ? "大型广告牌" : "Billboards"}</option>
+                <option value="DIGITAL_BOARD">{locale?.startsWith("ko") ? "디지털 스크린" : locale?.startsWith("ja") ? "デジタルスクリーン" : locale?.startsWith("zh") ? "数字屏幕" : "Digital Screens"}</option>
+                <option value="TRANSIT">{locale?.startsWith("ko") ? "교통 광고" : locale?.startsWith("ja") ? "交通広告" : locale?.startsWith("zh") ? "交通广告" : "Transit Ads"}</option>
+                <option value="STREET_FURNITURE">{locale?.startsWith("ko") ? "거리 시설물" : locale?.startsWith("ja") ? "街頭施設" : locale?.startsWith("zh") ? "街道设施" : "Street Installations"}</option>
+                <option value="WALL">{locale?.startsWith("ko") ? "벽면 광고" : locale?.startsWith("ja") ? "壁面広告" : locale?.startsWith("zh") ? "墙面广告" : "Wall Ads"}</option>
+                <option value="OTHER">{locale?.startsWith("ko") ? "기타" : locale?.startsWith("ja") ? "その他" : locale?.startsWith("zh") ? "其他" : "Others"}</option>
               </select>
             </div>
             <div>
@@ -612,6 +615,22 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
                         {tv("login_to_inquire")}
                       </Link>
                     )}
+                    <button
+                      type="button"
+                      className="shrink-0 rounded-md bg-gradient-to-r from-cyan-500 to-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:from-cyan-400 hover:to-blue-500 transition-colors"
+                      onClick={() =>
+                        addToCart({
+                          id: it.id,
+                          mediaName: it.title,
+                          mediaCategory: exploreMediaTypeToCategory(it.mediaType ?? ""),
+                          priceMin: it.priceMin ?? null,
+                          priceMax: it.priceMax ?? null,
+                          source: "explore",
+                        })
+                      }
+                    >
+                      🛒 담기
+                    </button>
                     <Link
                       href={`/medias/${it.id}`}
                       className={cn(

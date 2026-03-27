@@ -232,6 +232,12 @@ export function OmniCartShell() {
     return () => window.removeEventListener(OMNI_CART_ADD_FEEDBACK, handler);
   }, [hydrated]);
 
+  React.useEffect(() => {
+    const openHandler = () => setOpen(true);
+    window.addEventListener("xthex-omni-cart-open", openHandler);
+    return () => window.removeEventListener("xthex-omni-cart-open", openHandler);
+  }, []);
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
   );

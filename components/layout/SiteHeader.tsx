@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { OmniCartHeaderBtn } from "@/components/layout/OmniCartHeaderBtn";
 import { CurrencySwitcher } from "@/components/CurrencySwitcher";
 import { AuthNav } from "@/components/auth/auth-nav";
 import { landing } from "@/lib/landing-theme";
@@ -54,6 +55,7 @@ export async function SiteHeader() {
           </Link>
         </nav>
         <div className="justify-self-end flex shrink-0 items-center gap-2 sm:gap-3">
+          <OmniCartHeaderBtn />
           <LanguageSwitcher />
           <CurrencySwitcher locale={locale} label={tNav("currency")} />
           <AuthNav

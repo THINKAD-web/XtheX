@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { MediaCategory, MediaStatus, Prisma } from "@prisma/client";
 import { z } from "zod";
 import { audienceTagsMatchingSearchQuery } from "@/lib/media/audience-tags";
-import { EXPLORE_EMPTY_DB_MOCKS } from "@/lib/explore/explore-empty-db-mocks";
 
 const querySchema = z.object({
   mediaType: z.string().optional(),
@@ -236,16 +235,6 @@ export async function GET(req: Request) {
     images: [...httpOnly(m.sampleImages ?? []), ...(m.images ?? [])].slice(0, 8),
     createdAt: m.createdAt.toISOString(),
   }));
-
-  // 발행(PUBLISHED) 매체가 없을 때만: 데모용 여러 핀·카드 (실데이터와 혼합되지 않음)
-  if (items.length === 0 && !idCursor) {
-    items = EXPLORE_EMPTY_DB_MOCKS.map((row) => ({
-      ...row,
-      trustScore: 82,
-      aiReviewScore: 78,
-      dailyExposure: "데모",
-    }));
-  }
 
   const nextCursor =
     medias.length === take

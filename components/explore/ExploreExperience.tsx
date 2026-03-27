@@ -520,7 +520,7 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
                 <article
                   key={it.id}
                   className={cn(
-                    "flex flex-col overflow-hidden rounded-2xl border bg-white shadow-md transition hover:shadow-lg dark:bg-zinc-900",
+                    "flex flex-col overflow-hidden rounded-2xl border bg-white shadow-sm transition hover:shadow-md dark:bg-zinc-900",
                     isSelected
                       ? "border-emerald-300 ring-2 ring-emerald-400/40 dark:border-emerald-700"
                       : "border-zinc-200 hover:border-blue-300/60 dark:border-zinc-700",
@@ -544,7 +544,7 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
                       AI {it.aiReviewScore}
                     </Badge>
                   )}
-                  <label className="absolute right-2 top-2 inline-flex items-center gap-2 rounded-lg bg-white/90 px-2 py-1 text-xs font-medium text-zinc-800 shadow ring-1 ring-black/5 backdrop-blur dark:bg-zinc-950/80 dark:text-zinc-100 dark:ring-white/10">
+                  <label className="absolute left-2 top-2 inline-flex items-center gap-2 rounded-lg bg-white/90 px-2 py-1 text-xs font-medium text-zinc-800 shadow ring-1 ring-black/5 backdrop-blur dark:bg-zinc-950/80 dark:text-zinc-100 dark:ring-white/10">
                     <input
                       type="checkbox"
                       className="h-4 w-4 accent-emerald-600"
@@ -564,9 +564,14 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
                   <h3 className="line-clamp-2 font-semibold text-zinc-900 dark:text-zinc-50">
                     {it.title}
                   </h3>
-                  <p className="mt-1 text-xs font-medium uppercase text-blue-700 dark:text-sky-400">
-                    {String(it.mediaType)}
-                  </p>
+                  <div className="mt-2 flex items-center justify-between gap-2">
+                    <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-700 dark:bg-blue-950/40 dark:text-blue-200">
+                      {String(it.mediaType)}
+                    </Badge>
+                    <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                      {formatDisplayMoney(it.priceMin)}
+                    </p>
+                  </div>
                   <p className="mt-2 flex items-start gap-1 text-sm text-zinc-600 dark:text-zinc-400">
                     <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
                     <span className="line-clamp-2">{getAddress(it.location)}</span>
@@ -580,9 +585,9 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
                     </div>
                     <div>
                       <span className="block text-[10px] uppercase tracking-wide text-zinc-500">
-                        {tv("card_weekly_price")}
+                        {tv("filter_min_trust")}
                       </span>
-                      {formatDisplayMoney(it.priceMin)}
+                      {it.trustScore != null ? `${it.trustScore}` : "—"}
                     </div>
                   </div>
                   <div className="mt-4 flex flex-wrap gap-2">
@@ -620,6 +625,28 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
                 </article>
               );
             })}
+          </div>
+        ) : null}
+
+        {view === "list" && !loading && items.length === 0 ? (
+          <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+            <p className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+              {tv("empty_title")}
+            </p>
+            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+              {tv("empty_desc")}
+            </p>
+            <div className="mt-4 flex flex-wrap justify-center gap-2">
+              <Button type="button" variant="outline" onClick={resetFilters}>
+                {t("reset")}
+              </Button>
+              <Link
+                href="/dashboard/media-owner/upload"
+                className="inline-flex h-9 items-center justify-center rounded-md bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-500"
+              >
+                {tv("empty_cta")}
+              </Link>
+            </div>
           </div>
         ) : null}
 

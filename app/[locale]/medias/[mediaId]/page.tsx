@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { AppSiteChrome } from "@/components/layout/AppSiteChrome";
@@ -34,6 +35,58 @@ type PageProps = {
   params: Promise<{ locale: string; mediaId: string }>;
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 };
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale, mediaId } = await params;
+  if (!isMediaUuid(mediaId)) {
+    return {
+      title: "Media Detail | XtheX",
+      description: "Published media detail page.",
+      robots: { index: false, follow: false },
+    };
+  }
+  const media = await prisma.media.findUnique({
+    where: { id: mediaId },
+    select: {
+      status: true,
+      mediaName: true,
+      description: true,
+      sampleImages: true,
+      images: true,
+    },
+  });
+  if (!media || media.status !== "PUBLISHED") {
+    return {
+      title: "Media Detail | XtheX",
+      description: "Published media detail page.",
+      robots: { index: false, follow: false },
+    };
+  }
+  const candidateImages = [...(media.sampleImages ?? []), ...(media.images ?? [])];
+  const firstImage = candidateImages.find((u) => /^https?:\/\//i.test(String(u).trim())) ?? "/og-image.png";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://xthex.com";
+  const absoluteImage = firstImage.startsWith("http")
+    ? firstImage
+    : `${appUrl.replace(/\/$/, "")}${firstImage.startsWith("/") ? "" : "/"}${firstImage}`;
+
+  return {
+    title: `${media.mediaName} | XtheX`,
+    description:
+      media.description?.slice(0, 150) ||
+      (locale === "ko"
+        ? "XtheX 공개 매체 상세 정보"
+        : "XtheX published media detail"),
+    openGraph: {
+      title: `${media.mediaName} | XtheX`,
+      description:
+        media.description?.slice(0, 150) ||
+        (locale === "ko"
+          ? "XtheX 공개 매체 상세 정보"
+          : "XtheX published media detail"),
+      images: [{ url: absoluteImage }],
+    },
+  };
+}
 
 export default async function MediaDetailPage({ params, searchParams }: PageProps) {
   const { locale, mediaId } = await params;
@@ -254,7 +307,7 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
               </div>
               <Link
                 href={`/${locale}/medias/${media.id}/contact`}
-                className="mt-2 flex w-full items-center justify-center rounded-full bg-orange-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-orange-400"
+                className="mt-2 flex h-12 w-full items-center justify-center rounded-full bg-orange-500 px-4 text-base font-semibold text-white shadow-sm hover:bg-orange-400"
               >
                 {t("contact_this_media")}
               </Link>
@@ -313,6 +366,25 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
 
       {/* Body */}
       <section className={`${landing.container} py-10`}>
+          <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="rounded-2xl bg-zinc-900/80 p-4 ring-1 ring-zinc-800">
+              <p className="text-xs text-zinc-500">{t("price")}</p>
+              <p className="mt-1 text-sm font-semibold text-zinc-100">{displayPriceLabel}</p>
+            </div>
+            <div className="rounded-2xl bg-zinc-900/80 p-4 ring-1 ring-zinc-800">
+              <p className="text-xs text-zinc-500">{t("location")}</p>
+              <p className="mt-1 text-sm font-semibold text-zinc-100">
+                {location.address ?? t("no_address")}
+                {location.district ? ` · ${location.district}` : ""}
+              </p>
+            </div>
+            <div className="rounded-2xl bg-zinc-900/80 p-4 ring-1 ring-zinc-800">
+              <p className="text-xs text-zinc-500">{t("impressions_traffic")}</p>
+              <p className="mt-1 text-sm font-semibold text-zinc-100">
+                {exposure.daily_traffic ?? t("no_performance_data")}
+              </p>
+            </div>
+          </div>
           <div className="grid gap-10 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1.1fr)]">
             {/* Left column – editorial blocks */}
             <div className="space-y-8">

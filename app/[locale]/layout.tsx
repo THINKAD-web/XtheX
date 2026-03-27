@@ -5,6 +5,7 @@ import { routing } from "@/i18n/routing";
 import { ConditionalSiteFooter } from "@/components/layout/ConditionalSiteFooter";
 import { OnboardingGate } from "@/components/onboarding/OnboardingGate";
 import { OmniCartShellLazy } from "@/components/omni/OmniCartShellLazy";
+import { ChatWidget } from "@/components/chat/ChatWidget";
 
 type Props = { children: React.ReactNode; params: Promise<{ locale: string }> };
 
@@ -25,6 +26,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         <main className="flex-1">
           <OnboardingGate>
             <OmniCartShellLazy />
+            <ChatWidget />
             {children}
           </OnboardingGate>
         </main>

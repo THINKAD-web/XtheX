@@ -1,6 +1,7 @@
 import { CampaignStatus } from "@prisma/client";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
+import { Activity, CheckCircle, Clock } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { gateAdvertiserDashboard } from "@/lib/auth/dashboard-gate";
 import { landing } from "@/lib/landing-theme";
@@ -43,17 +44,27 @@ export default async function AdvertiserDashboardPage() {
     (user.email?.includes("@") ? user.email.split("@")[0] : user.email) ||
     t("default_name");
 
-  const recentCampaigns = await prisma.campaign.findMany({
-    where: { userId: user.id },
-    orderBy: { createdAt: "desc" },
-    take: 5,
-    select: {
-      id: true,
-      title: true,
-      status: true,
-      createdAt: true,
-    },
-  });
+  const [recentCampaigns, activeCount, completedCount, pendingCount] =
+    await Promise.all([
+      prisma.campaign.findMany({
+        where: { userId: user.id },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+        select: { id: true, title: true, status: true, createdAt: true },
+      }),
+      prisma.campaign.count({
+        where: { userId: user.id, status: "APPROVED" },
+      }),
+      prisma.campaign.count({
+        where: { userId: user.id, status: "REJECTED" },
+      }),
+      prisma.campaign.count({
+        where: {
+          userId: user.id,
+          status: { in: ["DRAFT", "SUBMITTED"] },
+        },
+      }),
+    ]);
 
   return (
       <main className={`${landing.container} space-y-10 py-10 lg:space-y-12 lg:py-14`}>
@@ -72,6 +83,36 @@ export default async function AdvertiserDashboardPage() {
           <p className="relative mt-3 max-w-2xl text-pretty text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
             {t("subtitle")}
           </p>
+        </section>
+
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="flex items-center gap-4 rounded-xl border bg-card p-4 shadow-sm">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/40">
+              <Activity className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">{t("card_active")}</p>
+              <p className="text-2xl font-bold">{activeCount}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 rounded-xl border bg-card p-4 shadow-sm">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/40">
+              <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">{t("card_completed")}</p>
+              <p className="text-2xl font-bold">{completedCount}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 rounded-xl border bg-card p-4 shadow-sm">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/40">
+              <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">{t("card_pending")}</p>
+              <p className="text-2xl font-bold">{pendingCount}</p>
+            </div>
+          </div>
         </section>
 
         <DashboardStatsSection role="ADVERTISER" />

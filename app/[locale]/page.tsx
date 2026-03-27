@@ -23,34 +23,37 @@ import { FeaturesSectionClient } from "@/components/home/FeaturesSectionClient";
 import { HowItWorksSectionClient } from "@/components/home/HowItWorksSectionClient";
 import { CrossBorderCaseCard } from "@/components/home/CrossBorderCaseCard";
 
-export const metadata: Metadata = {
-  title: "XtheX - Global Outdoor Ad Marketplace",
-  description:
-    "전세계 옥외광고 매체를 AI로 연결하는 플랫폼. 매체사 제안서 업로드부터 광고주 탐색, 매칭, 계약까지 한 곳에서.",
-  openGraph: {
-    title: "XtheX - Global Outdoor Ad Marketplace",
-    description:
-      "전세계 옥외광고 매체를 AI로 연결하는 플랫폼. 매체사 제안서 업로드부터 광고주 탐색, 매칭, 계약까지 한 곳에서.",
-    url: "/",
-    siteName: "XtheX",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "XtheX - Global Outdoor Ad Marketplace",
-      },
-    ],
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "XtheX - Global Outdoor Ad Marketplace",
-    description:
-      "전세계 옥외광고 매체를 AI로 연결하는 플랫폼. 매체사 제안서 업로드부터 광고주 탐색, 매칭, 계약까지 한 곳에서.",
-    images: ["/og-image.png"],
-  },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const titles: Record<string, string> = {
+    ko: "XtheX - 글로벌 옥외광고 마켓플레이스",
+    en: "XtheX - Global OOH Ad Marketplace",
+    ja: "XtheX - グローバル屋外広告マーケットプレイス",
+    zh: "XtheX - 全球户外广告平台",
+  };
+  const descs: Record<string, string> = {
+    ko: "전세계 옥외광고를 AI로 연결 — 매체사 제안서 업로드부터 광고주 탐색, 매칭, 계약까지",
+    en: "Connect global OOH ads with AI — from media proposals to advertiser matching and contracts",
+    ja: "AIで世界中の屋外広告をつなぐ — 媒体提案から広告主マッチング・契約まで",
+    zh: "用AI连接全球户外广告 — 从媒体提案到广告主匹配与合同",
+  };
+  const title = titles[locale] ?? titles.en;
+  const description = descs[locale] ?? descs.en;
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `/${locale}`,
+      siteName: "XtheX",
+    },
+  };
+}
 
 async function Features() {
   const t = await getTranslations("home.features");

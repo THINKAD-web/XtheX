@@ -15,6 +15,7 @@ import { MediaCreativeHints } from "@/components/hints/MediaCreativeHints";
 import { getSimilarMediasForMedia } from "@/lib/medias/similar";
 import { SimilarBundleSection } from "@/components/medias/SimilarBundleSection";
 import { AddToOmniCartButton } from "@/components/medias/AddToOmniCartButton";
+import { ShareButtons } from "@/components/medias/ShareButtons";
 import {
   convertCurrency,
   formatCurrency,
@@ -247,9 +248,12 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
                   {media.category}
                 </span>
               </div>
-              <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-                {media.mediaName}
-              </h1>
+              <div className="flex flex-wrap items-center gap-4">
+                <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+                  {media.mediaName}
+                </h1>
+                <ShareButtons title={`${media.mediaName} - XtheX`} url={pageUrl} />
+              </div>
               {media.description && (
                 <p className="max-w-2xl text-sm text-zinc-300 whitespace-pre-wrap">
                   {media.description}

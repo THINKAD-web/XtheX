@@ -49,6 +49,7 @@ import {
   getOwnerSubmittedForReviewAt,
   hasOwnerSubmittedForReview,
 } from "@/lib/media/owner-review-submission";
+import { Upload, Loader2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { parseRejectionFromAdminMemo } from "@/lib/media/admin-memo-rejection";
 
@@ -196,6 +197,8 @@ export function MediaReviewForm({
   const [rejectOpen, setRejectOpen] = React.useState(false);
   const [rejectReason, setRejectReason] = React.useState("");
   const [resubmitConfirmOpen, setResubmitConfirmOpen] = React.useState(false);
+  const [uploading, setUploading] = React.useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const location = parseLocationJson(media.locationJson);
   const exposure = parseExposureJson(media.exposureJson);
@@ -382,6 +385,58 @@ export function MediaReviewForm({
   const selectAllImages = () =>
     form.setValue("extractedImages", extractedCandidates.slice(0, 10));
   const clearAllImages = () => form.setValue("extractedImages", []);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const current = form.getValues("sampleImages") ?? [];
+    const remaining = 5 - current.length;
+    if (remaining <= 0) {
+      toast({ title: "최대 5장까지 업로드할 수 있습니다.", variant: "destructive" });
+      e.target.value = "";
+      return;
+    }
+
+    const selected = Array.from(files).slice(0, remaining);
+    const fd = new FormData();
+    selected.forEach((f) => fd.append("mediaSamples", f));
+
+    setUploading(true);
+    try {
+      const res = await fetch("/api/admin/media-samples", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!data.ok) {
+        toast({ title: "업로드 실패", description: data.error, variant: "destructive" });
+        return;
+      }
+      const newUrls: string[] = data.urls ?? [];
+      if (newUrls.length > 0) {
+        form.setValue("sampleImages", [...current, ...newUrls].slice(0, 5), { shouldDirty: true });
+      }
+      const newDescs: string[] = data.descriptions ?? [];
+      if (newDescs.length > 0) {
+        const curDescs = form.getValues("sampleDescriptions") ?? [];
+        form.setValue("sampleDescriptions", [...curDescs, ...newDescs].slice(0, 5), { shouldDirty: true });
+      }
+    } catch (err) {
+      toast({
+        title: "업로드 실패",
+        description: err instanceof Error ? err.message : String(err),
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
+
+  const removeSampleImage = (index: number) => {
+    const imgs = (form.getValues("sampleImages") ?? []).filter((_, i) => i !== index);
+    const descs = (form.getValues("sampleDescriptions") ?? []).filter((_, i) => i !== index);
+    form.setValue("sampleImages", imgs, { shouldDirty: true });
+    form.setValue("sampleDescriptions", descs, { shouldDirty: true });
+  };
 
   const buildPayload = (): MediaReviewFormPayload => ({
     ...form.getValues(),
@@ -1533,6 +1588,73 @@ export function MediaReviewForm({
               ))}
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      <Card className={cardClass}>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div className="space-y-1">
+            <CardTitle className={sectionTitleClass}>매체 이미지</CardTitle>
+            <p className={sectionDescClass}>
+              매체 실물 사진을 업로드하세요. 최대 5장까지 등록 가능합니다.
+            </p>
+          </div>
+          <Badge variant="outline" className="border-orange-500/50 text-orange-300">
+            {watchedSampleImages.length}/5장
+          </Badge>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {watchedSampleImages.length > 0 ? (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {watchedSampleImages.map((url, idx) => (
+                <div
+                  key={url}
+                  className="group relative overflow-hidden rounded-lg border border-zinc-700 bg-zinc-900/80"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={url} alt={`매체 이미지 ${idx + 1}`} className="h-32 w-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => removeSampleImage(idx)}
+                    className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-zinc-300 opacity-0 transition-opacity hover:bg-red-600 hover:text-white group-hover:opacity-100"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-zinc-500">등록된 이미지가 없습니다.</p>
+          )}
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={uploading || watchedSampleImages.length >= 5}
+              onClick={() => fileInputRef.current?.click()}
+              className="border-zinc-600"
+            >
+              {uploading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  업로드 중…
+                </>
+              ) : (
+                <>
+                  <Upload className="mr-2 h-4 w-4" />
+                  이미지 추가 (최대 5장)
+                </>
+              )}
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={handleImageUpload}
+            />
+          </div>
         </CardContent>
       </Card>
 

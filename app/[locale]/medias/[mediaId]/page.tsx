@@ -595,15 +595,19 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
 
             <MediaCaseStudies
               caseStudies={caseStudies.map((cs) => ({
+                id: cs.id,
                 titleKo: cs.title,
                 titleEn: cs.title,
-                descriptionKo: [cs.client ? `클라이언트: ${cs.client}` : "", cs.description ?? ""].filter(Boolean).join(" · "),
-                descriptionEn: [cs.client ? `Client: ${cs.client}` : "", cs.description ?? ""].filter(Boolean).join(" · "),
+                descriptionKo: cs.description ?? "",
+                descriptionEn: cs.description ?? "",
+                client: cs.client ?? undefined,
                 result: cs.result ?? undefined,
                 imageUrl: cs.images[0] ?? undefined,
+                images: cs.images,
               }))}
               locale={locale}
               adminButton={isAdmin ? <AdminCaseStudyModal mediaId={media.id} /> : undefined}
+              isAdmin={isAdmin}
             />
 
             {similarMedias.length > 0 && (

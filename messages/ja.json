@@ -107,9 +107,27 @@
     "home": "ホーム",
     "about": "概要",
     "explore": "探索",
+    "news": "ニュース",
     "sign_in": "ログイン",
     "sign_up": "新規登録",
     "currency": "通貨"
+  },
+  "news": {
+    "title": "業界ニュース",
+    "subtitle": "グローバルOOH業界の最新ニュース、トレンド、インサイト",
+    "all": "すべて",
+    "industry_news": "業界ニュース",
+    "trend": "トレンド",
+    "case_study": "ケーススタディ",
+    "market_report": "市場レポート",
+    "no_articles": "まだ記事がありません",
+    "no_articles_desc": "間もなく新しいOOHインサイトを公開する予定です。",
+    "read_more": "続きを読む",
+    "back_to_list": "ニュース一覧へ",
+    "source": "出典",
+    "share": "シェア",
+    "related": "関連記事",
+    "published_at": "公開日"
   },
   "explore": {
     "title": "探索",

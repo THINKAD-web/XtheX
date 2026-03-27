@@ -16,6 +16,7 @@ import { getSimilarMediasForMedia } from "@/lib/medias/similar";
 import { SimilarBundleSection } from "@/components/medias/SimilarBundleSection";
 import { AddToOmniCartButton } from "@/components/medias/AddToOmniCartButton";
 import { ShareButtons } from "@/components/medias/ShareButtons";
+import { MediaDetailStickyBar } from "@/components/medias/MediaDetailStickyBar";
 import {
   convertCurrency,
   formatCurrency,
@@ -591,6 +592,7 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
             </aside>
           </div>
       </section>
+      <MediaDetailStickyBar mediaId={media.id} mediaName={media.mediaName} />
     </AppSiteChrome>
   );
 }

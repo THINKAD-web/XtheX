@@ -107,9 +107,27 @@
     "home": "홈",
     "about": "소개",
     "explore": "탐색",
+    "news": "뉴스",
     "sign_in": "로그인",
     "sign_up": "회원가입",
     "currency": "통화"
+  },
+  "news": {
+    "title": "업계 뉴스",
+    "subtitle": "글로벌 옥외광고(OOH) 최신 뉴스, 트렌드, 업계 소식",
+    "all": "전체",
+    "industry_news": "업계 뉴스",
+    "trend": "트렌드",
+    "case_study": "케이스 스터디",
+    "market_report": "시장 보고서",
+    "no_articles": "아직 게시된 뉴스가 없습니다",
+    "no_articles_desc": "곧 새로운 OOH 인사이트를 게시할 예정입니다.",
+    "read_more": "자세히 보기",
+    "back_to_list": "뉴스 목록으로",
+    "source": "출처",
+    "share": "공유",
+    "related": "관련 기사",
+    "published_at": "게시일"
   },
   "explore": {
     "title": "탐색",

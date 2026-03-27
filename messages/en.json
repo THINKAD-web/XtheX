@@ -107,9 +107,27 @@
     "home": "Home",
     "about": "About",
     "explore": "Explore",
+    "news": "News",
     "sign_in": "Sign in",
     "sign_up": "Sign up",
     "currency": "Currency"
+  },
+  "news": {
+    "title": "Industry News",
+    "subtitle": "The latest OOH industry news, trends, and insights",
+    "all": "All",
+    "industry_news": "Industry News",
+    "trend": "Trend",
+    "case_study": "Case Study",
+    "market_report": "Market Report",
+    "no_articles": "No articles yet",
+    "no_articles_desc": "Stay tuned — we'll publish fresh OOH insights soon.",
+    "read_more": "Read more",
+    "back_to_list": "Back to News",
+    "source": "Source",
+    "share": "Share",
+    "related": "Related Articles",
+    "published_at": "Published"
   },
   "explore": {
     "title": "Explore",

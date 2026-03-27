@@ -373,3 +373,21 @@ model SavedFilterPreset {
   updatedAt DateTime @updatedAt
 }
 
+model News {
+  id         String   @id @default(uuid()) @db.Uuid
+  slug       String   @unique
+  title      String
+  excerpt    String
+  content    String   @db.Text
+  category   String   // "Industry News" | "Trend" | "Case Study" | "Market Report"
+  coverImage String?
+  source     String?  // 원문 출처 URL
+  locale     String   @default("en")
+  published  Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([locale, published, createdAt])
+  @@index([category])
+}
+

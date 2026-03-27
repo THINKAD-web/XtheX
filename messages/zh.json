@@ -107,9 +107,27 @@
     "home": "首页",
     "about": "关于",
     "explore": "探索",
+    "news": "新闻",
     "sign_in": "登录",
     "sign_up": "注册",
     "currency": "货币"
+  },
+  "news": {
+    "title": "行业新闻",
+    "subtitle": "全球户外广告(OOH)行业最新动态、趋势与洞察",
+    "all": "全部",
+    "industry_news": "行业新闻",
+    "trend": "趋势",
+    "case_study": "案例研究",
+    "market_report": "市场报告",
+    "no_articles": "暂无文章",
+    "no_articles_desc": "我们将很快发布新的OOH行业洞察。",
+    "read_more": "阅读更多",
+    "back_to_list": "返回新闻列表",
+    "source": "来源",
+    "share": "分享",
+    "related": "相关文章",
+    "published_at": "发布日期"
   },
   "explore": {
     "title": "探索",

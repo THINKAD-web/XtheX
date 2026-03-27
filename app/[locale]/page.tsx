@@ -1,16 +1,14 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { getTranslations } from "next-intl/server";
 import { AppSiteChrome } from "@/components/layout/AppSiteChrome";
 import { CountUp } from "@/components/count-up";
-import { StatsSection } from "@/components/stats-section";
 import { Link } from "@/i18n/navigation";
 import { FaqSection } from "@/components/FaqSection";
-import { TrendingMediasSection } from "@/components/medias/TrendingMediasSection";
 import { RealtimeMiniDashboardSection } from "@/components/campaign/RealtimeMiniDashboardSection";
 import { LivePerformanceDashboardSection } from "@/components/campaign/LivePerformanceDashboardSection";
 import { DashboardTabSection } from "@/components/home/DashboardTabSection";
 import { SUCCESS_CASES } from "@/lib/case-studies/success-cases";
-import { SuccessCaseGallery } from "@/components/case-studies/SuccessCaseGallery";
 import { MediaMixSearchSection } from "@/components/mix-media/MediaMixSearchSection";
 import { landing } from "@/lib/landing-theme";
 import { HomeHeroDaypart } from "@/components/daypart/HomeHeroDaypart";
@@ -22,6 +20,25 @@ import { TestimonialsSectionClient } from "@/components/home/TestimonialsSection
 import { FeaturesSectionClient } from "@/components/home/FeaturesSectionClient";
 import { HowItWorksSectionClient } from "@/components/home/HowItWorksSectionClient";
 import { CrossBorderCaseCard } from "@/components/home/CrossBorderCaseCard";
+
+const LazyPulse = () => (
+  <div className="h-64 animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800" />
+);
+
+const TrendingMediasSection = dynamic(
+  () => import("@/components/medias/TrendingMediasSection").then((m) => ({ default: m.TrendingMediasSection })),
+  { loading: LazyPulse },
+);
+
+const SuccessCaseGallery = dynamic(
+  () => import("@/components/case-studies/SuccessCaseGallery").then((m) => ({ default: m.SuccessCaseGallery })),
+  { loading: LazyPulse },
+);
+
+const StatsSection = dynamic(
+  () => import("@/components/stats-section").then((m) => ({ default: m.StatsSection })),
+  { loading: LazyPulse },
+);
 
 export async function generateMetadata({
   params,

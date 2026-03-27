@@ -14,7 +14,7 @@ type Props = {
 export function CrossBorderCaseCard({ tag, title, description, fromCountry, toCountry, className }: Props) {
   return (
     <div className={cn(
-      "relative overflow-hidden rounded-2xl border border-blue-200/60 bg-gradient-to-br from-blue-50 to-white p-5 shadow-sm dark:border-blue-800/40 dark:from-blue-950/40 dark:to-zinc-900",
+      "relative overflow-hidden rounded-2xl border border-blue-200/60 bg-gradient-to-br from-blue-50 to-white p-5 shadow-sm dark:border-blue-800/40 dark:from-blue-950/40 dark:to-zinc-900 hover:scale-[1.02] hover:shadow-blue-200/60 hover:border-blue-300/60 transition-all duration-300 cursor-pointer",
       className
     )}>
       <div className="mb-3 flex items-center gap-2">

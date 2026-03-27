@@ -157,13 +157,13 @@ function isMockMediaId(id: string): boolean {
 function mediaTypePlaceholder(mediaType: string) {
   switch (mediaType) {
     case "BILLBOARD":
-      return { bg: "bg-gradient-to-br from-orange-100 to-amber-50", Icon: Building2 };
+      return { bg: "bg-gradient-to-br from-orange-100 to-amber-50 dark:from-orange-950/40 dark:to-amber-900/20", Icon: Building2 };
     case "DIGITAL_BOARD":
-      return { bg: "bg-gradient-to-br from-blue-100 to-cyan-50", Icon: Monitor };
+      return { bg: "bg-gradient-to-br from-blue-100 to-cyan-50 dark:from-blue-950/40 dark:to-cyan-900/20", Icon: Monitor };
     case "TRANSIT":
-      return { bg: "bg-gradient-to-br from-green-100 to-emerald-50", Icon: TrainFront };
+      return { bg: "bg-gradient-to-br from-green-100 to-emerald-50 dark:from-green-950/40 dark:to-emerald-900/20", Icon: TrainFront };
     default:
-      return { bg: "bg-gradient-to-br from-zinc-100 to-slate-50", Icon: LayoutGrid };
+      return { bg: "bg-gradient-to-br from-zinc-100 to-slate-50 dark:from-zinc-900/40 dark:to-slate-900/20", Icon: LayoutGrid };
   }
 }
 
@@ -715,11 +715,8 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
                     (() => {
                       const ph = mediaTypePlaceholder(String(it.mediaType));
                       return (
-                        <div className={cn("flex h-full flex-col items-center justify-center gap-2", ph.bg)}>
-                          <ph.Icon className="h-10 w-10 text-zinc-400 dark:text-zinc-500" />
-                          <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-                            {String(it.mediaType).replace(/_/g, " ")}
-                          </span>
+                        <div className={cn("h-40 w-full flex items-center justify-center", ph.bg)}>
+                          <ph.Icon className="h-12 w-12 opacity-30" />
                         </div>
                       );
                     })()

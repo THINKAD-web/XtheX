@@ -7,6 +7,7 @@ import { gateAdvertiserDashboard } from "@/lib/auth/dashboard-gate";
 import { landing } from "@/lib/landing-theme";
 import { prisma } from "@/lib/prisma";
 import { DashboardStatsSection } from "@/components/dashboard/DashboardStatsSection";
+import { DashboardNotificationBanner } from "@/components/layout/DashboardNotificationBanner";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -68,6 +69,7 @@ export default async function AdvertiserDashboardPage() {
 
   return (
       <main className={`${landing.container} space-y-10 py-10 lg:space-y-12 lg:py-14`}>
+        <DashboardNotificationBanner message="캠페인 진행 현황을 확인하세요" />
         <section className="relative overflow-hidden rounded-3xl border border-sky-200/60 bg-gradient-to-br from-white via-sky-50/50 to-emerald-50/40 p-8 shadow-lg dark:border-zinc-700 dark:from-zinc-900 dark:via-zinc-900/90 dark:to-emerald-950/30 dark:shadow-black/30 lg:p-10">
           <div
             className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-blue-400/15 blur-3xl dark:bg-blue-500/10"

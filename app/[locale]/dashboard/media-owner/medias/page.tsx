@@ -10,6 +10,7 @@ import { MediaOwnerMediaStatusOutcome } from "@/components/dashboard/MediaOwnerM
 import { MediaOwnerMediasFlowBanner } from "@/components/dashboard/MediaOwnerMediasFlowBanner";
 import { MediaOwnerMediasRefreshOnFocus } from "@/components/dashboard/MediaOwnerMediasRefreshOnFocus";
 import { cn } from "@/lib/utils";
+import { Eye } from "lucide-react";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -63,6 +64,7 @@ export default async function MediaOwnerMediasPage({
       viewCount: true,
       price: true,
       updatedAt: true,
+      _count: { select: { inquiries: true } },
     },
   });
 
@@ -181,6 +183,10 @@ export default async function MediaOwnerMediasPage({
                           <p className="mt-0.5 text-xs uppercase text-zinc-500">
                             {String(m.category)}
                           </p>
+                          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">문의 {m._count?.inquiries ?? 0}건</span>
+                            <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600"><Eye className="h-3 w-3" />{m.viewCount}</span>
+                          </div>
                         </div>
                       </td>
                       <td className="px-5 py-4">
@@ -222,6 +228,10 @@ export default async function MediaOwnerMediasPage({
                       <p className="mt-1 text-xs uppercase text-zinc-500">
                         {String(m.category)}
                       </p>
+                      <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">문의 {m._count?.inquiries ?? 0}건</span>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600"><Eye className="h-3 w-3" />{m.viewCount}</span>
+                      </div>
                     </div>
                     <div className="shrink-0 text-right">
                       <MediaOwnerMediaStatusOutcome

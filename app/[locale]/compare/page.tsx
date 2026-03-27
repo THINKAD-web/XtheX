@@ -8,6 +8,8 @@ import { CompareRecommendedTags } from "@/components/compare/CompareRecommendedT
 import { ComparePerfSimulator } from "@/components/compare/ComparePerfSimulator";
 import { CompareCharts } from "@/components/compare/CompareCharts";
 import { CompareShareExport } from "@/components/compare/CompareShareExport";
+import { ComparePrintButton } from "@/components/compare/ComparePrintButton";
+import { CompareOmniCartRow } from "@/components/compare/CompareOmniCartRow";
 import { RoiCalculatorWidget } from "@/components/roi/RoiCalculatorWidget";
 import {
   getBestValueReason,
@@ -60,15 +62,22 @@ export default async function ComparePage({ params, searchParams }: PageProps) {
       <AppSiteChrome mainClassName="pb-24">
         <section className={sectionY}>
           <div className={container}>
-            <div className={`${panel} mx-auto max-w-xl space-y-6 p-8`}>
-              <h2 className="text-3xl font-bold tracking-tight text-foreground lg:text-4xl">
-                {isKo ? "비교할 매체가 없습니다" : "No media selected for comparison"}
-              </h2>
-              <p className="text-pretty text-base leading-relaxed text-muted-foreground lg:text-lg">
-                {isKo
-                  ? "/explore에서 매체 카드의 ‘비교’ 버튼을 눌러 최대 3개까지 선택한 뒤, 비교하기 버튼을 눌러보세요."
-                  : "On /explore, choose up to 3 media using the 'Compare' button, then press 'Compare'."}
-              </p>
+            <div className={`${panel} mx-auto max-w-xl space-y-8 p-10 text-center`}>
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+                </svg>
+              </div>
+              <div className="space-y-3">
+                <h2 className="text-2xl font-bold tracking-tight text-foreground lg:text-3xl">
+                  {isKo ? "비교할 매체가 없습니다" : "No media selected for comparison"}
+                </h2>
+                <p className="mx-auto max-w-md text-pretty text-base leading-relaxed text-muted-foreground">
+                  {isKo
+                    ? "/explore에서 매체 카드의 '비교' 버튼을 눌러 최대 3개까지 선택한 뒤, 비교하기 버튼을 눌러보세요."
+                    : "On /explore, choose up to 3 media using the 'Compare' button, then press 'Compare'."}
+                </p>
+              </div>
               <Link
                 href="/explore"
                 className="inline-flex h-11 min-w-[200px] items-center justify-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
@@ -251,6 +260,7 @@ export default async function ComparePage({ params, searchParams }: PageProps) {
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
                   <CompareShareExport ids={ids} locale={locale} />
+                  <ComparePrintButton locale={locale} />
                   <Link
                     href="/explore"
                     className="inline-flex h-10 shrink-0 items-center justify-center rounded-md border border-input bg-background px-5 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
@@ -443,6 +453,15 @@ export default async function ComparePage({ params, searchParams }: PageProps) {
                   tagLabels={tagLabels}
                   locale={locale}
                   explorePath={`/${locale}/explore`}
+                />
+                <CompareOmniCartRow
+                  medias={mediasWithLocale.map((m) => ({
+                    id: m.id,
+                    mediaName: m.displayName,
+                    category: m.category,
+                    price: m.price,
+                  }))}
+                  locale={locale}
                 />
               </tbody>
             </table>

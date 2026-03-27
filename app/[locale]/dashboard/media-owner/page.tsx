@@ -9,6 +9,7 @@ import { gateMediaOwnerDashboard } from "@/lib/auth/dashboard-gate";
 import { landing } from "@/lib/landing-theme";
 import { DashboardStatsSection } from "@/components/dashboard/DashboardStatsSection";
 import { prisma } from "@/lib/prisma";
+import { DashboardNotificationBanner } from "@/components/layout/DashboardNotificationBanner";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -74,6 +75,7 @@ export default async function MediaOwnerDashboardPage() {
 
   return (
     <main className={`${landing.container} space-y-10 py-10 lg:space-y-12 lg:py-14`}>
+        <DashboardNotificationBanner message="새로운 문의가 있는지 확인하세요" />
         <section className="relative overflow-hidden rounded-3xl border border-emerald-200/60 bg-gradient-to-br from-white via-emerald-50/40 to-sky-50/50 p-8 shadow-lg dark:border-zinc-700 dark:from-zinc-900 dark:via-emerald-950/25 dark:to-zinc-900/90 dark:shadow-black/30 lg:p-10">
           <div
             className="pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full bg-emerald-400/20 blur-3xl dark:bg-emerald-500/10"

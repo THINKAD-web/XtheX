@@ -25,13 +25,15 @@ import { mixCategoryToOmni } from "@/lib/omni-cart/category";
 const OMNI_CART_BTN =
   "shrink-0 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 px-2 py-1 text-[10px] font-medium text-white hover:from-blue-700 hover:to-cyan-600";
 
-const CATEGORY_KO: Record<string, string> = {
-  BILLBOARD: "빌보드",
-  DIGITAL_BOARD: "디지털",
-  TRANSIT: "대중교통",
-  STREET_FURNITURE: "가로시설",
-  WALL: "벽면",
-  ETC: "기타",
+const useOmniCategoryLabel = () => {
+  const locale = useLocale();
+  const labels: Record<string, Record<string, string>> = {
+    ko: { BILLBOARD: "빌보드", DIGITAL_BOARD: "디지털", TRANSIT: "대중교통", STREET_FURNITURE: "가로시설", WALL: "벽면", ETC: "기타" },
+    en: { BILLBOARD: "Billboard", DIGITAL_BOARD: "Digital", TRANSIT: "Transit", STREET_FURNITURE: "Street", WALL: "Wall", ETC: "Other" },
+    ja: { BILLBOARD: "ビルボード", DIGITAL_BOARD: "デジタル", TRANSIT: "交通広告", STREET_FURNITURE: "街頭施設", WALL: "壁面", ETC: "その他" },
+    zh: { BILLBOARD: "广告牌", DIGITAL_BOARD: "数字屏", TRANSIT: "交通广告", STREET_FURNITURE: "街道设施", WALL: "墙面", ETC: "其他" },
+  };
+  return labels[locale] ?? labels.en;
 };
 
 function formatKrw(n: number): string {
@@ -69,6 +71,8 @@ function ProposalCard({
   isSavingThis: boolean;
 }) {
   const { add } = useOmniCart();
+  const tMix = useTranslations("home.mediaMix");
+  const categoryLabel = useOmniCategoryLabel();
   const compareIds = proposal.media_ids.slice(0, 3).join(",");
   return (
     <Card
@@ -92,10 +96,10 @@ function ProposalCard({
         <CardTitle className="flex items-center gap-2 text-base font-semibold text-zinc-900 dark:text-zinc-50">
           {isSelected && (
             <span className="rounded-full bg-orange-500/15 px-2 py-0.5 text-xs font-medium text-orange-700 dark:text-orange-300">
-              지도에서 강조
+              {tMix("map_highlight")}
             </span>
           )}
-          추천 조합
+          {tMix("combo_label")}
         </CardTitle>
         <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
           {proposal.reasoning_ko}
@@ -104,14 +108,14 @@ function ProposalCard({
       <CardContent className="space-y-4">
         <div className="flex flex-wrap gap-4 text-sm">
           <div>
-            <span className="text-zinc-500 dark:text-zinc-400">총 비용</span>
+            <span className="text-zinc-500 dark:text-zinc-400">{tMix("total_cost")}</span>
             <p className="font-semibold text-zinc-900 dark:text-zinc-100">
               {formatKrw(proposal.total_cost_krw)}
             </p>
           </div>
           <div>
             <span className="text-zinc-500 dark:text-zinc-400">
-              추정 리치
+              {tMix("est_reach")}
             </span>
             <p className="font-semibold text-zinc-900 dark:text-zinc-100">
               {formatReach(proposal.estimated_reach)}
@@ -120,7 +124,7 @@ function ProposalCard({
         </div>
         <div>
           <p className="mb-2 text-xs font-medium uppercase tracking-wide text-zinc-500">
-            매체 구성
+            {tMix("media_comp")}
           </p>
           <ul className="flex flex-wrap gap-2">
             {proposal.breakdown.map((b) => (
@@ -128,7 +132,7 @@ function ProposalCard({
                 key={b.category}
                 className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-800 dark:bg-blue-500/15 dark:text-blue-300"
               >
-                {CATEGORY_KO[b.category] ?? b.category} {b.pct}% · {b.count}면
+                {categoryLabel[b.category] ?? b.category} {b.pct}% · {b.count}
               </li>
             ))}
           </ul>
@@ -141,7 +145,7 @@ function ProposalCard({
             >
               <span className="min-w-0 flex-1 truncate">{m.mediaName}</span>
               <div className="flex shrink-0 items-center gap-1.5">
-                <span className="text-zinc-500">{CATEGORY_KO[m.category]}</span>
+                <span className="text-zinc-500">{categoryLabel[m.category]}</span>
                 <button
                   type="button"
                   className={OMNI_CART_BTN}
@@ -151,7 +155,7 @@ function ProposalCard({
                     add({
                       id: m.id,
                       mediaName: m.mediaName,
-                      category: CATEGORY_KO[m.category],
+                      category: categoryLabel[m.category],
                       mediaCategory: mixCategoryToOmni(m.category),
                       priceMin: p,
                       priceMax: p,
@@ -159,7 +163,7 @@ function ProposalCard({
                     });
                   }}
                 >
-                  옴니채널 담기
+                  {tMix("omni_btn")}
                 </button>
               </div>
             </li>
@@ -174,14 +178,14 @@ function ProposalCard({
             href={`/compare?ids=${encodeURIComponent(compareIds)}`}
             className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-blue-600 px-6 text-sm font-medium text-white transition-all hover:bg-blue-600/90 sm:w-auto"
           >
-            이 조합으로 비교하기
+            {tMix("compare_btn")}
           </Link>
           {proposal.media_ids.length > 3 && (
             <Link
               href="/explore"
               className="inline-flex h-11 items-center justify-center rounded-lg border border-border bg-background px-4 text-sm font-medium hover:bg-muted"
             >
-              탐색에서 나머지 매체 보기
+              {tMix("explore_rest")}
             </Link>
           )}
           <Button
@@ -197,12 +201,12 @@ function ProposalCard({
             {isSavingThis ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                저장 중…
+                {tMix("saving")}
               </>
             ) : (
               <>
                 <Save className="mr-2 h-4 w-4" />
-                이 조합 저장
+                {tMix("save_btn")}
               </>
             )}
           </Button>
@@ -296,7 +300,6 @@ export function MediaMixSearchSection() {
   const [draftCampaignId, setDraftCampaignId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [authWallOpen, setAuthWallOpen] = useState(false);
-  // 섹션 크기 슬라이더: 100(최대) ~ 0(최소/숨김), 오른쪽으로 당기면 작아짐
   const [sectionScale, setSectionScale] = useState(100);
 
   const isDayUi = useLandingLightChrome();
@@ -345,7 +348,7 @@ export function MediaMixSearchSection() {
       });
       const data = (await res.json()) as MixMediaResponse | MixMediaError;
       if (!data.ok) {
-        setError("error" in data ? data.error : "요청 실패");
+        setError("error" in data ? data.error : tMix("error_request_failed"));
         return;
       }
       setResult(data);
@@ -359,7 +362,7 @@ export function MediaMixSearchSection() {
       }
       lastRecalcBudget.current = data.parse.budget_krw;
     } catch {
-      setError("네트워크 오류가 발생했습니다.");
+      setError(tMix("error_network"));
     } finally {
       setLoading(false);
     }
@@ -390,7 +393,7 @@ export function MediaMixSearchSection() {
         if (cancelled) return;
         if (!data.ok) {
           setRecalcError(
-            "error" in data ? data.error : "재계산에 실패했습니다.",
+            "error" in data ? data.error : tMix("error_recalc_failed"),
           );
           return;
         }
@@ -411,7 +414,7 @@ export function MediaMixSearchSection() {
           return data.proposals[0]?.id ?? null;
         });
       } catch {
-        if (!cancelled) setRecalcError("네트워크 오류");
+        if (!cancelled) setRecalcError(tMix("error_network_short"));
       } finally {
         if (!cancelled) setRecalculating(false);
       }
@@ -420,7 +423,7 @@ export function MediaMixSearchSection() {
     return () => {
       cancelled = true;
     };
-  }, [debouncedBudget, result]);
+  }, [debouncedBudget, result, tMix]);
 
   const sliderValue =
     budgetSlider ?? result?.parse.budget_krw ?? 10_000_000;
@@ -482,27 +485,27 @@ export function MediaMixSearchSection() {
         if (!res.ok || !data.ok || !data.campaign?.id) {
           toast({
             variant: "destructive",
-            title: "저장 실패",
-            description: data.error ?? "다시 시도해 주세요.",
+            title: tMix("save_failed_title"),
+            description: data.error ?? tMix("try_again"),
           });
           return;
         }
         setDraftCampaignId(data.campaign.id);
         toast({
-          title: "캠페인 초안 저장됨!",
-          description: "제출하시겠어요? 아래 제출 버튼으로 매체사에 알림을 보낼 수 있습니다.",
+          title: tMix("draft_saved_title"),
+          description: tMix("draft_saved_desc"),
         });
       } catch {
         toast({
           variant: "destructive",
-          title: "저장 실패",
-          description: "네트워크 오류가 발생했습니다.",
+          title: tMix("save_failed_title"),
+          description: tMix("error_network"),
         });
       } finally {
         setSavingProposalId(null);
       }
     },
-    [isSignedIn, result?.parse, toast],
+    [isSignedIn, result?.parse, toast, tMix],
   );
 
   const submitCampaign = useCallback(async () => {
@@ -518,29 +521,28 @@ export function MediaMixSearchSection() {
       if (!res.ok || !data.ok) {
         toast({
           variant: "destructive",
-          title: "제출 실패",
-          description: data.error ?? "다시 시도해 주세요.",
+          title: tMix("submit_failed_title"),
+          description: data.error ?? tMix("try_again"),
         });
         return;
       }
       setDraftCampaignId(null);
       toast({
-        title: "캠페인이 제출되었습니다",
-        description: "매체사 알림이 전달되었습니다. 곧 대시보드에서 목록을 확인할 수 있습니다.",
+        title: tMix("campaign_submitted_title"),
+        description: tMix("campaign_submitted_desc"),
       });
     } catch {
       toast({
         variant: "destructive",
-        title: "제출 실패",
-        description: "네트워크 오류가 발생했습니다.",
+        title: tMix("submit_failed_title"),
+        description: tMix("error_network"),
       });
     } finally {
       setSubmitting(false);
     }
-  }, [draftCampaignId, isSignedIn, toast]);
+  }, [draftCampaignId, isSignedIn, toast, tMix]);
 
-  // sectionScale: 100=full, 0=hidden. 오른쪽으로 당길수록 작아짐
-  const scaledPy = Math.round((sectionScale / 100) * 7); // 0~7rem
+  const scaledPy = Math.round((sectionScale / 100) * 7);
   const sectionStyle: React.CSSProperties =
     sectionScale < 100
       ? {
@@ -564,12 +566,11 @@ export function MediaMixSearchSection() {
           : "border-zinc-800/50 bg-gradient-to-b from-zinc-950 to-zinc-900/60",
       )}
     >
-      {/* 섹션 크기 조절 슬라이더 */}
       <div
         className={cn(
           "absolute right-4 top-3 z-10 flex items-center gap-2",
         )}
-        title="섹션 크기 조절 (오른쪽으로 줄이기)"
+        title={tMix("section_resize")}
       >
         <Maximize2
           className={cn(
@@ -593,7 +594,7 @@ export function MediaMixSearchSection() {
               ? "bg-zinc-200 accent-zinc-500 [&::-webkit-slider-thumb]:bg-zinc-500"
               : "bg-zinc-700 accent-zinc-400 [&::-webkit-slider-thumb]:bg-zinc-400",
           )}
-          aria-label="섹션 크기 조절"
+          aria-label={tMix("section_resize")}
         />
         <span
           className={cn(
@@ -616,7 +617,7 @@ export function MediaMixSearchSection() {
             isDayUi ? "text-zinc-900" : "text-zinc-50",
           )}
         >
-          자연어로 미디어 믹스 추천
+          {tMix("section_title")}
         </h2>
         <p
           className={cn(
@@ -624,9 +625,7 @@ export function MediaMixSearchSection() {
             isDayUi ? "text-zinc-600" : "text-zinc-400",
           )}
         >
-          타겟·예산·기간·지역을 문장으로 입력하면 AI가 파싱하고, DB 매체를
-          조합해 3~5개 제안을 드립니다. 크리에이티브 이미지를 올리면 스타일
-          힌트도 반영합니다.
+          {tMix("section_desc")}
         </p>
 
         {!isSignedIn ? (
@@ -673,8 +672,7 @@ export function MediaMixSearchSection() {
                 isDayUi ? "text-zinc-600" : "text-zinc-400",
               )}
             >
-              예: 20대 여성 타겟, 예산 5000만원, 서울 강남 중심 4주, 카페 브랜드
-              젊고 트렌디한 느낌
+              {tMix("hint_text")}
             </p>
           </div>
           <div className={cn(
@@ -700,11 +698,11 @@ export function MediaMixSearchSection() {
               "min-h-[160px] w-full resize-y border-0 bg-transparent px-4 py-5 text-base leading-relaxed placeholder:text-zinc-400 focus:outline-none focus:ring-0 lg:min-h-[180px] lg:text-lg",
               isDayUi ? "text-zinc-900" : "text-zinc-100",
             )}
-            placeholder="캠페인 브리프를 자유롭게 입력하세요…"
+            placeholder={tMix("placeholder")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             disabled={loading}
-            aria-label="미디어 믹스 브리프"
+            aria-label={tMix("brief_aria")}
           />
           <div
             className={cn(
@@ -731,7 +729,7 @@ export function MediaMixSearchSection() {
                   )}
                 >
                   <ImagePlus className="mr-2 h-4 w-4" />
-                  크리에이티브 (선택)
+                  {tMix("creative_label")}
                 </span>
               </label>
               {file && (
@@ -755,12 +753,12 @@ export function MediaMixSearchSection() {
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  분석 중
+                  {tMix("analyze_btn")}
                 </>
               ) : (
                 <>
                   <SendHorizontal className="mr-2 h-4 w-4" />
-                  추천 받기
+                  {tMix("recommend_btn")}
                 </>
               )}
             </Button>
@@ -770,7 +768,7 @@ export function MediaMixSearchSection() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={preview}
-                alt="첨부 미리보기"
+                alt={tMix("attachment_preview")}
                 className="max-h-32 rounded-lg object-contain"
               />
             </div>
@@ -795,9 +793,9 @@ export function MediaMixSearchSection() {
           >
             <Card className="max-w-md border-zinc-200 shadow-xl dark:border-zinc-700">
               <CardHeader>
-                <CardTitle id="mix-auth-title">로그인이 필요합니다</CardTitle>
+                <CardTitle id="mix-auth-title">{tMix("login_required")}</CardTitle>
                 <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                  캠페인을 저장하려면 로그인해 주세요.
+                  {tMix("save_login_prompt")}
                 </p>
               </CardHeader>
               <CardContent className="flex flex-wrap gap-3">
@@ -805,14 +803,14 @@ export function MediaMixSearchSection() {
                   href="/login"
                   className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                 >
-                  로그인
+                  {tMix("login_btn")}
                 </Link>
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setAuthWallOpen(false)}
                 >
-                  닫기
+                  {tMix("close_btn")}
                 </Button>
               </CardContent>
             </Card>
@@ -826,11 +824,10 @@ export function MediaMixSearchSection() {
                 <CardContent className="flex flex-col gap-4 py-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-3">
                   <div className="min-w-0">
                     <p className="font-semibold text-emerald-900 dark:text-emerald-100">
-                      초안이 저장되었습니다
+                      {tMix("draft_saved")}
                     </p>
                     <p className="mt-1 text-sm text-emerald-800/90 dark:text-emerald-200/90">
-                      제출하면 매체사 측 알림 훅이 실행됩니다. (이메일·Slack은
-                      환경변수로 확장 가능)
+                      {tMix("submit_note")}
                     </p>
                     <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
                       <Link
@@ -838,14 +835,14 @@ export function MediaMixSearchSection() {
                         className="inline-flex items-center gap-1.5 font-medium text-emerald-800 underline-offset-2 hover:underline dark:text-emerald-200"
                       >
                         <ExternalLink className="h-3.5 w-3.5" aria-hidden />
-                        캠페인 상세 보기
+                        {tMix("campaign_detail")}
                       </Link>
                       <Link
                         href="/dashboard/campaigns"
                         className="inline-flex items-center gap-1.5 font-medium text-emerald-800 underline-offset-2 hover:underline dark:text-emerald-200"
                       >
                         <LayoutDashboard className="h-3.5 w-3.5" aria-hidden />
-                        대시보드에서 보기
+                        {tMix("dashboard_view")}
                       </Link>
                     </div>
                   </div>
@@ -858,10 +855,10 @@ export function MediaMixSearchSection() {
                       {submitting ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          제출 중…
+                          {tMix("submitting")}
                         </>
                       ) : (
-                        "캠페인 제출"
+                        tMix("submit_campaign")
                       )}
                     </Button>
                 </CardContent>
@@ -871,7 +868,7 @@ export function MediaMixSearchSection() {
               <Card className="border-blue-200/60 bg-blue-50/50 dark:border-blue-900/40 dark:bg-blue-950/30">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-blue-900 dark:text-blue-200">
-                    크리에이티브 스타일 분석
+                    {tMix("creative_analysis")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="text-sm text-blue-900/90 dark:text-blue-100/90">
@@ -881,11 +878,11 @@ export function MediaMixSearchSection() {
             )}
             <div className="rounded-xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-xs text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800/40 dark:text-zinc-400">
               <strong className="text-zinc-800 dark:text-zinc-200">
-                파싱 요약
+                {tMix("parse_summary")}
               </strong>
-              : 예산 {formatKrw(result.parse.budget_krw)} ·{" "}
-              {result.parse.duration_weeks}주 · 지역{" "}
-              {result.parse.location_keywords.join(", ") || "—"} · 목표{" "}
+              : {formatKrw(result.parse.budget_krw)} ·{" "}
+              {result.parse.duration_weeks}w · {" "}
+              {result.parse.location_keywords.join(", ") || "—"} · {" "}
               {result.parse.goal}
             </div>
 
@@ -895,7 +892,7 @@ export function MediaMixSearchSection() {
                   htmlFor="mix-budget-slider"
                   className="text-sm font-medium text-zinc-900 dark:text-zinc-100"
                 >
-                  예산 조정 (실시간 재조합)
+                  {tMix("budget_label")}
                 </label>
                 <span className="text-sm font-semibold text-orange-600 dark:text-orange-400">
                   {formatKrw(sliderValue)}
@@ -935,13 +932,13 @@ export function MediaMixSearchSection() {
                 <MapPin className="h-5 w-5 shrink-0 text-orange-600 dark:text-orange-400" />
                 <div>
                   <p className="font-semibold text-zinc-900 dark:text-zinc-50">
-                    선택한 조합
+                    {tMix("selected_combo")}
                   </p>
                   <p className="text-zinc-700 dark:text-zinc-300">
-                    총 비용{" "}
+                    {tMix("total_cost")}{" "}
                     <strong>{formatKrw(selectedProposal.total_cost_krw)}</strong>
                     {" · "}
-                    추정 리치{" "}
+                    {tMix("est_reach")}{" "}
                     <strong>
                       {formatReach(selectedProposal.estimated_reach)}
                     </strong>
@@ -952,8 +949,7 @@ export function MediaMixSearchSection() {
 
             {result.proposals.length === 0 ? (
               <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
-                조건에 맞는 매체 조합을 찾지 못했습니다. 예산을 늘리거나 지역을
-                넓혀 보세요.
+                {tMix("no_result")}
               </p>
             ) : (
               <>
@@ -973,13 +969,10 @@ export function MediaMixSearchSection() {
                 <div className="space-y-3">
                   <h3 className="flex flex-wrap items-center gap-2 text-base font-semibold text-zinc-900 dark:text-zinc-100 lg:text-lg">
                     <MapPin className="h-5 w-5 shrink-0" />
-                    제안 매체 위치 (클러스터 · 클릭 시 상세)
+                    {tMix("map_title")}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    주황 핀은 선택한 조합에 포함된 매체입니다.{" "}
-                    {process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
-                      ? "Google 지도 (한국어)"
-                      : "Leaflet + CARTO (다크/라이트 테마)"}
+                    {tMix("map_sub")}
                   </p>
                   <div className="overflow-hidden rounded-2xl border border-border shadow-xl dark:border-zinc-700">
                     <MixMediaMapLazy markers={mapMarkers} />

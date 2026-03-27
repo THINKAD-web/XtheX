@@ -94,17 +94,17 @@
     },
     "footer": {
       "copyright": "© {year} XtheX. All rights reserved.",
-      "about": "About",
-      "contact": "Contact",
-      "terms": "Terms"
+      "about": "关于",
+      "contact": "联系我们",
+      "terms": "使用条款"
     }
   },
   "nav": {
-    "home": "Home",
-    "about": "About",
+    "home": "首页",
+    "about": "关于",
     "explore": "探索",
-    "sign_in": "Sign in",
-    "sign_up": "Sign up",
+    "sign_in": "登录",
+    "sign_up": "注册",
     "currency": "货币"
   },
   "explore": {

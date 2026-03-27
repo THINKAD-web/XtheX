@@ -94,17 +94,17 @@
     },
     "footer": {
       "copyright": "© {year} XtheX. All rights reserved.",
-      "about": "About",
-      "contact": "Contact",
-      "terms": "Terms"
+      "about": "소개",
+      "contact": "문의",
+      "terms": "이용약관"
     }
   },
   "nav": {
-    "home": "Home",
-    "about": "About",
+    "home": "홈",
+    "about": "소개",
     "explore": "탐색",
-    "sign_in": "Sign in",
-    "sign_up": "Sign up",
+    "sign_in": "로그인",
+    "sign_up": "회원가입",
     "currency": "통화"
   },
   "explore": {

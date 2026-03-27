@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { toast as sonnerToast } from "sonner";
-import { Loader2, SendHorizontal, ImagePlus, X, MapPin, Save, ExternalLink, LayoutDashboard } from "lucide-react";
+import { Loader2, SendHorizontal, ImagePlus, X, MapPin, Save, ExternalLink, LayoutDashboard, Maximize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link, useRouter } from "@/i18n/navigation";
@@ -272,6 +272,8 @@ export function MediaMixSearchSection() {
   const [draftCampaignId, setDraftCampaignId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [authWallOpen, setAuthWallOpen] = useState(false);
+  // 섹션 크기 슬라이더: 100(최대) ~ 0(최소/숨김), 오른쪽으로 당기면 작아짐
+  const [sectionScale, setSectionScale] = useState(100);
 
   const isDayUi = useLandingLightChrome();
 
@@ -513,9 +515,23 @@ export function MediaMixSearchSection() {
     }
   }, [draftCampaignId, isSignedIn, toast]);
 
+  // sectionScale: 100=full, 0=hidden. 오른쪽으로 당길수록 작아짐
+  const scaledPy = Math.round((sectionScale / 100) * 7); // 0~7rem
+  const sectionStyle: React.CSSProperties =
+    sectionScale < 100
+      ? {
+          maxHeight: `${sectionScale}vh`,
+          overflow: "hidden",
+          transition: "max-height 0.3s ease",
+          paddingTop: `${scaledPy * 0.25}rem`,
+          paddingBottom: `${scaledPy * 0.25}rem`,
+        }
+      : { transition: "max-height 0.3s ease" };
+
   return (
     <section
       id="media-mix-ai"
+      style={sectionStyle}
       className={cn(
         landing.sectionAlt,
         "relative border-t py-20 lg:py-28",
@@ -524,6 +540,47 @@ export function MediaMixSearchSection() {
           : "border-zinc-800/50 bg-gradient-to-b from-zinc-950 to-zinc-900/60",
       )}
     >
+      {/* 섹션 크기 조절 슬라이더 */}
+      <div
+        className={cn(
+          "absolute right-4 top-3 z-10 flex items-center gap-2",
+        )}
+        title="섹션 크기 조절 (오른쪽으로 줄이기)"
+      >
+        <Maximize2
+          className={cn(
+            "h-3.5 w-3.5 shrink-0",
+            isDayUi ? "text-zinc-400" : "text-zinc-500",
+          )}
+          aria-hidden
+        />
+        <input
+          type="range"
+          min={10}
+          max={100}
+          step={5}
+          value={sectionScale}
+          onChange={(e) => setSectionScale(Number(e.target.value))}
+          className={cn(
+            "h-1.5 w-20 cursor-pointer appearance-none rounded-full",
+            "[&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:w-3.5",
+            "[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full",
+            isDayUi
+              ? "bg-zinc-200 accent-zinc-500 [&::-webkit-slider-thumb]:bg-zinc-500"
+              : "bg-zinc-700 accent-zinc-400 [&::-webkit-slider-thumb]:bg-zinc-400",
+          )}
+          aria-label="섹션 크기 조절"
+        />
+        <span
+          className={cn(
+            "w-7 text-right text-[10px] tabular-nums",
+            isDayUi ? "text-zinc-400" : "text-zinc-500",
+          )}
+        >
+          {sectionScale}%
+        </span>
+      </div>
+
       <div
         className={
           result ? landing.container : "mx-auto max-w-4xl px-4 sm:px-6 lg:px-8"

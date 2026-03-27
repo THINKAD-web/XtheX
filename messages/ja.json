@@ -94,17 +94,17 @@
     },
     "footer": {
       "copyright": "© {year} XtheX. All rights reserved.",
-      "about": "About",
-      "contact": "Contact",
-      "terms": "Terms"
+      "about": "概要",
+      "contact": "お問い合わせ",
+      "terms": "利用規約"
     }
   },
   "nav": {
-    "home": "Home",
-    "about": "About",
+    "home": "ホーム",
+    "about": "概要",
     "explore": "探索",
-    "sign_in": "Sign in",
-    "sign_up": "Sign up",
+    "sign_in": "ログイン",
+    "sign_up": "新規登録",
     "currency": "通貨"
   },
   "explore": {

@@ -15,63 +15,43 @@ const LABELS: Record<(typeof SUPPORTED_LOCALES)[number], string> = {
   zh: "中文",
 };
 
-const FLAGS: Record<(typeof SUPPORTED_LOCALES)[number], string> = {
-  ko: "🇰🇷",
-  en: "🇺🇸",
-  ja: "🇯🇵",
-  zh: "🇨🇳",
-};
-
-const segmentInner =
-  "flex h-9 min-h-9 items-center text-xs text-foreground transition-colors";
-
 export function LanguageSwitcher() {
   const router = useRouter();
   const pathname = usePathname();
   const activeLocale = useLocale() as (typeof SUPPORTED_LOCALES)[number];
 
   const handleChange = (nextLocale: string) => {
-    if (!SUPPORTED_LOCALES.includes(nextLocale as (typeof SUPPORTED_LOCALES)[number])) return;
+    if (!SUPPORTED_LOCALES.includes(nextLocale as any)) return;
     if (nextLocale === activeLocale) return;
-
-    const search =
-      typeof window !== "undefined" && window.location.search
-        ? window.location.search
-        : "";
-
+    const search = typeof window !== "undefined" ? window.location.search : "";
     router.replace(`${pathname}${search}`, { locale: nextLocale });
     router.refresh();
   };
 
   return (
     <div
-      className={cn(
-        "inline-flex h-9 min-h-9 items-stretch overflow-hidden rounded-md border border-border bg-background shadow-sm",
-        "ring-1 ring-black/[0.04] dark:ring-white/[0.06]",
-      )}
+      className="inline-flex h-9 items-stretch overflow-hidden rounded-md border border-border bg-background shadow-sm ring-1 ring-black/[0.04] dark:ring-white/[0.06]"
       role="group"
-      aria-label="Language and brightness"
+      aria-label="Language switcher"
     >
-      <label className={cn(segmentInner, "cursor-pointer gap-1.5 border-r border-border px-2.5 hover:bg-muted/60")}>
-        <span className="shrink-0 text-[13px] leading-none text-muted-foreground" aria-hidden>
-          🌐
-        </span>
-        <select
-          aria-label="Select language"
+      {SUPPORTED_LOCALES.map((code, i) => (
+        <button
+          key={code}
+          type="button"
+          onClick={() => handleChange(code)}
+          aria-label={LABELS[code]}
+          title={LABELS[code]}
           className={cn(
-            "h-full min-w-0 max-w-[9.5rem] cursor-pointer bg-transparent py-0 pr-1 text-xs text-foreground outline-none",
-            "focus-visible:ring-0 sm:max-w-none",
+            "flex h-9 w-9 items-center justify-center text-[11px] font-semibold tracking-wide transition-colors",
+            i > 0 && "border-l border-border",
+            activeLocale === code
+              ? "bg-foreground text-background"
+              : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
           )}
-          value={activeLocale}
-          onChange={(e) => handleChange(e.target.value)}
         >
-          {SUPPORTED_LOCALES.map((code) => (
-            <option key={code} value={code}>
-              {FLAGS[code]} {LABELS[code]}
-            </option>
-          ))}
-        </select>
-      </label>
+          {code.toUpperCase()}
+        </button>
+      ))}
       <BrightnessToggle />
     </div>
   );
@@ -94,8 +74,7 @@ function BrightnessToggle() {
       title={title}
       aria-label={title}
       className={cn(
-        segmentInner,
-        "w-9 shrink-0 justify-center border-0 bg-transparent p-0 text-muted-foreground",
+        "flex h-9 w-9 shrink-0 items-center justify-center border-l border-border bg-transparent p-0 text-muted-foreground transition-colors",
         "hover:bg-muted/80 hover:text-foreground",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
       )}

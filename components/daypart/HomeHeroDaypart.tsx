@@ -28,9 +28,7 @@ export function HomeHeroDaypart() {
     <section
       className={cn(
         "relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 pb-28 pt-32 sm:pb-32 sm:pt-36 lg:pb-36 lg:pt-40",
-        isDay
-          ? "text-zinc-900"
-          : "text-white",
+        "text-white",
       )}
     >
       {/* Background Image */}
@@ -47,7 +45,7 @@ export function HomeHeroDaypart() {
         className={cn(
           "absolute inset-0 z-[1]",
           isDay
-            ? "bg-gradient-to-b from-white/80 via-white/60 to-white/90"
+            ? "bg-gradient-to-b from-black/30 via-black/20 to-black/50"
             : "bg-gradient-to-b from-zinc-950/85 via-zinc-950/70 to-zinc-950/90",
         )}
       />
@@ -60,28 +58,19 @@ export function HomeHeroDaypart() {
       >
         {authed && displayName ? (
           <p
-            className={cn(
-              "mb-4 text-lg font-semibold tracking-tight sm:text-xl",
-              isDay ? "text-blue-700" : "text-blue-300",
-            )}
+            className="mb-4 text-lg font-semibold tracking-tight sm:text-xl text-blue-200"
           >
             {t("greeting", { name: displayName })}
           </p>
         ) : null}
 
         <h1
-          className={cn(
-            "text-balance text-4xl font-bold tracking-tight lg:text-6xl drop-shadow-lg",
-            isDay ? "text-zinc-900" : "text-white",
-          )}
+          className="text-balance text-4xl font-bold tracking-tight lg:text-6xl drop-shadow-lg text-white"
         >
           {t("title")}
         </h1>
         <p
-          className={cn(
-            "mx-auto mt-8 max-w-2xl text-pretty text-lg leading-relaxed lg:text-xl lg:leading-relaxed drop-shadow-md",
-            isDay ? "text-zinc-700" : "text-zinc-200",
-          )}
+          className="mx-auto mt-8 max-w-2xl text-pretty text-lg leading-relaxed lg:text-xl lg:leading-relaxed drop-shadow-md text-zinc-100"
         >
           {t("subtitle")}
         </p>
@@ -91,12 +80,7 @@ export function HomeHeroDaypart() {
             mediaLabel={t("cta_partner")}
             advertiserLabel={t("cta_explore")}
             mediaClassName={landing.btnPrimary}
-            advertiserClassName={cn(
-              "inline-flex h-11 min-w-[200px] items-center justify-center rounded-lg border px-6 text-sm font-medium transition-colors duration-200",
-              isDay
-                ? "border-zinc-300 bg-white text-zinc-900 shadow-sm hover:bg-zinc-50"
-                : "min-w-[200px] border-zinc-500 text-white hover:bg-white/10 dark:border-zinc-500",
-            )}
+            advertiserClassName="inline-flex h-11 min-w-[200px] items-center justify-center rounded-lg border border-zinc-400 bg-transparent px-6 text-sm font-medium text-white transition-colors duration-200 hover:bg-white/10"
           />
 
           {!loading && !authed ? (
@@ -110,12 +94,7 @@ export function HomeHeroDaypart() {
 
               <Link
                 href="/login"
-                className={cn(
-                  "text-sm underline-offset-4 transition-colors duration-200 hover:underline",
-                  isDay
-                    ? "text-zinc-600 hover:text-zinc-900"
-                    : "text-zinc-400 hover:text-white",
-                )}
+                className="text-sm text-zinc-300 underline-offset-4 transition-colors hover:underline hover:text-white"
               >
                 {t("has_account_login")}
               </Link>

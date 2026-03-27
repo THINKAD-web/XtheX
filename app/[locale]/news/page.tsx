@@ -6,6 +6,8 @@ import { isDatabaseConfigured } from "@/lib/prisma";
 import { Newspaper } from "lucide-react";
 import { NewsGrid } from "./news-grid";
 
+export const revalidate = 300;
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("news");
   return {
@@ -23,12 +25,15 @@ const CATEGORIES = [
 
 type NewsRow = {
   id: string;
-  slug: string;
+  slug: string | null;
   title: string;
-  excerpt: string;
+  excerpt: string | null;
   category: string;
   coverImage: string | null;
+  imageUrl: string | null;
   source: string | null;
+  link: string | null;
+  pubDate: Date | null;
   createdAt: Date;
 };
 
@@ -41,7 +46,8 @@ async function fetchNews(locale: string): Promise<NewsRow[]> {
   try {
     let articles = await (prisma as any).news.findMany({
       where: { published: true, locale },
-      orderBy: { createdAt: "desc" },
+      orderBy: [{ pubDate: "desc" }, { createdAt: "desc" }],
+      take: 30,
       select: {
         id: true,
         slug: true,
@@ -49,7 +55,10 @@ async function fetchNews(locale: string): Promise<NewsRow[]> {
         excerpt: true,
         category: true,
         coverImage: true,
+        imageUrl: true,
         source: true,
+        link: true,
+        pubDate: true,
         createdAt: true,
       },
     });
@@ -57,7 +66,8 @@ async function fetchNews(locale: string): Promise<NewsRow[]> {
     if (articles.length === 0 && locale !== "en") {
       articles = await (prisma as any).news.findMany({
         where: { published: true, locale: "en" },
-        orderBy: { createdAt: "desc" },
+        orderBy: [{ pubDate: "desc" }, { createdAt: "desc" }],
+        take: 30,
         select: {
           id: true,
           slug: true,
@@ -65,10 +75,19 @@ async function fetchNews(locale: string): Promise<NewsRow[]> {
           excerpt: true,
           category: true,
           coverImage: true,
+          imageUrl: true,
           source: true,
+          link: true,
+          pubDate: true,
           createdAt: true,
         },
       });
+    }
+
+    if (articles.length === 0) {
+      await fetch(
+        `${process.env.NEXTAUTH_URL ?? "http://localhost:3000"}/api/cron/fetch-news`,
+      ).catch(() => {});
     }
 
     return articles;
@@ -105,15 +124,24 @@ export default async function NewsPage() {
 
         {/* Content */}
         <section className={`${landing.container} py-12 lg:py-16`}>
-          <NewsGrid
-            articles={JSON.parse(JSON.stringify(articles))}
-            categoryLabels={categoryLabels}
-            categories={CATEGORIES as unknown as string[]}
-            allLabel={t("all")}
-            noArticlesTitle={t("no_articles")}
-            noArticlesDesc={t("no_articles_desc")}
-            readMoreLabel={t("read_more")}
-          />
+          {articles.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-24 text-center">
+              <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-muted">
+                <Newspaper className="h-10 w-10 text-muted-foreground" />
+              </div>
+              <p className="text-muted-foreground">뉴스를 불러오는 중...</p>
+            </div>
+          ) : (
+            <NewsGrid
+              articles={JSON.parse(JSON.stringify(articles))}
+              categoryLabels={categoryLabels}
+              categories={CATEGORIES as unknown as string[]}
+              allLabel={t("all")}
+              noArticlesTitle={t("no_articles")}
+              noArticlesDesc={t("no_articles_desc")}
+              readMoreLabel={t("read_more")}
+            />
+          )}
         </section>
       </main>
     </AppSiteChrome>

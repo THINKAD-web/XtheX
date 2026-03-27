@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { AdminActions } from "@/components/admin/admin-actions";
 import { AdminQuickNav } from "@/components/admin/admin-quick-nav";
+import { AdminNewsFetchButton } from "@/components/admin/admin-news-fetch-button";
 import { AdminDatabaseSetupMessage } from "@/components/admin/admin-database-setup-message";
 import { cn } from "@/lib/utils";
 
@@ -170,6 +171,11 @@ export default async function AdminPage({
 
             <div className={cn(panel, "p-6 sm:p-8")}>
               <AdminQuickNav t={tHome} />
+            </div>
+
+            <div className={cn(panel, "p-6 sm:p-8")}>
+              <p className="mb-4 text-sm font-semibold text-foreground">RSS 뉴스 관리</p>
+              <AdminNewsFetchButton />
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">

@@ -62,12 +62,14 @@ export function HomeHeroDaypart() {
         "text-white",
       )}
     >
+      {/* Animated gradient base */}
+      <div className="animate-hero-gradient absolute inset-0" />
       {/* Background Image */}
       <Image
         src="/images/hero-billboard.jpg"
         alt="Times Square Billboard"
         fill
-        className="object-cover"
+        className="object-cover opacity-60"
         priority
         quality={80}
       />
@@ -77,7 +79,7 @@ export function HomeHeroDaypart() {
           "absolute inset-0 z-[1]",
           isDay
             ? "bg-gradient-to-b from-black/30 via-black/20 to-black/50"
-            : "bg-gradient-to-b from-zinc-950/85 via-zinc-950/70 to-zinc-950/90",
+            : "bg-gradient-to-b from-zinc-950/60 via-zinc-950/40 to-zinc-950/70",
         )}
       />
 

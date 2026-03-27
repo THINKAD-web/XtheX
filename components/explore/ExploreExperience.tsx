@@ -317,7 +317,26 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
     router.replace(pathname);
   }
 
-  const dataForSelection = view === "map" ? mapItems : items;
+  const [clientSort, setClientSort] = React.useState<string>("default");
+
+  const sortedItems = React.useMemo(() => {
+    if (clientSort === "default") return items;
+    const sorted = [...items];
+    switch (clientSort) {
+      case "newest":
+        return sorted;
+      case "priceAsc":
+        return sorted.sort((a, b) => (a.priceMin ?? Infinity) - (b.priceMin ?? Infinity));
+      case "priceDesc":
+        return sorted.sort((a, b) => (b.priceMin ?? 0) - (a.priceMin ?? 0));
+      case "popular":
+        return sorted.sort((a, b) => (b.trustScore ?? 0) - (a.trustScore ?? 0));
+      default:
+        return sorted;
+    }
+  }, [items, clientSort]);
+
+  const dataForSelection = view === "map" ? mapItems : sortedItems;
   const selected = dataForSelection.find((i) => i.id === selectedId) ?? null;
   const mapRemountKey = buildSearchParams(filters, preferredCurrency).toString();
 
@@ -647,33 +666,52 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
         </div>
 
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <div className="inline-flex rounded-lg border border-zinc-200 bg-white p-1 dark:border-zinc-700 dark:bg-zinc-900">
-            <button
-              type="button"
-              onClick={() => setView("list")}
-              className={cn(
-                "inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors",
-                view === "list"
-                  ? "bg-blue-600 text-white shadow"
-                  : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800",
-              )}
-            >
-              <LayoutGrid className="h-4 w-4" />
-              {tv("tab_list")}
-            </button>
-            <button
-              type="button"
-              onClick={() => setView("map")}
-              className={cn(
-                "inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors",
-                view === "map"
-                  ? "bg-emerald-600 text-white shadow"
-                  : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800",
-              )}
-            >
-              <MapIcon className="h-4 w-4" />
-              {tv("tab_map")}
-            </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="inline-flex rounded-lg border border-zinc-200 bg-white p-1 dark:border-zinc-700 dark:bg-zinc-900">
+              <button
+                type="button"
+                onClick={() => setView("list")}
+                className={cn(
+                  "inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors",
+                  view === "list"
+                    ? "bg-blue-600 text-white shadow"
+                    : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800",
+                )}
+              >
+                <LayoutGrid className="h-4 w-4" />
+                {tv("tab_list")}
+              </button>
+              <button
+                type="button"
+                onClick={() => setView("map")}
+                className={cn(
+                  "inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors",
+                  view === "map"
+                    ? "bg-emerald-600 text-white shadow"
+                    : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800",
+                )}
+              >
+                <MapIcon className="h-4 w-4" />
+                {tv("tab_map")}
+              </button>
+            </div>
+            {view === "list" && (
+              <div className="flex items-center gap-2">
+                <label className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                  정렬
+                </label>
+                <select
+                  className="h-9 rounded-md border border-zinc-200 bg-white px-3 text-sm text-zinc-700 shadow-sm transition-colors hover:border-zinc-300 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
+                  value={clientSort}
+                  onChange={(e) => setClientSort(e.target.value)}
+                >
+                  <option value="default">최신순</option>
+                  <option value="priceAsc">가격낮은순</option>
+                  <option value="priceDesc">가격높은순</option>
+                  <option value="popular">인기순</option>
+                </select>
+              </div>
+            )}
           </div>
           <p className="text-sm text-zinc-500">
             {t("loaded", {
@@ -691,16 +729,16 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
 
         {view === "list" ? (
           <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            {items.map((it) => {
+            {sortedItems.map((it) => {
               const isSelected = selectedIds.includes(it.id);
               return (
                 <article
                   key={it.id}
                   className={cn(
-                    "flex flex-col overflow-hidden rounded-2xl border bg-white shadow-sm transition-all duration-200 hover:shadow-lg hover:scale-[1.01] dark:bg-zinc-900",
+                    "flex flex-col overflow-hidden rounded-2xl border bg-white shadow-sm transition-all duration-300 ease-out hover:scale-[1.03] hover:shadow-[0_8px_30px_rgba(59,130,246,0.15)] dark:bg-zinc-900 dark:hover:shadow-[0_8px_30px_rgba(59,130,246,0.25)]",
                     isSelected
                       ? "border-emerald-300 ring-2 ring-emerald-400/40 dark:border-emerald-700"
-                      : "border-zinc-200 hover:border-blue-300/60 dark:border-zinc-700",
+                      : "border-zinc-200 hover:border-blue-400/70 dark:border-zinc-700 dark:hover:border-blue-500/50",
                   )}
                 >
                 <div className="relative aspect-[16/10] bg-zinc-100 dark:bg-zinc-800">

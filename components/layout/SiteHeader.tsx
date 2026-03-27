@@ -20,6 +20,7 @@ export async function SiteHeader() {
   const navItems = [
     { href: "/", label: tNav("home") },
     { href: "/explore", label: tExplore("title") },
+    { href: "/campaign-planner", label: tNav("campaign_planner") },
     { href: "/news", label: tNews("title") },
     { href: "/blog", label: tBlog("nav_label") },
     { href: "/about", label: tNav("about") },

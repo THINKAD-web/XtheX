@@ -168,6 +168,90 @@ body {
   color: hsl(var(--foreground));
 }
 
+/* Blog prose — styles for rendered markdown HTML */
+.blog-prose h2 {
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: hsl(var(--foreground));
+}
+.blog-prose h3 {
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+.blog-prose p {
+  margin-bottom: 1rem;
+  line-height: 1.75;
+  color: hsl(var(--muted-foreground));
+}
+.blog-prose ul {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+  list-style-type: disc;
+  color: hsl(var(--muted-foreground));
+}
+.blog-prose ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+  list-style-type: decimal;
+  color: hsl(var(--muted-foreground));
+}
+.blog-prose li {
+  margin-bottom: 0.25rem;
+  line-height: 1.75;
+}
+.blog-prose strong {
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+.blog-prose blockquote {
+  margin: 1.5rem 0;
+  border-left: 4px solid #3b82f6;
+  padding: 0.75rem 1rem;
+  font-style: italic;
+  color: hsl(var(--muted-foreground));
+  background: hsl(213 94% 58% / 0.05);
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+.blog-prose table {
+  width: 100%;
+  margin: 1.5rem 0;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+.blog-prose thead {
+  border-bottom: 2px solid hsl(var(--border));
+}
+.blog-prose th {
+  padding: 0.5rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+.blog-prose td {
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid hsl(var(--border) / 0.5);
+  color: hsl(var(--muted-foreground));
+}
+.blog-prose a {
+  color: #3b82f6;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.blog-prose a:hover {
+  color: #2563eb;
+}
+.blog-prose hr {
+  margin: 2rem 0;
+  border-color: hsl(var(--border));
+}
+
 @media print {
   .no-print {
     display: none !important;

@@ -15,11 +15,13 @@ export async function SiteHeader() {
   const tFooter = await getTranslations("home.footer");
 
   const tNews = await getTranslations("news");
+  const tBlog = await getTranslations("blog");
 
   const navItems = [
     { href: "/", label: tNav("home") },
     { href: "/explore", label: tExplore("title") },
     { href: "/news", label: tNews("title") },
+    { href: "/blog", label: tBlog("nav_label") },
     { href: "/about", label: tNav("about") },
     { href: "/contact", label: tFooter("contact") },
     { href: "/terms", label: tFooter("terms") },

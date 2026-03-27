@@ -160,6 +160,9 @@
     "sign_up": "新規登録",
     "currency": "通貨"
   },
+  "blog": {
+    "nav_label": "ブログ"
+  },
   "news": {
     "title": "業界ニュース",
     "subtitle": "グローバルOOH業界の最新ニュース、トレンド、インサイト",

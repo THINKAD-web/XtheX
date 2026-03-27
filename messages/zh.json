@@ -160,6 +160,9 @@
     "sign_up": "注册",
     "currency": "货币"
   },
+  "blog": {
+    "nav_label": "博客"
+  },
   "news": {
     "title": "行业新闻",
     "subtitle": "全球户外广告(OOH)行业最新动态、趋势与洞察",

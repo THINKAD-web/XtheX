@@ -160,6 +160,9 @@
     "sign_up": "회원가입",
     "currency": "통화"
   },
+  "blog": {
+    "nav_label": "블로그"
+  },
   "news": {
     "title": "업계 뉴스",
     "subtitle": "글로벌 옥외광고(OOH) 최신 뉴스, 트렌드, 업계 소식",

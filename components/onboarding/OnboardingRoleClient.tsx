@@ -2,12 +2,10 @@
 
 import * as React from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { useSession } from "next-auth/react";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
-import { Sparkles } from "lucide-react";
-import { AdvertiserRoleCard } from "@/components/onboarding/AdvertiserRoleCard";
-import { MediaOwnerRoleCard } from "@/components/onboarding/MediaOwnerRoleCard";
+import { Building2, Monitor, Sparkles } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { getLoginUrlForOnboardingRole } from "@/lib/onboarding/auth-entry";
 import { useOnboardingRoleIntent } from "@/lib/onboarding/onboarding-role-intent-store";
 
@@ -46,6 +44,9 @@ export function OnboardingRoleClient() {
   const router = useRouter();
   const reduceMotion = useReducedMotion();
   const [loading, setLoading] = React.useState<"adv" | "media" | null>(null);
+  const [selectedRole, setSelectedRole] = React.useState<
+    "ADVERTISER" | "MEDIA_OWNER" | null
+  >(null);
 
   const choose = async (role: "ADVERTISER" | "MEDIA_OWNER") => {
     setLoading(role === "ADVERTISER" ? "adv" : "media");
@@ -62,15 +63,6 @@ export function OnboardingRoleClient() {
       setLoading(null);
     }
   };
-
-  const springHover = reduceMotion
-    ? undefined
-    : {
-        scale: 1.012,
-        y: -2,
-        transition: { type: "spring" as const, stiffness: 400, damping: 22 },
-      };
-  const springTap = reduceMotion ? undefined : { scale: 0.992 };
 
   return (
     <div className="relative mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
@@ -142,17 +134,26 @@ export function OnboardingRoleClient() {
             variants={reduceMotion ? undefined : cardVariants}
             initial={reduceMotion ? undefined : "hidden"}
             animate={reduceMotion ? undefined : "show"}
-            whileHover={springHover}
-            whileTap={springTap}
           >
-            <AdvertiserRoleCard
-              loading={loading === "adv"}
-              anyLoading={
-                loading !== null || status === "loading"
-              }
-              onChoose={() => choose("ADVERTISER")}
-              reduceMotion={reduceMotion ?? undefined}
-            />
+            <button
+              type="button"
+              onClick={() => setSelectedRole("ADVERTISER")}
+              disabled={loading !== null}
+              className={cn(
+                "w-full cursor-pointer rounded-xl border-2 p-6 text-center transition-all hover:border-blue-400",
+                selectedRole === "ADVERTISER"
+                  ? "border-blue-500 ring-2 ring-blue-500"
+                  : "border-zinc-200 dark:border-zinc-700",
+              )}
+            >
+              <Building2 className="mx-auto h-10 w-10 text-blue-600 dark:text-blue-400" />
+              <h3 className="mt-3 text-lg font-bold text-zinc-900 dark:text-zinc-50">
+                광고주 / Advertiser
+              </h3>
+              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                AI 미디어 믹스 제안으로 캠페인을 빠르게 실행하세요
+              </p>
+            </button>
           </motion.div>
 
           <motion.div
@@ -160,19 +161,52 @@ export function OnboardingRoleClient() {
             variants={reduceMotion ? undefined : cardVariants}
             initial={reduceMotion ? undefined : "hidden"}
             animate={reduceMotion ? undefined : "show"}
-            whileHover={springHover}
-            whileTap={springTap}
           >
-            <MediaOwnerRoleCard
-              loading={loading === "media"}
-              anyLoading={
-                loading !== null || status === "loading"
-              }
-              onChoose={() => choose("MEDIA_OWNER")}
-              reduceMotion={reduceMotion ?? undefined}
-            />
+            <button
+              type="button"
+              onClick={() => setSelectedRole("MEDIA_OWNER")}
+              disabled={loading !== null}
+              className={cn(
+                "w-full cursor-pointer rounded-xl border-2 p-6 text-center transition-all hover:border-blue-400",
+                selectedRole === "MEDIA_OWNER"
+                  ? "border-blue-500 ring-2 ring-blue-500"
+                  : "border-zinc-200 dark:border-zinc-700",
+              )}
+            >
+              <Monitor className="mx-auto h-10 w-10 text-emerald-600 dark:text-emerald-400" />
+              <h3 className="mt-3 text-lg font-bold text-zinc-900 dark:text-zinc-50">
+                매체사 / Media Owner
+              </h3>
+              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                보유 매체를 등록하고 안정적인 광고 수익을 시작하세요
+              </p>
+            </button>
           </motion.div>
         </div>
+
+        {selectedRole && (
+          <motion.div
+            className="mt-6 flex justify-center"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <Button
+              type="button"
+              className="h-12 px-8 text-base font-semibold bg-blue-600 hover:bg-blue-700"
+              disabled={loading !== null}
+              onClick={() => choose(selectedRole)}
+            >
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  처리 중...
+                </span>
+              ) : (
+                "시작하기"
+              )}
+            </Button>
+          </motion.div>
+        )}
 
         <motion.p
           className="mt-6 text-center text-xs text-zinc-500 dark:text-zinc-400"

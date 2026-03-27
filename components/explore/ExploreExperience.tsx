@@ -6,7 +6,14 @@ import { useSearchParams, useRouter, useParams } from "next/navigation";
 import { usePathname } from "@/i18n/navigation";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { MapPin, LayoutGrid, Map as MapIcon, MessageCircle } from "lucide-react";
+import {
+  MapPin,
+  LayoutGrid,
+  Map as MapIcon,
+  MessageCircle,
+  SlidersHorizontal,
+} from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -174,6 +181,7 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
   const [mapItems, setMapItems] = React.useState<ExploreApiItem[]>([]);
   const [mapLoading, setMapLoading] = React.useState(false);
   const [mapError, setMapError] = React.useState<string | null>(null);
+  const [filterOpen, setFilterOpen] = React.useState(false);
 
   React.useEffect(() => {
     const sp = new URLSearchParams(searchParams?.toString() ?? "");
@@ -357,7 +365,7 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
           )}
         </header>
 
-        <div className="mb-6 rounded-2xl border border-zinc-200/80 bg-white/90 p-4 shadow-sm ring-1 ring-black/[0.04] dark:border-zinc-700 dark:bg-zinc-900/80 dark:ring-white/[0.06]">
+        <div className="mb-6 hidden rounded-2xl border border-zinc-200/80 bg-white/90 p-4 shadow-sm ring-1 ring-black/[0.04] dark:border-zinc-700 dark:bg-zinc-900/80 dark:ring-white/[0.06] md:block">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
             <div className="xl:col-span-2">
               <label className="mb-1 block text-xs font-medium text-zinc-600 dark:text-zinc-400">
@@ -472,6 +480,149 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
           </div>
         </div>
 
+        <div className="mb-4 md:hidden">
+          <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="sm">
+                <SlidersHorizontal className="mr-2 h-4 w-4" />
+                필터
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[320px] overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle>필터</SheetTitle>
+              </SheetHeader>
+              <div className="mt-4 grid gap-4">
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                    {t("search.label")}
+                  </label>
+                  <Input
+                    value={draft.q}
+                    onChange={(e) => setDraft((d) => ({ ...d, q: e.target.value }))}
+                    placeholder={t("search.placeholder")}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-zinc-600">
+                    {tv("filter_media_type")}
+                  </label>
+                  <select
+                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                    value={draft.mediaType}
+                    onChange={(e) =>
+                      setDraft((d) => ({ ...d, mediaType: e.target.value }))
+                    }
+                  >
+                    <option value="ALL">{tv("filter_all")}</option>
+                    <option value="BILLBOARD">Billboard</option>
+                    <option value="DIGITAL_BOARD">Digital Screen</option>
+                    <option value="TRANSIT">Transit</option>
+                    <option value="STREET_FURNITURE">Street Furniture</option>
+                    <option value="WALL">Wall</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-zinc-600">
+                    {tv("filter_region")}
+                  </label>
+                  <Input
+                    value={draft.district}
+                    onChange={(e) =>
+                      setDraft((d) => ({ ...d, district: e.target.value }))
+                    }
+                    placeholder={tv("filter_region_ph")}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-zinc-600">
+                    {tv("filter_min_trust")}
+                  </label>
+                  <Input
+                    type="number"
+                    min={0}
+                    max={100}
+                    value={draft.minTrustScore}
+                    onChange={(e) =>
+                      setDraft((d) => ({ ...d, minTrustScore: e.target.value }))
+                    }
+                    placeholder="0–100"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-zinc-600">
+                      {t("filters.priceMin")} ({preferredCurrency})
+                    </label>
+                    <Input
+                      type="number"
+                      value={draft.priceMin}
+                      onChange={(e) =>
+                        setDraft((d) => ({ ...d, priceMin: e.target.value }))
+                      }
+                      placeholder="0"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-zinc-600">
+                      {t("filters.priceMax")} ({preferredCurrency})
+                    </label>
+                    <Input
+                      type="number"
+                      value={draft.priceMax}
+                      onChange={(e) =>
+                        setDraft((d) => ({ ...d, priceMax: e.target.value }))
+                      }
+                      placeholder="∞"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-zinc-600">
+                    {tv("sort")}
+                  </label>
+                  <select
+                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                    value={draft.sort}
+                    onChange={(e) => setDraft((d) => ({ ...d, sort: e.target.value }))}
+                  >
+                    <option value="createdDesc">{tv("sort_recent")}</option>
+                    <option value="priceAsc">{tv("sort_price_asc")}</option>
+                    <option value="priceDesc">{tv("sort_price_desc")}</option>
+                    <option value="trustDesc">{tv("sort_reach_desc")}</option>
+                    <option value="aiDesc">{tv("sort_ai_desc")}</option>
+                  </select>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    className="flex-1"
+                    onClick={() => {
+                      applyFilters();
+                      setFilterOpen(false);
+                    }}
+                    disabled={loading}
+                  >
+                    {t("apply")}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => {
+                      resetFilters();
+                      setFilterOpen(false);
+                    }}
+                  >
+                    {t("reset")}
+                  </Button>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div className="inline-flex rounded-lg border border-zinc-200 bg-white p-1 dark:border-zinc-700 dark:bg-zinc-900">
             <button
@@ -575,9 +726,11 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
                       {formatDisplayMoney(it.priceMin)}
                     </p>
                   </div>
-                  <p className="mt-2 flex items-start gap-1 text-sm text-zinc-600 dark:text-zinc-400">
-                    <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
-                    <span className="line-clamp-2">{getAddress(it.location)}</span>
+                  <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                      <MapPin className="h-3 w-3" />
+                      {getAddress(it.location)}
+                    </span>
                   </p>
                   <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-zinc-600 dark:text-zinc-400">
                     <div>
@@ -648,24 +801,20 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
         ) : null}
 
         {view === "list" && !loading && items.length === 0 ? (
-          <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
-            <p className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-              {tv("empty_title")}
+          <div className="flex flex-col items-center justify-center gap-4 py-20 text-zinc-500">
+            <MapPin className="h-10 w-10 text-zinc-300" />
+            <p className="text-base font-medium">
+              {locale === "ja"
+                ? "該当する媒体がありません"
+                : locale === "zh"
+                  ? "没有找到媒体"
+                  : locale === "en"
+                    ? "No media found"
+                    : "조건에 맞는 매체가 없어요"}
             </p>
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              {tv("empty_desc")}
-            </p>
-            <div className="mt-4 flex flex-wrap justify-center gap-2">
-              <Button type="button" variant="outline" onClick={resetFilters}>
-                {t("reset")}
-              </Button>
-              <Link
-                href="/dashboard/media-owner/upload"
-                className="inline-flex h-9 items-center justify-center rounded-md bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-500"
-              >
-                {tv("empty_cta")}
-              </Link>
-            </div>
+            <Button type="button" variant="outline" onClick={resetFilters}>
+              {t("reset")}
+            </Button>
           </div>
         ) : null}
 

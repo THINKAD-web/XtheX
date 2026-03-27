@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const ALLOWED_EXT = [".pdf", ".ppt", ".pptx"];
@@ -92,7 +93,7 @@ export function UploadDropzone({
         className={cn(
           "relative min-h-[220px] rounded-2xl border-2 border-dashed transition-all duration-300 lg:min-h-[280px]",
           isDragOver
-            ? "scale-[1.01] border-blue-500 bg-blue-50 shadow-md"
+            ? "scale-[1.01] border-blue-400 bg-blue-50 shadow-md"
             : "border-zinc-300 bg-zinc-50 hover:border-blue-400 hover:bg-blue-50/60",
           disabled && "pointer-events-none opacity-60",
         )}
@@ -121,8 +122,17 @@ export function UploadDropzone({
               className="flex items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm"
             >
               <div className="min-w-0 flex-1">
-                <span className="truncate font-medium text-zinc-900">{item.file.name}</span>
-                <span className="ml-2 text-zinc-500">{formatSize(item.file.size)}</span>
+                <div className="flex min-w-0 items-center gap-2">
+                  {item.status === "ready" ? (
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
+                  ) : item.status === "error" ? (
+                    <AlertCircle className="h-4 w-4 shrink-0 text-destructive" />
+                  ) : (
+                    <Loader2 className="h-4 w-4 shrink-0 animate-spin text-blue-500" />
+                  )}
+                  <span className="truncate font-medium text-zinc-900">{item.file.name}</span>
+                  <span className="ml-2 shrink-0 text-zinc-500">{formatSize(item.file.size)}</span>
+                </div>
                 {item.status === "error" && item.error && (
                   <p className="mt-0.5 text-xs text-destructive">{item.error}</p>
                 )}

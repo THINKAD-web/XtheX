@@ -901,6 +901,19 @@
     "ai_point_visibility": "High visibility and reach around {district}.",
     "ai_point_targeting": "Strong fit for {audience} targeting and messaging.",
     "ai_point_trust": "Trust score {score}/100 with stable operational reliability.",
-    "ai_point_efficiency": "Current pricing and exposure profile suggest strong budget efficiency."
+    "ai_point_efficiency": "Current pricing and exposure profile suggest strong budget efficiency.",
+    "stats_overview": "Key Metrics",
+    "visibility_score": "Visibility Score",
+    "target_audience_section": "Target Audience",
+    "target_age": "Target Age",
+    "target_description": "Target Description",
+    "target_tags": "Target Tags",
+    "location_section": "Location Info",
+    "address_label": "Address",
+    "district_label": "District",
+    "coordinates": "Coordinates",
+    "pricing_section": "Pricing",
+    "monthly_ad_price": "Monthly Ad Price",
+    "pros_cons_section": "Pros & Cons"
   }
 }

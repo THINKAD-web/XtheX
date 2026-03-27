@@ -894,6 +894,19 @@
     "ai_point_visibility": "High visibility and reach around {district}.",
     "ai_point_targeting": "Strong fit for {audience} targeting and messaging.",
     "ai_point_trust": "Trust score {score}/100 with stable operational reliability.",
-    "ai_point_efficiency": "Current pricing and exposure profile suggest strong budget efficiency."
+    "ai_point_efficiency": "Current pricing and exposure profile suggest strong budget efficiency.",
+    "stats_overview": "核心指标",
+    "visibility_score": "可见性评分",
+    "target_audience_section": "目标受众",
+    "target_age": "目标年龄段",
+    "target_description": "目标描述",
+    "target_tags": "目标标签",
+    "location_section": "位置信息",
+    "address_label": "地址",
+    "district_label": "区域",
+    "coordinates": "坐标",
+    "pricing_section": "价格信息",
+    "monthly_ad_price": "月广告费",
+    "pros_cons_section": "优缺点"
   }
 }

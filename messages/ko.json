@@ -901,6 +901,19 @@
     "ai_point_visibility": "{district} 중심의 도달성과 가시성이 우수합니다.",
     "ai_point_targeting": "{audience} 타겟과 메시지 전달 적합도가 높습니다.",
     "ai_point_trust": "매체 신뢰도 {score}/100 및 운영 안정성이 확인됩니다.",
-    "ai_point_efficiency": "현재 가격 및 노출 조건 기준으로 예산 대비 효율이 우수한 편입니다."
+    "ai_point_efficiency": "현재 가격 및 노출 조건 기준으로 예산 대비 효율이 우수한 편입니다.",
+    "stats_overview": "핵심 지표",
+    "visibility_score": "가시성 점수",
+    "target_audience_section": "타겟 오디언스",
+    "target_age": "타겟 연령대",
+    "target_description": "타겟 설명",
+    "target_tags": "타겟 태그",
+    "location_section": "위치 정보",
+    "address_label": "주소",
+    "district_label": "지역",
+    "coordinates": "좌표",
+    "pricing_section": "가격 정보",
+    "monthly_ad_price": "월 광고료",
+    "pros_cons_section": "장단점"
   }
 }

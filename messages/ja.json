@@ -894,6 +894,19 @@
     "ai_point_visibility": "High visibility and reach around {district}.",
     "ai_point_targeting": "Strong fit for {audience} targeting and messaging.",
     "ai_point_trust": "Trust score {score}/100 with stable operational reliability.",
-    "ai_point_efficiency": "Current pricing and exposure profile suggest strong budget efficiency."
+    "ai_point_efficiency": "Current pricing and exposure profile suggest strong budget efficiency.",
+    "stats_overview": "主要指標",
+    "visibility_score": "視認性スコア",
+    "target_audience_section": "ターゲットオーディエンス",
+    "target_age": "ターゲット年齢層",
+    "target_description": "ターゲット説明",
+    "target_tags": "ターゲットタグ",
+    "location_section": "位置情報",
+    "address_label": "住所",
+    "district_label": "地域",
+    "coordinates": "座標",
+    "pricing_section": "価格情報",
+    "monthly_ad_price": "月額広告料",
+    "pros_cons_section": "長所と短所"
   }
 }

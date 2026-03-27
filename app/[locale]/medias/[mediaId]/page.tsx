@@ -23,9 +23,33 @@ import {
   isSupportedCurrency,
   type SupportedCurrency,
 } from "@/lib/currency";
+import {
+  Users,
+  Eye,
+  Target,
+  Repeat,
+  Coins,
+  BarChart3,
+  MapPin,
+  Banknote,
+  ThumbsUp,
+  ThumbsDown,
+  UserCheck,
+  Navigation,
+} from "lucide-react";
 
 const isVideoUrl = (url: string) =>
   /\.(mp4|webm|mov|m4v)$/i.test(url) || url.includes("youtube.com") || url.includes("youtu.be");
+
+function formatTraffic(n: unknown, isKo: boolean): string {
+  if (n == null) return "-";
+  const num = typeof n === "number" ? n : Number(n);
+  if (Number.isNaN(num)) return String(n);
+  if (!isKo) return num >= 1_000_000 ? `${(num / 1_000_000).toFixed(1)}M` : num.toLocaleString("en-US");
+  if (num >= 100_000_000) return `${(num / 100_000_000).toFixed(1)}억`;
+  if (num >= 10_000) return `${Math.round(num / 10_000)}만`;
+  return num.toLocaleString("ko-KR");
+}
 
 /** Media.id is @db.Uuid — non-UUID strings cause Prisma/Postgres to throw. */
 function isMediaUuid(id: string): boolean {
@@ -137,6 +161,7 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
       pros: true,
       cons: true,
       targetAudience: true,
+      audienceTags: true,
       tags: true,
       trustScore: true,
     },
@@ -376,221 +401,285 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
           </div>
       </section>
 
-      {/* Body */}
+      {/* ── Stats Grid ── */}
       <section className={`${landing.container} py-10`}>
-          <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="rounded-2xl bg-zinc-900/80 p-4 ring-1 ring-zinc-800">
-              <p className="text-xs text-zinc-500">{t("price")}</p>
-              <p className="mt-1 text-sm font-semibold text-zinc-100">{displayPriceLabel}</p>
+        <h2 className="mb-6 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+          {t("stats_overview")}
+        </h2>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {([
+            { icon: Users,    label: t("daily_traffic"),       value: exposure.daily_traffic != null ? formatTraffic(exposure.daily_traffic, isKo) : null },
+            { icon: Eye,      label: t("monthly_impressions"), value: exposure.monthly_impressions != null ? formatTraffic(exposure.monthly_impressions, isKo) : null },
+            { icon: Target,   label: t("reach"),               value: exposure.reach != null ? `${exposure.reach}%` : null },
+            { icon: Repeat,   label: t("frequency"),           value: exposure.frequency != null ? `${exposure.frequency}${isKo ? "회" : "x"}` : null },
+            { icon: Coins,    label: "CPM",                    value: (exposure.cpm ?? media.cpm) != null ? `${Number(exposure.cpm ?? media.cpm).toLocaleString()}${isKo ? "원" : " KRW"}` : null },
+            { icon: BarChart3, label: t("visibility_score"),   value: exposure.visibility_score != null ? `${exposure.visibility_score}/100` : null },
+          ] as const).map(({ icon: Icon, label, value }) => (
+            <div key={label} className="flex items-start gap-3 rounded-2xl bg-zinc-900/80 p-4 ring-1 ring-zinc-800">
+              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-orange-500/10 text-orange-400">
+                <Icon className="h-4 w-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[11px] text-zinc-500">{label}</p>
+                <p className="mt-0.5 text-sm font-semibold text-zinc-100">
+                  {value ?? t("no_performance_data")}
+                </p>
+              </div>
             </div>
-            <div className="rounded-2xl bg-zinc-900/80 p-4 ring-1 ring-zinc-800">
-              <p className="text-xs text-zinc-500">{t("location")}</p>
-              <p className="mt-1 text-sm font-semibold text-zinc-100">
-                {location.address ?? t("no_address")}
-                {location.district ? ` · ${location.district}` : ""}
-              </p>
-            </div>
-            <div className="rounded-2xl bg-zinc-900/80 p-4 ring-1 ring-zinc-800">
-              <p className="text-xs text-zinc-500">{t("impressions_traffic")}</p>
-              <p className="mt-1 text-sm font-semibold text-zinc-100">
-                {exposure.daily_traffic ?? t("no_performance_data")}
-              </p>
-            </div>
-          </div>
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1.1fr)]">
-            {/* Left column – editorial blocks */}
-            <div className="space-y-8">
-              <article className="space-y-4">
-                <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
-                  {t("location_audience")}
-                </h2>
-                <div className="grid gap-4 text-sm md:grid-cols-2">
-                  <div className="rounded-2xl bg-zinc-900/80 p-4 ring-1 ring-zinc-800">
-                    <p className="text-xs text-zinc-500">
-                      {t("location")}
+          ))}
+        </div>
+      </section>
+
+      {/* ── Body: Two-column layout ── */}
+      <section className={`${landing.container} pb-10`}>
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1.1fr)]">
+          {/* Left column */}
+          <div className="space-y-8">
+            {/* Target Audience */}
+            <article className="space-y-4">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                {t("target_audience_section")}
+              </h2>
+              <div className="rounded-2xl bg-zinc-900/80 p-5 ring-1 ring-zinc-800">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <div className="flex items-center gap-2 text-[11px] text-zinc-500">
+                      <UserCheck className="h-3.5 w-3.5" />
+                      {t("target_age")}
+                    </div>
+                    <p className="mt-1 text-sm font-medium text-zinc-100">
+                      {exposure.target_age ?? "-"}
                     </p>
-                    <p className="mt-1 text-sm text-zinc-100">
-                      {location.address ?? t("no_address")}
-                    </p>
-                    {location.district && (
-                      <p className="mt-0.5 text-xs text-zinc-500">{location.district}</p>
-                    )}
                   </div>
-                  <div className="rounded-2xl bg-zinc-900/80 p-4 ring-1 ring-zinc-800">
-                    <p className="text-xs text-zinc-500">
-                      {t("audience")}
-                    </p>
-                    <p className="mt-1 text-sm text-zinc-100">
+                  <div>
+                    <div className="flex items-center gap-2 text-[11px] text-zinc-500">
+                      <Users className="h-3.5 w-3.5" />
+                      {t("target_description")}
+                    </div>
+                    <p className="mt-1 text-sm font-medium text-zinc-100">
                       {media.targetAudience ?? t("no_audience_info")}
                     </p>
                   </div>
                 </div>
-              </article>
+                {media.audienceTags && media.audienceTags.length > 0 && (
+                  <div className="mt-4 border-t border-zinc-800 pt-4">
+                    <p className="mb-2 text-[11px] text-zinc-500">{t("target_tags")}</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {media.audienceTags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="rounded-full bg-orange-500/10 px-2.5 py-0.5 text-[11px] font-medium text-orange-300 ring-1 ring-orange-500/30"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </article>
 
-              <article className="space-y-4">
-                <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
-                  {t("performance")}
-                </h2>
-                <div className="rounded-2xl bg-zinc-900/80 p-4 ring-1 ring-zinc-800">
-                  <p className="text-xs text-zinc-500">
-                    {t("impressions_traffic")}
-                  </p>
-                  <ul className="mt-2 space-y-1 text-xs text-zinc-300">
-                    {exposure.daily_traffic && (
-                      <li>
-                        {t("daily_traffic")}: {exposure.daily_traffic}
-                      </li>
-                    )}
-                    {exposure.monthly_impressions && (
-                      <li>
-                        {t("monthly_impressions")}:{" "}
-                        {exposure.monthly_impressions}
-                      </li>
-                    )}
-                    {exposure.reach && (
-                      <li>
-                        {t("reach")}: {exposure.reach}
-                      </li>
-                    )}
-                    {exposure.frequency && (
-                      <li>
-                        {t("frequency")}: {exposure.frequency}
-                      </li>
-                    )}
-                    {!exposure.daily_traffic &&
-                      !exposure.monthly_impressions &&
-                      !exposure.reach &&
-                      !exposure.frequency && (
-                        <li>
-                          {t("no_performance_data")}
-                        </li>
-                      )}
-                  </ul>
+            {/* Location */}
+            <article className="space-y-4">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                {t("location_section")}
+              </h2>
+              <div className="rounded-2xl bg-zinc-900/80 p-5 ring-1 ring-zinc-800">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <div className="flex items-center gap-2 text-[11px] text-zinc-500">
+                      <MapPin className="h-3.5 w-3.5" />
+                      {t("address_label")}
+                    </div>
+                    <p className="mt-1 text-sm font-medium text-zinc-100">
+                      {location.address ?? t("no_address")}
+                    </p>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 text-[11px] text-zinc-500">
+                      <Navigation className="h-3.5 w-3.5" />
+                      {t("district_label")}
+                    </div>
+                    <p className="mt-1 text-sm font-medium text-zinc-100">
+                      {location.district ?? "-"}
+                    </p>
+                  </div>
                 </div>
-              </article>
+                {(location.lat != null && location.lng != null) && (
+                  <div className="mt-4 border-t border-zinc-800 pt-4">
+                    <p className="mb-2 text-[11px] text-zinc-500">{t("coordinates")}</p>
+                    <div className="flex items-center gap-4">
+                      <code className="rounded bg-zinc-800 px-2 py-1 text-xs text-zinc-300">
+                        {Number(location.lat).toFixed(5)}, {Number(location.lng).toFixed(5)}
+                      </code>
+                      <Link
+                        href={`/${locale}/explore?center=${location.lat},${location.lng}&zoom=15`}
+                        className="text-xs text-orange-400 hover:underline"
+                      >
+                        {t("view_on_map")}
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </article>
 
+            {/* Pricing */}
+            <article className="space-y-4">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                {t("pricing_section")}
+              </h2>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="flex items-start gap-3 rounded-2xl bg-zinc-900/80 p-4 ring-1 ring-zinc-800">
+                  <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
+                    <Banknote className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="text-[11px] text-zinc-500">{t("monthly_ad_price")}</p>
+                    <p className="mt-0.5 text-sm font-semibold text-zinc-100">{displayPriceLabel}</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 rounded-2xl bg-zinc-900/80 p-4 ring-1 ring-zinc-800">
+                  <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400">
+                    <Coins className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="text-[11px] text-zinc-500">CPM</p>
+                    <p className="mt-0.5 text-sm font-semibold text-zinc-100">
+                      {media.cpm != null
+                        ? `${media.cpm.toLocaleString()}${isKo ? "원" : " KRW"}`
+                        : t("price_on_request")}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            {/* Pros & Cons */}
+            {(media.pros || media.cons) && (
               <article className="space-y-4">
                 <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
-                  {t("editorial_notes")}
+                  {t("pros_cons_section")}
                 </h2>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="rounded-2xl bg-emerald-500/5 p-4 ring-1 ring-emerald-500/30">
-                    <p className="text-xs font-semibold text-emerald-300">
-                      {t("strengths")}
-                    </p>
-                    <p className="mt-2 text-xs text-emerald-100">
-                      {media.pros ??
-                        t("no_strengths")}
+                    <div className="flex items-center gap-2">
+                      <ThumbsUp className="h-3.5 w-3.5 text-emerald-400" />
+                      <p className="text-xs font-semibold text-emerald-300">{t("strengths")}</p>
+                    </div>
+                    <p className="mt-2 whitespace-pre-wrap text-xs leading-relaxed text-emerald-100">
+                      {media.pros ?? t("no_strengths")}
                     </p>
                   </div>
                   <div className="rounded-2xl bg-amber-500/5 p-4 ring-1 ring-amber-500/30">
-                    <p className="text-xs font-semibold text-amber-300">
-                      {t("cautions")}
-                    </p>
-                    <p className="mt-2 text-xs text-amber-100">
-                      {media.cons ??
-                        t("no_cautions")}
+                    <div className="flex items-center gap-2">
+                      <ThumbsDown className="h-3.5 w-3.5 text-amber-400" />
+                      <p className="text-xs font-semibold text-amber-300">{t("cautions")}</p>
+                    </div>
+                    <p className="mt-2 whitespace-pre-wrap text-xs leading-relaxed text-amber-100">
+                      {media.cons ?? t("no_cautions")}
                     </p>
                   </div>
                 </div>
               </article>
+            )}
 
-              <MediaCaseStudies caseStudies={[]} locale={locale} />
+            <MediaCaseStudies caseStudies={[]} locale={locale} />
 
-              {similarMedias.length > 0 && (
-                <article className="space-y-4">
-                  <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
-                    {t("similar_media")}
-                  </h2>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    {similarMedias.map((m) => {
-                      const loc = (m.locationJson ?? {}) as any;
-                      return (
-                        <Link
-                          key={m.id}
-                          href={`/${locale}/medias/${m.id}`}
-                          className="group flex flex-col justify-between rounded-2xl bg-zinc-900/80 p-4 ring-1 ring-zinc-800 hover:bg-zinc-900 hover:ring-zinc-600"
-                        >
-                          <div>
-                            <p className="text-xs uppercase tracking-wide text-zinc-500">
-                              {m.category}
-                            </p>
-                            <p className="mt-1 line-clamp-2 text-sm font-medium text-zinc-100 group-hover:text-white">
-                              {m.mediaName}
-                            </p>
-                            <p className="mt-1 line-clamp-2 text-xs text-zinc-400">
-                              {m.description ?? ""}
-                            </p>
-                          </div>
-                          <div className="mt-3 flex items-center justify-between text-[11px] text-zinc-500">
-                            <span className="truncate">
-                              {loc.address ?? t("no_address")}
-                            </span>
-                            {m.price != null && (
-                              <span className="ml-2 flex-shrink-0 font-medium text-zinc-200">
-                                {m.price.toLocaleString()}
-                                {isKo ? "원" : " KRW"}
-                              </span>
-                            )}
-                          </div>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </article>
-              )}
-
-              <SimilarBundleSection
-                locale={locale}
-                baseMediaIds={[media.id]}
-                items={similarEffectMedias}
-                titleKo="이 매체와 비슷한 효과 예상 매체"
-                titleEn="Similar expected effect"
-                subtitleKo="카테고리/상권/CPM을 기준으로 3개를 추천합니다."
-                subtitleEn="Recommended by category, district, and CPM."
-              />
-            </div>
-
-            {/* Right column – gallery (3~5장 슬라이드) + 집행 사례 */}
-            <aside className="space-y-6">
-              <MediaGallery
-                images={imageUrls}
-                mediaName={media.mediaName}
-              />
-
-              {videoUrls.length > 0 && (
-                <div className="space-y-2 rounded-3xl bg-zinc-900/80 p-4 ring-1 ring-zinc-800">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
-                    Media Footage
-                  </p>
-                  <div className="space-y-3">
-                    {videoUrls.map((url) =>
-                      url.includes("youtube.com") || url.includes("youtu.be") ? (
-                        <div
-                          key={url}
-                          className="aspect-video w-full overflow-hidden rounded-xl ring-1 ring-zinc-800"
-                        >
-                          <iframe
-                            src={url}
-                            className="h-full w-full"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                          />
+            {similarMedias.length > 0 && (
+              <article className="space-y-4">
+                <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                  {t("similar_media")}
+                </h2>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {similarMedias.map((m) => {
+                    const loc = (m.locationJson ?? {}) as any;
+                    return (
+                      <Link
+                        key={m.id}
+                        href={`/${locale}/medias/${m.id}`}
+                        className="group flex flex-col justify-between rounded-2xl bg-zinc-900/80 p-4 ring-1 ring-zinc-800 hover:bg-zinc-900 hover:ring-zinc-600"
+                      >
+                        <div>
+                          <p className="text-xs uppercase tracking-wide text-zinc-500">
+                            {m.category}
+                          </p>
+                          <p className="mt-1 line-clamp-2 text-sm font-medium text-zinc-100 group-hover:text-white">
+                            {m.mediaName}
+                          </p>
+                          <p className="mt-1 line-clamp-2 text-xs text-zinc-400">
+                            {m.description ?? ""}
+                          </p>
                         </div>
-                      ) : (
-                        <video
-                          key={url}
-                          src={url}
-                          controls
-                          className="aspect-video w-full overflow-hidden rounded-xl bg-black ring-1 ring-zinc-800"
-                        />
-                      ),
-                    )}
-                  </div>
+                        <div className="mt-3 flex items-center justify-between text-[11px] text-zinc-500">
+                          <span className="truncate">
+                            {loc.address ?? t("no_address")}
+                          </span>
+                          {m.price != null && (
+                            <span className="ml-2 flex-shrink-0 font-medium text-zinc-200">
+                              {m.price.toLocaleString()}
+                              {isKo ? "원" : " KRW"}
+                            </span>
+                          )}
+                        </div>
+                      </Link>
+                    );
+                  })}
                 </div>
-              )}
-            </aside>
+              </article>
+            )}
+
+            <SimilarBundleSection
+              locale={locale}
+              baseMediaIds={[media.id]}
+              items={similarEffectMedias}
+              titleKo="이 매체와 비슷한 효과 예상 매체"
+              titleEn="Similar expected effect"
+              subtitleKo="카테고리/상권/CPM을 기준으로 3개를 추천합니다."
+              subtitleEn="Recommended by category, district, and CPM."
+            />
           </div>
+
+          {/* Right column – gallery + footage */}
+          <aside className="space-y-6">
+            <MediaGallery
+              images={imageUrls}
+              mediaName={media.mediaName}
+            />
+
+            {videoUrls.length > 0 && (
+              <div className="space-y-2 rounded-3xl bg-zinc-900/80 p-4 ring-1 ring-zinc-800">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+                  Media Footage
+                </p>
+                <div className="space-y-3">
+                  {videoUrls.map((url) =>
+                    url.includes("youtube.com") || url.includes("youtu.be") ? (
+                      <div
+                        key={url}
+                        className="aspect-video w-full overflow-hidden rounded-xl ring-1 ring-zinc-800"
+                      >
+                        <iframe
+                          src={url}
+                          className="h-full w-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      </div>
+                    ) : (
+                      <video
+                        key={url}
+                        src={url}
+                        controls
+                        className="aspect-video w-full overflow-hidden rounded-xl bg-black ring-1 ring-zinc-800"
+                      />
+                    ),
+                  )}
+                </div>
+              </div>
+            )}
+          </aside>
+        </div>
       </section>
       <MediaDetailStickyBar mediaId={media.id} mediaName={media.mediaName} />
     </AppSiteChrome>

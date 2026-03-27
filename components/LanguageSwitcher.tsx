@@ -1,10 +1,16 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import { Monitor, Moon, Sun } from "lucide-react";
+import { Monitor, Moon, Sun, ChevronDown } from "lucide-react";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { useBrightness } from "@/components/brightness/BrightnessPreference";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const SUPPORTED_LOCALES = ["ko", "en", "ja", "zh"] as const;
 
@@ -34,24 +40,32 @@ export function LanguageSwitcher() {
       role="group"
       aria-label="Language switcher"
     >
-      {SUPPORTED_LOCALES.map((code, i) => (
-        <button
-          key={code}
-          type="button"
-          onClick={() => handleChange(code)}
-          aria-label={LABELS[code]}
-          title={LABELS[code]}
-          className={cn(
-            "flex h-9 w-9 items-center justify-center text-[11px] font-semibold tracking-wide transition-colors",
-            i > 0 && "border-l border-border",
-            activeLocale === code
-              ? "bg-foreground text-background"
-              : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
-          )}
-        >
-          {code.toUpperCase()}
-        </button>
-      ))}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            className="flex h-7 items-center gap-1 self-center px-2 text-[10px] font-semibold tracking-wide text-foreground transition-colors hover:bg-muted/60 focus-visible:outline-none"
+          >
+            {activeLocale.toUpperCase()}
+            <ChevronDown className="h-3 w-3 opacity-60" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" sideOffset={6} className="min-w-[120px]">
+          {SUPPORTED_LOCALES.map((code) => (
+            <DropdownMenuItem
+              key={code}
+              onClick={() => handleChange(code)}
+              className={cn(
+                "flex items-center gap-2 text-xs",
+                activeLocale === code && "font-bold",
+              )}
+            >
+              <span className="w-6 font-semibold">{code.toUpperCase()}</span>
+              <span className="text-muted-foreground">{LABELS[code]}</span>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
       <BrightnessToggle />
     </div>
   );

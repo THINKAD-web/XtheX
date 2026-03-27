@@ -364,7 +364,7 @@ export function OmniCartShell() {
       <TooltipProvider delayDuration={200}>
         <div
           className={cn(
-            "fixed right-4 top-20 z-[85] flex items-center gap-1.5 md:right-6 md:top-24",
+            "fixed right-4 bottom-6 z-[85] flex items-center gap-1.5 md:right-6 md:bottom-8",
           )}
         >
           <div className="relative shrink-0">

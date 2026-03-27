@@ -45,10 +45,12 @@ export async function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <div className="justify-self-end flex shrink-0 items-center gap-2 sm:gap-3">
+        <div className="justify-self-end flex shrink-0 items-center gap-1.5 sm:gap-3">
           <OmniCartHeaderBtn />
           <LanguageSwitcher />
-          <CurrencySwitcher locale={locale} label={tNav("currency")} />
+          <div className="hidden sm:flex items-center gap-1.5 sm:gap-3">
+            <CurrencySwitcher locale={locale} label={tNav("currency")} />
+          </div>
           <AuthNav
             signInLabel={tNav("sign_in")}
             signUpLabel={tNav("sign_up")}

@@ -14,6 +14,10 @@
       "ai_recommend_go": "AIおすすめ",
       "admin_console": "管理コンソール"
     },
+    "betaNotice": {
+      "badge": "アーリーアクセス · 韓国先行",
+      "dismiss_aria": "通知を閉じる"
+    },
     "mediaMix": {
       "demo_watermark": "デモモード – ログインで本格的なおすすめを利用できます",
       "demo_toast_title": "ログインすると、より正確なおすすめが受けられます",

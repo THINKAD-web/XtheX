@@ -14,6 +14,10 @@
       "ai_recommend_go": "AI 定制推荐",
       "admin_console": "管理后台"
     },
+    "betaNotice": {
+      "badge": "抢先体验 · 韩国优先上线",
+      "dismiss_aria": "关闭提示"
+    },
     "mediaMix": {
       "demo_watermark": "演示模式 – 登录后可获得真实个性化推荐",
       "demo_toast_title": "登录后可获得更精准的定制推荐",

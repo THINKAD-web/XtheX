@@ -14,6 +14,10 @@
       "ai_recommend_go": "AI recommendations",
       "admin_console": "Admin console"
     },
+    "betaNotice": {
+      "badge": "Early Access · Korea-first launch",
+      "dismiss_aria": "Dismiss notice"
+    },
     "mediaMix": {
       "demo_watermark": "Demo Mode – Sign in for real personalized recommendations",
       "demo_toast_title": "Sign in for more accurate, tailored recommendations",

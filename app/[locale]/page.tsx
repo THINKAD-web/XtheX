@@ -15,6 +15,7 @@ import { landing } from "@/lib/landing-theme";
 import { HomeHeroDaypart } from "@/components/daypart/HomeHeroDaypart";
 import { HomeSolidDaypartWrapper } from "@/components/daypart/HomeSolidDaypartWrapper";
 import { HomeRoleCtas } from "@/components/home/home-role-ctas";
+import { BetaNoticebar } from "@/components/home/BetaNoticebar";
 import { PartnersSectionClient } from "@/components/home/PartnersSectionClient";
 import { TestimonialsSectionClient } from "@/components/home/TestimonialsSectionClient";
 import { FeaturesSectionClient } from "@/components/home/FeaturesSectionClient";
@@ -182,24 +183,11 @@ export default async function Home({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const t = await getTranslations("home.hero");
   return (
     <AppSiteChrome>
       <main>
         <HomeHeroDaypart />
-        <section className="border-b border-zinc-200/80 bg-white/90 py-5 dark:border-zinc-800 dark:bg-zinc-950/80">
-          <div className={`${landing.container} flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between`}>
-            <div className="inline-flex w-fit items-center rounded-full border border-blue-300 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 dark:border-blue-400/40 dark:bg-blue-950/30 dark:text-blue-200">
-              {locale.startsWith("ko") ? "Beta 서비스 · 한국 우선 출시" : "Early Access · Korea-first launch"}
-            </div>
-            <HomeRoleCtas
-              mediaLabel={t("cta_partner")}
-              advertiserLabel={t("cta_explore")}
-              mediaClassName="inline-flex h-10 items-center justify-center rounded-md bg-blue-600 px-5 text-sm font-semibold text-white hover:bg-blue-500"
-              advertiserClassName="inline-flex h-10 items-center justify-center rounded-md border border-blue-300 px-5 text-sm font-semibold text-blue-700 hover:bg-blue-50 dark:border-blue-400/40 dark:text-blue-200 dark:hover:bg-blue-950/30"
-            />
-          </div>
-        </section>
+        <BetaNoticebar />
         <MediaMixSearchSection />
         <HomeSolidDaypartWrapper>
           <TrendingMediasSection locale={locale} />

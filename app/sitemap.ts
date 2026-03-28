@@ -14,6 +14,7 @@ const staticPages = [
   "/news",
   "/campaign-planner",
   "/help",
+  "/developers",
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

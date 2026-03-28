@@ -5,6 +5,9 @@ import { useTranslations } from "next-intl";
 import { Bell } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import { useOfflineSyncEffect } from "@/components/offline/useOfflineSyncEffect";
+import { OFFLINE_CACHE } from "@/lib/offline/cache-keys";
+import { offlineCacheGet, offlineCachePut } from "@/lib/offline/indexed-cache";
 import { cn } from "@/lib/utils";
 
 type NotificationRow = {
@@ -16,6 +19,12 @@ type NotificationRow = {
   link: string | null;
   read: boolean;
   createdAt: string;
+  starred?: boolean;
+};
+
+type NotificationsCachePayload = {
+  notifications: NotificationRow[];
+  unreadCount: number;
 };
 
 function formatTimeAgo(iso: string): string {
@@ -43,36 +52,73 @@ function truncateMessage(text: string, max = 80): string {
 
 export function NotificationCenter() {
   const t = useTranslations("notificationCenter");
+  const tOff = useTranslations("offline");
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationRow[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [fromCache, setFromCache] = useState(false);
   const [marking, setMarking] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
+  const applyCache = useCallback(
+    async (): Promise<boolean> => {
+      const cached = await offlineCacheGet<NotificationsCachePayload>(
+        OFFLINE_CACHE.notifications,
+      );
+      if (!cached?.value || !Array.isArray(cached.value.notifications))
+        return false;
+      setNotifications(cached.value.notifications);
+      setUnreadCount(cached.value.unreadCount ?? 0);
+      setFromCache(true);
+      return true;
+    },
+    [],
+  );
+
   const load = useCallback(async () => {
     setLoading(true);
+    setFromCache(false);
     try {
       const res = await fetch("/api/notifications", { credentials: "include" });
-      if (!res.ok) {
-        setNotifications([]);
-        setUnreadCount(0);
+      if (res.ok) {
+        const data = (await res.json()) as {
+          notifications?: NotificationRow[];
+          unreadCount?: number;
+        };
+        const list = data.notifications ?? [];
+        const unread = data.unreadCount ?? 0;
+        setNotifications(list);
+        setUnreadCount(unread);
+        await offlineCachePut(OFFLINE_CACHE.notifications, {
+          notifications: list,
+          unreadCount: unread,
+        });
         return;
       }
-      const data = (await res.json()) as {
-        notifications?: NotificationRow[];
-        unreadCount?: number;
-      };
-      setNotifications(data.notifications ?? []);
-      setUnreadCount(data.unreadCount ?? 0);
+      const restored = await applyCache();
+      if (!restored) {
+        setNotifications([]);
+        setUnreadCount(0);
+      }
+    } catch {
+      const restored = await applyCache();
+      if (!restored) {
+        setNotifications([]);
+        setUnreadCount(0);
+      }
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [applyCache]);
 
   useEffect(() => {
     void load();
   }, [load]);
+
+  useOfflineSyncEffect(() => {
+    void load();
+  });
 
   useEffect(() => {
     if (!open) return;
@@ -96,8 +142,16 @@ export function NotificationCenter() {
         body: JSON.stringify({ action: "markAllRead" }),
       });
       if (res.ok) {
-        setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+        setNotifications((prev) => {
+          const next = prev.map((n) => ({ ...n, read: true }));
+          void offlineCachePut(OFFLINE_CACHE.notifications, {
+            notifications: next,
+            unreadCount: 0,
+          });
+          return next;
+        });
         setUnreadCount(0);
+        setFromCache(false);
       }
     } finally {
       setMarking(false);
@@ -135,6 +189,11 @@ export function NotificationCenter() {
         >
           <div className="border-b border-border px-4 py-3">
             <p className="text-sm font-semibold text-foreground">Notifications</p>
+            {fromCache ? (
+              <p className="mt-1 text-xs text-amber-800 dark:text-amber-200/90">
+                {tOff("cached_hint")}
+              </p>
+            ) : null}
           </div>
 
           <div className="max-h-[min(420px,70vh)] overflow-y-auto">

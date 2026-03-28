@@ -9,6 +9,7 @@ import { AuthNav } from "@/components/auth/auth-nav";
 import { MobileNav, type AppNavItem } from "@/components/layout/MobileNav";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 import { SearchAutocomplete } from "@/components/search/SearchAutocomplete";
+import { OfflineBadge } from "@/components/offline/OfflineBadge";
 import { landing } from "@/lib/landing-theme";
 import { getLocale } from "next-intl/server";
 
@@ -60,6 +61,7 @@ export async function SiteHeader() {
           ))}
         </nav>
         <div className="justify-self-end flex shrink-0 items-center gap-1.5 sm:gap-3">
+          <OfflineBadge />
           <span data-tour="tour-search" className="hidden sm:inline">
             <SearchAutocomplete className="hidden sm:block" />
           </span>

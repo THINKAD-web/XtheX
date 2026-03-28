@@ -1778,6 +1778,14 @@
     "quiet_window": "From · To",
     "quiet_hint_overnight": "If “from” is later than “to” (e.g. 22:00–07:00), the quiet period spans midnight."
   },
+  "offline": {
+    "badge_offline": "离线",
+    "badge_aria": "当前离线。在可用时将显示已保存的数据。",
+    "cached_hint": "显示已保存的通知。联网后将自动刷新。",
+    "stats_cached_banner": "离线：显示本设备上次保存的仪表盘统计。",
+    "history_cached_banner": "离线：若本设备有与当前筛选条件匹配的已保存列表则显示。",
+    "sync_restored": "已重新联网，正在刷新最新数据。"
+  },
   "notificationHistory": {
     "title": "通知记录",
     "subtitle": "按日期、类别、已读状态和收藏筛选，并可标记已读/未读与星标。",

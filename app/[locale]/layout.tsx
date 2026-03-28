@@ -10,6 +10,7 @@ import { OnboardingGate } from "@/components/onboarding/OnboardingGate";
 import { GuidedTourOverlayLazy } from "@/components/onboarding/GuidedTourOverlayLazy";
 import { OmniCartShellLazy } from "@/components/omni/OmniCartShellLazy";
 import { WelcomeModal } from "@/components/onboarding/WelcomeModal";
+import { OfflineProvider } from "@/components/offline/offline-context";
 
 const ChatWidget = dynamic(
   () => import("@/components/chat/ChatWidget").then((m) => m.ChatWidget),
@@ -36,20 +37,22 @@ export default async function LocaleLayout({ children, params }: Props) {
       messages={messages as unknown as Record<string, unknown>}
       timeZone={timeZone}
     >
-      <DocumentLang />
-      <div className="flex min-h-screen flex-col bg-background text-foreground">
-        <main className="flex-1">
-          <OnboardingGate>
-            <WelcomeModal />
-            <GuidedTourOverlayLazy />
-            <OmniCartShellLazy />
-            <ChatWidget />
-            <FeedbackWidget />
-            {children}
-          </OnboardingGate>
-        </main>
-        <ConditionalSiteFooter />
-      </div>
+      <OfflineProvider>
+        <DocumentLang />
+        <div className="flex min-h-screen flex-col bg-background text-foreground">
+          <main className="flex-1">
+            <OnboardingGate>
+              <WelcomeModal />
+              <GuidedTourOverlayLazy />
+              <OmniCartShellLazy />
+              <ChatWidget />
+              <FeedbackWidget />
+              {children}
+            </OnboardingGate>
+          </main>
+          <ConditionalSiteFooter />
+        </div>
+      </OfflineProvider>
     </NextIntlClientProvider>
   );
 }

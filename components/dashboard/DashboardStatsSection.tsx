@@ -3,6 +3,9 @@
 import * as React from "react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
+import { useOfflineSyncEffect } from "@/components/offline/useOfflineSyncEffect";
+import { OFFLINE_CACHE } from "@/lib/offline/cache-keys";
+import { offlineCacheGet, offlineCachePut } from "@/lib/offline/indexed-cache";
 
 const StatCards = dynamic(
   () => import("@/components/dashboard/StatCards").then((m) => m.StatCards),
@@ -58,81 +61,92 @@ function isMediaOwnerStats(v: unknown): v is MediaOwnerStats {
 
 export function DashboardStatsSection({ role }: { role: Role }) {
   const tm = useTranslations("dashboard.mobile");
+  const tOff = useTranslations("offline");
   const [loading, setLoading] = React.useState(true);
+  const [staleFromCache, setStaleFromCache] = React.useState(false);
   const [data, setData] = React.useState<AdvertiserStats | MediaOwnerStats | null>(null);
 
-  React.useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      setLoading(true);
-      try {
-        const res = await fetch("/api/dashboard/stats", { cache: "no-store" });
-        const json = await res.json().catch(() => null);
-        if (cancelled) return;
-        if (!res.ok) throw new Error((json as any)?.error ?? "Failed");
-        if (role === "ADVERTISER" && isAdvertiserStats(json)) {
-          setData(json);
-          return;
-        }
-        if (role === "MEDIA_OWNER" && isMediaOwnerStats(json)) {
-          setData(json);
-          return;
-        }
-        throw new Error("Invalid stats payload");
-      } catch {
-        // fallback mock for resilience
-        if (cancelled) return;
-        if (role === "ADVERTISER") {
-          setData({
-            role: "ADVERTISER",
-            totalInquiries: 24,
-            pendingInquiries: 8,
-            totalBudget: 12_800_000,
-            avgPublishedCpm: 3400,
-            recentInquiriesTrend: [
-              { m: "10/01", inquiries: 2 },
-              { m: "10/08", inquiries: 4 },
-              { m: "10/15", inquiries: 5 },
-              { m: "10/22", inquiries: 3 },
-              { m: "10/29", inquiries: 6 },
-            ],
-            inquiryStatusDist: [
-              { name: "PENDING", value: 8 },
-              { name: "REPLIED", value: 12 },
-              { name: "CLOSED", value: 4 },
-            ],
-          });
-        } else {
-          setData({
-            role: "MEDIA_OWNER",
-            totalMedias: 27,
-            publishedMedias: 18,
-            pendingMedias: 6,
-            totalReceivedInquiries: 42,
-            monthlyInquiriesTrend: [
-              { m: "7월", inquiries: 8 },
-              { m: "8월", inquiries: 12 },
-              { m: "9월", inquiries: 9 },
-              { m: "10월", inquiries: 15 },
-              { m: "11월", inquiries: 11 },
-              { m: "12월", inquiries: 18 },
-            ],
-            mediaStatusDist: [
-              { name: "PENDING", value: 6 },
-              { name: "PUBLISHED", value: 18 },
-              { name: "REJECTED", value: 3 },
-            ],
-          });
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
+  const load = React.useCallback(async () => {
+    setLoading(true);
+    setStaleFromCache(false);
+    try {
+      const res = await fetch("/api/dashboard/stats", { cache: "no-store" });
+      const json = await res.json().catch(() => null);
+      if (!res.ok) throw new Error((json as { error?: string })?.error ?? "Failed");
+      if (role === "ADVERTISER" && isAdvertiserStats(json)) {
+        setData(json);
+        await offlineCachePut(OFFLINE_CACHE.dashboardStats("ADVERTISER"), json);
+        return;
       }
+      if (role === "MEDIA_OWNER" && isMediaOwnerStats(json)) {
+        setData(json);
+        await offlineCachePut(OFFLINE_CACHE.dashboardStats("MEDIA_OWNER"), json);
+        return;
+      }
+      throw new Error("Invalid stats payload");
+    } catch {
+      const cacheKey = OFFLINE_CACHE.dashboardStats(role);
+      const cached = await offlineCacheGet<AdvertiserStats | MediaOwnerStats>(cacheKey);
+      const v = cached?.value;
+      if (v && (role === "ADVERTISER" ? isAdvertiserStats(v) : isMediaOwnerStats(v))) {
+        setData(v);
+        setStaleFromCache(true);
+        return;
+      }
+      if (role === "ADVERTISER") {
+        setData({
+          role: "ADVERTISER",
+          totalInquiries: 24,
+          pendingInquiries: 8,
+          totalBudget: 12_800_000,
+          avgPublishedCpm: 3400,
+          recentInquiriesTrend: [
+            { m: "10/01", inquiries: 2 },
+            { m: "10/08", inquiries: 4 },
+            { m: "10/15", inquiries: 5 },
+            { m: "10/22", inquiries: 3 },
+            { m: "10/29", inquiries: 6 },
+          ],
+          inquiryStatusDist: [
+            { name: "PENDING", value: 8 },
+            { name: "REPLIED", value: 12 },
+            { name: "CLOSED", value: 4 },
+          ],
+        });
+      } else {
+        setData({
+          role: "MEDIA_OWNER",
+          totalMedias: 27,
+          publishedMedias: 18,
+          pendingMedias: 6,
+          totalReceivedInquiries: 42,
+          monthlyInquiriesTrend: [
+            { m: "7월", inquiries: 8 },
+            { m: "8월", inquiries: 12 },
+            { m: "9월", inquiries: 9 },
+            { m: "10월", inquiries: 15 },
+            { m: "11월", inquiries: 11 },
+            { m: "12월", inquiries: 18 },
+          ],
+          mediaStatusDist: [
+            { name: "PENDING", value: 6 },
+            { name: "PUBLISHED", value: 18 },
+            { name: "REJECTED", value: 3 },
+          ],
+        });
+      }
+    } finally {
+      setLoading(false);
     }
-    void load();
-    return () => {
-      cancelled = true;
-    };
   }, [role]);
+
+  React.useEffect(() => {
+    void load();
+  }, [load]);
+
+  useOfflineSyncEffect(() => {
+    void load();
+  });
 
   if (role === "ADVERTISER") {
     const s = isAdvertiserStats(data)
@@ -147,6 +161,11 @@ export function DashboardStatsSection({ role }: { role: Role }) {
         };
     return (
       <>
+        {staleFromCache ? (
+          <p className="mb-3 rounded-lg border border-amber-500/35 bg-amber-500/10 px-3 py-2 text-sm text-amber-950 dark:text-amber-100">
+            {tOff("stats_cached_banner")}
+          </p>
+        ) : null}
         <StatCards
           loading={loading}
           swipeHint={tm("swipe_kpis_hint")}
@@ -209,6 +228,11 @@ export function DashboardStatsSection({ role }: { role: Role }) {
 
   return (
     <>
+      {staleFromCache ? (
+        <p className="mb-3 rounded-lg border border-amber-500/35 bg-amber-500/10 px-3 py-2 text-sm text-amber-950 dark:text-amber-100">
+          {tOff("stats_cached_banner")}
+        </p>
+      ) : null}
       <StatCards
         loading={loading}
         swipeHint={tm("swipe_kpis_hint")}

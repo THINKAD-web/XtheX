@@ -27,6 +27,9 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { NOTIFICATION_CATEGORIES } from "@/lib/notifications/prefs-shared";
+import { useOfflineSyncEffect } from "@/components/offline/useOfflineSyncEffect";
+import { OFFLINE_CACHE } from "@/lib/offline/cache-keys";
+import { offlineCacheGet, offlineCachePut } from "@/lib/offline/indexed-cache";
 
 type Row = {
   id: string;
@@ -86,6 +89,7 @@ function NotificationHref({
 
 export function NotificationHistoryClient() {
   const t = useTranslations("notificationHistory");
+  const tOff = useTranslations("offline");
   const tPrefs = useTranslations("notificationsPrefs");
 
   const [from, setFrom] = useState("");
@@ -97,6 +101,7 @@ export function NotificationHistoryClient() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [fromCache, setFromCache] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
 
   const queryString = useMemo(() => {
@@ -113,11 +118,23 @@ export function NotificationHistoryClient() {
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setFromCache(false);
+    const cacheKey = OFFLINE_CACHE.notificationHistory(queryString);
     try {
       const res = await fetch(`/api/notifications/history?${queryString}`, {
         credentials: "include",
       });
       if (!res.ok) {
+        const cached = await offlineCacheGet<{
+          notifications: Row[];
+          total: number;
+        }>(cacheKey);
+        if (cached?.value && Array.isArray(cached.value.notifications)) {
+          setRows(cached.value.notifications);
+          setTotal(cached.value.total ?? 0);
+          setFromCache(true);
+          return;
+        }
         setError(t("load_error"));
         setRows([]);
         setTotal(0);
@@ -127,9 +144,22 @@ export function NotificationHistoryClient() {
         notifications: Row[];
         total: number;
       };
-      setRows(data.notifications ?? []);
-      setTotal(data.total ?? 0);
+      const list = data.notifications ?? [];
+      const tot = data.total ?? 0;
+      setRows(list);
+      setTotal(tot);
+      await offlineCachePut(cacheKey, { notifications: list, total: tot });
     } catch {
+      const cached = await offlineCacheGet<{
+        notifications: Row[];
+        total: number;
+      }>(cacheKey);
+      if (cached?.value && Array.isArray(cached.value.notifications)) {
+        setRows(cached.value.notifications);
+        setTotal(cached.value.total ?? 0);
+        setFromCache(true);
+        return;
+      }
       setError(t("load_error"));
       setRows([]);
       setTotal(0);
@@ -141,6 +171,10 @@ export function NotificationHistoryClient() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useOfflineSyncEffect(() => {
+    void load();
+  });
 
   const patchRow = async (
     id: string,
@@ -274,6 +308,12 @@ export function NotificationHistoryClient() {
       </Card>
 
       <p className="text-muted-foreground text-sm">{t("date_utc_hint")}</p>
+
+      {fromCache ? (
+        <p className="rounded-lg border border-amber-500/35 bg-amber-500/10 px-3 py-2 text-sm text-amber-950 dark:text-amber-100">
+          {tOff("history_cached_banner")}
+        </p>
+      ) : null}
 
       {error ? (
         <p className="text-destructive text-sm" role="alert">

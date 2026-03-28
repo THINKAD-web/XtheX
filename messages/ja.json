@@ -1778,6 +1778,14 @@
     "quiet_window": "From · To",
     "quiet_hint_overnight": "If “from” is later than “to” (e.g. 22:00–07:00), the quiet period spans midnight."
   },
+  "offline": {
+    "badge_offline": "オフライン",
+    "badge_aria": "ネットワークに接続されていません。保存済みデータを表示できる場合があります。",
+    "cached_hint": "保存された通知を表示しています。オンラインに戻ると自動で更新されます。",
+    "stats_cached_banner": "オフライン: この端末に保存した最新のダッシュボード統計を表示しています。",
+    "history_cached_banner": "オフライン: このフィルター条件で保存された通知一覧があれば表示します。",
+    "sync_restored": "再接続しました。最新データを取得しました。"
+  },
   "notificationHistory": {
     "title": "通知履歴",
     "subtitle": "日付・カテゴリ・既読・お気に入りで絞り込み、既読/未読や星を変更できます。",

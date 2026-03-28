@@ -1848,6 +1848,14 @@
     "quiet_window": "From · To",
     "quiet_hint_overnight": "If “from” is later than “to” (e.g. 22:00–07:00), the quiet period spans midnight."
   },
+  "offline": {
+    "badge_offline": "Sin conexión",
+    "badge_aria": "Estás sin conexión. Puede mostrarse datos guardados.",
+    "cached_hint": "Mostrando notificaciones guardadas. Se actualizarán al volver en línea.",
+    "stats_cached_banner": "Sin conexión: mostrando las últimas estadísticas guardadas en este dispositivo.",
+    "history_cached_banner": "Sin conexión: si hay una lista guardada para estos filtros en este dispositivo, se muestra.",
+    "sync_restored": "Conexión restablecida. Datos actualizados."
+  },
   "notificationHistory": {
     "title": "Historial de notificaciones",
     "subtitle": "Filtra por fecha, categoría, leído y favoritos. Marca leído/no leído y usa la estrella.",

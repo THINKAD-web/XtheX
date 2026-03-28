@@ -1,0 +1,27 @@
+{
+  "name": "XtheX - Global Outdoor Ad Marketplace",
+  "short_name": "XtheX",
+  "description": "Discover and match outdoor advertising media worldwide",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#f97316",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "advertising"],
+  "lang": "ko",
+  "dir": "ltr"
+}

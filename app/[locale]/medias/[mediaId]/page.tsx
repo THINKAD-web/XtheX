@@ -107,21 +107,26 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ? firstImage
     : `${appUrl.replace(/\/$/, "")}${firstImage.startsWith("/") ? "" : "/"}${firstImage}`;
 
+  const ogTitle = `${media.mediaName} | XtheX`;
+  const ogDesc =
+    media.description?.slice(0, 150) ||
+    (locale === "ko" ? "XtheX 공개 매체 상세 정보" : "XtheX published media detail");
+
   return {
-    title: `${media.mediaName} | XtheX`,
-    description:
-      media.description?.slice(0, 150) ||
-      (locale === "ko"
-        ? "XtheX 공개 매체 상세 정보"
-        : "XtheX published media detail"),
+    title: ogTitle,
+    description: ogDesc,
     openGraph: {
-      title: `${media.mediaName} | XtheX`,
-      description:
-        media.description?.slice(0, 150) ||
-        (locale === "ko"
-          ? "XtheX 공개 매체 상세 정보"
-          : "XtheX published media detail"),
-      images: [{ url: absoluteImage }],
+      title: ogTitle,
+      description: ogDesc,
+      images: [{ url: absoluteImage, width: 1200, height: 630, alt: media.mediaName }],
+      type: "article",
+      siteName: "XtheX",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: ogTitle,
+      description: ogDesc,
+      images: [absoluteImage],
     },
   };
 }

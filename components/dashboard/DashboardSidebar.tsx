@@ -15,6 +15,7 @@ import {
   Shield,
   Users,
   BarChart3,
+  Settings,
   LogOut,
   PanelLeftClose,
   PanelLeftOpen,
@@ -70,6 +71,7 @@ function getMenu(role: DashboardSidebarRole): NavItem[] {
     { label: "미디어 탐색", href: "/dashboard/advertiser/explore", icon: Map },
     { label: "내 문의함", href: "/dashboard/advertiser/inquiries", icon: Inbox },
     { label: "내 캠페인", comingSoon: true, icon: BriefcaseBusiness },
+    { label: "설정", href: "/dashboard/advertiser/settings", icon: Settings },
   ];
 }
 

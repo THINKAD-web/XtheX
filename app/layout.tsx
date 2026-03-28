@@ -6,6 +6,7 @@ import { SonnerToaster } from "@/components/ui/sonner-toaster";
 import { BrightnessProvider } from "@/components/brightness/BrightnessPreference";
 import { BrightnessThemeBridge } from "@/components/brightness/BrightnessThemeBridge";
 import { NavigationProgress } from "@/components/navigation-progress";
+import { ServiceWorkerRegistration } from "@/components/pwa/ServiceWorkerRegistration";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -54,8 +55,13 @@ export const metadata: Metadata = {
       },
     ],
   },
+  manifest: "/manifest.json",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+    ],
     apple: "/apple-touch-icon.png",
   },
   twitter: {
@@ -119,6 +125,10 @@ export default async function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
+        <meta name="theme-color" content="#f97316" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="preconnect" href="https://maps.googleapis.com" />
         <link rel="preconnect" href="https://maps.gstatic.com" crossOrigin="anonymous" />
         <script
@@ -141,6 +151,7 @@ export default async function RootLayout({
                 <NavigationProgress />
                 <div id="main-content">{children}</div>
                 <SonnerToaster />
+                <ServiceWorkerRegistration />
               </ThemeProvider>
             </BrightnessProvider>
           </ToastProvider>

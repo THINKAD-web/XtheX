@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f97316" />
+    <title>오프라인 · XtheX</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        min-height: 100%;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background: #09090b;
+        color: #fafafa;
+        -webkit-font-smoothing: antialiased;
+      }
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+      }
+      .wrap {
+        max-width: 22rem;
+        text-align: center;
+      }
+      .mark {
+        font-size: 1.75rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        color: #f97316;
+        margin-bottom: 1.5rem;
+      }
+      .mark span {
+        color: #fafafa;
+      }
+      h1 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        line-height: 1.4;
+        margin-bottom: 0.5rem;
+      }
+      p {
+        font-size: 0.9375rem;
+        line-height: 1.55;
+        color: #a1a1aa;
+        margin-bottom: 1.75rem;
+      }
+      p.en {
+        font-size: 0.875rem;
+        color: #71717a;
+      }
+      button {
+        appearance: none;
+        border: 1px solid #f97316;
+        background: transparent;
+        color: #f97316;
+        font-size: 0.875rem;
+        font-weight: 600;
+        padding: 0.65rem 1.35rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: background 0.15s ease, color 0.15s ease;
+      }
+      button:hover {
+        background: #f97316;
+        color: #09090b;
+      }
+      button:focus-visible {
+        outline: 2px solid #f97316;
+        outline-offset: 2px;
+      }
+      .hint {
+        margin-top: 2rem;
+        font-size: 0.75rem;
+        color: #52525b;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="mark">X<span>the</span>X</div>
+      <h1>인터넷에 연결되어 있지 않습니다</h1>
+      <p>네트워크 연결을 확인한 뒤 다시 시도해 주세요.</p>
+      <p class="en">You're offline. Check your connection and try again.</p>
+      <button type="button" onclick="window.location.reload()">다시 시도 · Retry</button>
+      <p class="hint">Global outdoor advertising marketplace</p>
+    </div>
+  </body>
+</html>

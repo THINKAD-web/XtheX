@@ -26,6 +26,9 @@ export async function generateMetadata({
   if (!post) return { title: "Not Found" };
 
   const { title, excerpt, coverImage } = post.frontmatter;
+  const ogImages = coverImage
+    ? [{ url: coverImage, width: 1200, height: 630, alt: title }]
+    : [{ url: "/og-image.png", width: 1200, height: 630, alt: "XtheX Blog" }];
   return {
     title: `${title} — XtheX Blog`,
     description: excerpt,
@@ -34,8 +37,14 @@ export async function generateMetadata({
       description: excerpt,
       url: `/${locale}/blog/${slug}`,
       siteName: "XtheX",
-      images: coverImage ? [{ url: coverImage }] : undefined,
+      images: ogImages,
       type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: excerpt,
+      images: ogImages.map((i) => i.url),
     },
   };
 }

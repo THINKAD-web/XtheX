@@ -72,6 +72,22 @@ enum CampaignInvoiceStatus {
   VOID
 }
 
+/** 관리자 파이프라인: 제안 → 계약 → 송출 → 완료 */
+enum CampaignWorkflowStage {
+  PROPOSAL
+  CONTRACT
+  LIVE
+  COMPLETED
+}
+
+enum CrmEntityType {
+  CAMPAIGN
+  INQUIRY
+  MEDIA
+  USER
+  INVOICE
+}
+
 enum InquiryStatus {
   PENDING
   REPLIED
@@ -172,6 +188,7 @@ model Media {
 
   createdBy User? @relation("MediaCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   inquiries   Inquiry[]
+  broadcastSchedules BroadcastSchedule[]
   caseStudies CaseStudy[]
   wishlists   Wishlist[]
   reviews     MediaReview[]
@@ -241,6 +258,11 @@ model User {
 
   autoBidRules AutoBidRule[]
   autoBidRuns  AutoBidRun[]
+
+  broadcastSchedulesCreated BroadcastSchedule[] @relation("BroadcastScheduleCreator")
+  adminCrmNotes             AdminCrmNote[]      @relation("AdminCrmNoteAuthor")
+  adminTodosCreated         AdminTodo[]         @relation("AdminTodoCreator")
+  adminTodosAssigned        AdminTodo[]         @relation("AdminTodoAssignee")
 
   twoFactorSecret       String?
   twoFactorEnabled      Boolean           @default(false)
@@ -370,12 +392,15 @@ model Campaign {
   parseSnapshot    Json?
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
+  workflowStage    CampaignWorkflowStage @default(PROPOSAL)
 
   user User @relation("CampaignsByUser", fields: [userId], references: [id], onDelete: Cascade)
   invoice CampaignInvoice?
+  broadcastSchedules BroadcastSchedule[]
 
   @@index([userId, status])
   @@index([userId, createdAt])
+  @@index([workflowStage, updatedAt])
 }
 
 model CampaignInvoice {
@@ -391,6 +416,8 @@ model CampaignInvoice {
   initialEmailSentAt   DateTime?
   lastReminderAt       DateTime?
   reminderCount        Int                   @default(0)
+  /** 관리자 결제 확정 시각 (월별 매출 집계) */
+  paidAt               DateTime?
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
 
@@ -399,6 +426,7 @@ model CampaignInvoice {
 
   @@index([userId, status])
   @@index([status, dueAt])
+  @@index([paidAt])
 }
 
 model CampaignDraft {
@@ -535,6 +563,61 @@ model InquiryContract {
   inquiry Inquiry @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
 
   @@index([status, updatedAt])
+}
+
+/** 송출·집행 일정 (관리자 캘린더) */
+model BroadcastSchedule {
+  id          String   @id @default(uuid()) @db.Uuid
+  title       String
+  campaignId  String?  @db.Uuid
+  mediaId     String?  @db.Uuid
+  startAt     DateTime
+  endAt       DateTime
+  notes       String?  @db.Text
+  createdById String?  @db.Uuid
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  campaign  Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  media     Media?    @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+  createdBy User?     @relation("BroadcastScheduleCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([startAt, endAt])
+  @@index([campaignId])
+  @@index([mediaId])
+}
+
+/** 관리자 CRM 메모 (캠페인·문의·매체·사용자·인보이스) */
+model AdminCrmNote {
+  id          String        @id @default(uuid()) @db.Uuid
+  entityType  CrmEntityType
+  entityId    String        @db.Uuid
+  body        String        @db.Text
+  createdById String        @db.Uuid
+  createdAt   DateTime      @default(now())
+
+  createdBy User @relation("AdminCrmNoteAuthor", fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([entityType, entityId, createdAt])
+}
+
+model AdminTodo {
+  id          String   @id @default(uuid()) @db.Uuid
+  title       String
+  body        String?  @db.Text
+  dueAt       DateTime?
+  done        Boolean  @default(false)
+  priority    Int      @default(0)
+  assigneeId  String?  @db.Uuid
+  createdById String   @db.Uuid
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  assignee  User? @relation("AdminTodoAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  createdBy User  @relation("AdminTodoCreator", fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([done, dueAt])
+  @@index([assigneeId])
 }
 
 enum AutoBidRuleStatus {

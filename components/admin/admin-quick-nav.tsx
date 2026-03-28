@@ -40,6 +40,9 @@ export function AdminQuickNav({ t }: { t: TAdminHome }) {
             <Link href="/admin/ai-upload" className={cn(linkPrimary, "w-full sm:w-auto sm:min-w-[9.5rem]")}>
               {t("nav_aiUpload")}
             </Link>
+            <Link href="/admin/workflow" className={cn(linkOutline, "w-full sm:w-auto sm:min-w-[9.5rem]")}>
+              {t("nav_workflow")}
+            </Link>
             <Link href="/admin/inquiries" className={cn(linkOutline, "w-full sm:w-auto sm:min-w-[9.5rem]")}>
               {t("nav_inquiries")}
             </Link>

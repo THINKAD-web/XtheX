@@ -29,38 +29,38 @@ export const landing = {
    * (dark: card bg reads well on zinc-950)
    */
   card: [
-    "rounded-2xl border border-border bg-card p-6 text-card-foreground shadow-xl",
-    "transition-[box-shadow,border-color,filter] duration-300 ease-out",
-    "hover:shadow-2xl hover:brightness-[1.02]",
-    "dark:border-zinc-700/80 dark:bg-zinc-900/90 dark:shadow-black/40",
-    "dark:hover:border-blue-500/35 dark:hover:shadow-blue-950/20",
+    "rounded-xl border border-border bg-card p-6 text-card-foreground shadow-md",
+    "transition-[box-shadow,border-color,transform,filter] duration-300 ease-out",
+    "hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-zinc-400/25 hover:brightness-[1.01]",
+    "dark:border-zinc-700/80 dark:bg-zinc-900/90 dark:shadow-black/50",
+    "dark:hover:border-primary/40 dark:hover:shadow-[0_24px_48px_-12px_rgba(37,99,235,0.35)]",
   ].join(" "),
 
   cardDark: [
-    "rounded-2xl border border-zinc-700/60 bg-zinc-900/85 p-6 shadow-xl shadow-black/35",
-    "backdrop-blur-sm transition-[box-shadow,border-color,filter] duration-300",
-    "hover:border-blue-500/40 hover:shadow-2xl hover:shadow-blue-950/25 hover:brightness-[1.02]",
+    "rounded-xl border border-zinc-700/60 bg-zinc-900/85 p-6 shadow-xl shadow-black/40",
+    "backdrop-blur-sm transition-[box-shadow,border-color,transform,filter] duration-300",
+    "hover:-translate-y-0.5 hover:border-primary/45 hover:shadow-2xl hover:shadow-[0_28px_56px_-14px_rgba(37,99,235,0.4)] hover:brightness-[1.02]",
   ].join(" "),
 
   cardDarkCompact: [
-    "rounded-2xl border border-zinc-700/50 bg-zinc-900/90 shadow-lg shadow-black/30",
-    "transition-all duration-300 hover:border-blue-500/35 hover:shadow-xl",
+    "rounded-xl border border-zinc-700/50 bg-zinc-900/90 shadow-lg shadow-black/35",
+    "transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-xl hover:shadow-blue-950/30",
   ].join(" "),
 
   /** Flat inner panels (sliders, summaries) */
   panel:
-    "rounded-2xl border border-border bg-muted/40 p-4 shadow-md dark:border-zinc-700 dark:bg-zinc-800/50",
+    "rounded-xl border border-border bg-muted/40 p-4 shadow-md dark:border-zinc-700 dark:bg-zinc-800/50",
 
   /** Composer / static surfaces (no hover scale) */
   surface:
-    "rounded-2xl border border-border bg-card shadow-xl dark:border-zinc-700 dark:bg-zinc-900/90",
+    "rounded-xl border border-border bg-card shadow-lg dark:border-zinc-700 dark:bg-zinc-900/90",
 
-  /** Primary CTA — brand blue (readable on dark hero) */
+  /** Primary CTA — brand blue #2563EB */
   btnPrimary: [
     "inline-flex h-11 min-w-[200px] items-center justify-center rounded-lg px-6",
-    "bg-blue-600 text-sm font-medium text-white",
-    "transition-all duration-200 hover:bg-blue-600/90 hover:shadow-lg hover:shadow-blue-600/25",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950",
+    "bg-[#2563EB] text-sm font-medium text-white",
+    "transition-all duration-200 hover:bg-[#1d4ed8] hover:shadow-xl hover:shadow-[#2563EB]/35",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950",
   ].join(" "),
 
   btnSecondary: [

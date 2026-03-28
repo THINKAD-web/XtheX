@@ -4,76 +4,81 @@
 @import "nprogress/nprogress.css";
 
 #nprogress .bar {
-  background: #10b981 !important;
+  background: #2563eb !important;
   height: 3px !important;
 }
 #nprogress .peg {
-  box-shadow: 0 0 10px #10b981, 0 0 5px #10b981 !important;
+  box-shadow: 0 0 10px #2563eb, 0 0 5px #2563eb !important;
 }
 
 :root {
-  --background: 0 0% 100%;
-  --foreground: 240 10% 3.9%;
+  /* Light: #F9FAFB feel */
+  --background: 210 20% 98%;
+  --foreground: 215 28% 17%;
 
   --card: 0 0% 100%;
-  --card-foreground: 240 10% 3.9%;
+  --card-foreground: 215 28% 17%;
 
   --popover: 0 0% 100%;
-  --popover-foreground: 240 10% 3.9%;
+  --popover-foreground: 215 28% 17%;
 
-  --primary: 240 5.9% 10%;
-  --primary-foreground: 0 0% 98%;
+  /* Primary #2563EB */
+  --primary: 221 83% 53%;
+  --primary-foreground: 0 0% 100%;
 
-  --secondary: 240 4.8% 95.9%;
-  --secondary-foreground: 240 5.9% 10%;
+  --secondary: 214 20% 93%;
+  --secondary-foreground: 215 28% 17%;
 
-  --muted: 240 4.8% 95.9%;
-  --muted-foreground: 240 3.8% 46.1%;
+  --muted: 210 20% 94%;
+  --muted-foreground: 215 16% 40%;
 
-  --accent: 240 4.8% 95.9%;
-  --accent-foreground: 240 5.9% 10%;
+  /* Accent #10B981 — emerald tint */
+  --accent: 160 84% 94%;
+  --accent-foreground: 160 84% 22%;
 
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 0 0% 98%;
 
-  --border: 240 5.9% 90%;
-  --input: 240 5.9% 90%;
-  --ring: 240 5.9% 10%;
+  --border: 214 20% 90%;
+  --input: 214 20% 90%;
+  --ring: 221 83% 53%;
 
-  --radius: 0.6rem;
+  --radius: 0.75rem;
 
-  --landing-blue: 217 91% 60%;
-  --landing-cyan: 189 94% 43%;
+  --landing-blue: 221 83% 53%;
+  --landing-cyan: 160 84% 39%;
+  --brand-accent: 160 84% 39%;
 }
 
 .dark {
-  --background: 240 10% 3.9%;
-  --foreground: 0 0% 98%;
+  /* Dark shell #1F2937 family */
+  --background: 215 28% 17%;
+  --foreground: 210 20% 98%;
 
-  --card: 240 10% 3.9%;
-  --card-foreground: 0 0% 98%;
+  --card: 215 25% 20%;
+  --card-foreground: 210 20% 98%;
 
-  --popover: 240 10% 3.9%;
-  --popover-foreground: 0 0% 98%;
+  --popover: 215 25% 20%;
+  --popover-foreground: 210 20% 98%;
 
-  --primary: 0 0% 98%;
-  --primary-foreground: 240 5.9% 10%;
+  --primary: 217 91% 60%;
+  --primary-foreground: 0 0% 100%;
 
-  --secondary: 240 3.7% 15.9%;
-  --secondary-foreground: 0 0% 98%;
+  --secondary: 215 20% 24%;
+  --secondary-foreground: 210 20% 98%;
 
-  --muted: 240 3.7% 15.9%;
-  --muted-foreground: 240 5% 64.9%;
+  --muted: 215 20% 24%;
+  --muted-foreground: 215 14% 65%;
 
-  --accent: 240 3.7% 15.9%;
-  --accent-foreground: 0 0% 98%;
+  --accent: 160 45% 18%;
+  --accent-foreground: 152 76% 80%;
 
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 0 0% 98%;
 
-  --border: 240 3.7% 15.9%;
-  --input: 240 3.7% 15.9%;
-  --ring: 240 4.9% 83.9%;
+  --border: 215 18% 28%;
+  --input: 215 18% 28%;
+  --ring: 217 91% 60%;
 }
 
 @theme inline {
@@ -129,9 +134,9 @@
   background: linear-gradient(
     135deg,
     #0f172a 0%,
-    #1e1b4b 25%,
-    #172554 50%,
-    #2e1065 75%,
+    #1e3a5f 22%,
+    #1e40af 48%,
+    #0f766e 72%,
     #0f172a 100%
   );
   background-size: 300% 300%;
@@ -187,10 +192,10 @@
 
 @keyframes cta-pulse {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.5);
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.45);
   }
   50% {
-    box-shadow: 0 0 0 10px rgba(249, 115, 22, 0);
+    box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
   }
 }
 

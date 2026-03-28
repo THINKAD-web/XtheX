@@ -12,7 +12,8 @@
       "has_account_login": "Already have an account? Sign in",
       "dashboard_go": "Go to dashboard",
       "ai_recommend_go": "AI recommendations",
-      "admin_console": "Admin console"
+      "admin_console": "Admin console",
+      "connect_global_ooh": "Connect to Global OOH"
     },
     "betaNotice": {
       "badge": "Early Access · Korea-first launch",

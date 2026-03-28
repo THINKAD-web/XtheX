@@ -5,6 +5,15 @@ const nextConfig = {
   /** Smaller serverless bundles on Vercel; deployment still runs `next start` via Vercel’s adapter. */
   output: "standalone",
   poweredByHeader: false,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
+    ],
+  },
   async headers() {
     return [
       {

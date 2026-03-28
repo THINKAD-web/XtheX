@@ -11,11 +11,16 @@ import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
 
+/** Global skyline — Unsplash (allowed in next.config remotePatterns) */
+const GLOBAL_CITY_HERO_SRC =
+  "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1f?auto=format&fit=crop&w=2400&q=82";
+
 const SPOTS: Record<string, string[]> = {
   ko: ["타임스스퀘어", "시부야 교차로", "강남 대형 전광판", "상하이 루자쭈이"],
   en: ["Times Square", "Shibuya Crossing", "Gangnam LED", "Shanghai Lujiazui"],
   ja: ["タイムズスクエア", "渋谷スクランブル", "江南LED", "上海陸家嘴"],
   zh: ["时代广场", "涩谷十字路口", "江南LED广告", "上海陆家嘴"],
+  es: ["Times Square", "Cruce de Shibuya", "Gangnam LED", "Lujiazui Shanghai"],
 };
 
 const SPOT_PREFIX: Record<string, string> = {
@@ -23,6 +28,7 @@ const SPOT_PREFIX: Record<string, string> = {
   en: "Right now at ",
   ja: "今すぐ ",
   zh: "现在就在 ",
+  es: "Ahora en ",
 };
 
 export function HomeHeroDaypart() {
@@ -78,12 +84,13 @@ export function HomeHeroDaypart() {
       {/* Background Image with parallax */}
       <motion.div className="absolute inset-0" style={{ y: bgY }}>
         <Image
-          src="/images/hero-billboard.jpg"
-          alt="Times Square Billboard"
+          src={GLOBAL_CITY_HERO_SRC}
+          alt="Global city skyline"
           fill
-          className="object-cover opacity-60 scale-110"
+          className="scale-105 object-cover opacity-55"
           priority
-          quality={80}
+          sizes="100vw"
+          quality={85}
         />
       </motion.div>
       {/* Overlay */}
@@ -111,6 +118,10 @@ export function HomeHeroDaypart() {
           </p>
         ) : null}
 
+        <p className="mb-4 inline-flex items-center justify-center rounded-full border border-emerald-400/35 bg-emerald-500/15 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-emerald-100 shadow-sm backdrop-blur-sm sm:text-xs">
+          {t("connect_global_ooh")}
+        </p>
+
         <h1
           className="text-balance text-4xl font-bold tracking-tight lg:text-6xl drop-shadow-lg text-white"
         >
@@ -123,7 +134,7 @@ export function HomeHeroDaypart() {
           )}
         >
           <span className="text-zinc-300">{prefix}</span>
-          <span className="text-cyan-300">{spots[spotIdx]}</span>
+          <span className="text-emerald-300">{spots[spotIdx]}</span>
         </p>
         <p
           className="mx-auto mt-8 max-w-2xl text-pretty text-lg leading-relaxed lg:text-xl lg:leading-relaxed drop-shadow-md text-zinc-100"
@@ -143,7 +154,7 @@ export function HomeHeroDaypart() {
             <>
               <Link
                 href="/login"
-                className="inline-flex h-12 min-w-[240px] items-center justify-center rounded-md bg-gradient-to-r from-blue-600 to-cyan-500 px-8 text-base font-semibold text-white shadow-lg transition-all duration-300 hover:from-blue-700 hover:to-cyan-600 hover:shadow-xl"
+                className="inline-flex h-12 min-w-[240px] items-center justify-center rounded-md bg-gradient-to-r from-[#2563EB] to-[#10B981] px-8 text-base font-semibold text-white shadow-lg transition-all duration-300 hover:from-[#1d4ed8] hover:to-[#059669] hover:shadow-xl"
               >
                 {t("login_full_ai")}
               </Link>

@@ -17,9 +17,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
           "disabled:pointer-events-none disabled:opacity-50",
           "ring-offset-background",
-          // Primary: emerald
           variant === "default" &&
-            "bg-emerald-600 text-white hover:bg-emerald-700",
+            "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90",
           // Secondary: neutral
           variant === "secondary" &&
             "bg-zinc-100 text-zinc-900 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700",

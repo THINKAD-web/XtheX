@@ -12,7 +12,8 @@
       "has_account_login": "이미 계정이 있나요? 로그인",
       "dashboard_go": "대시보드로 이동",
       "ai_recommend_go": "AI 맞춤 추천",
-      "admin_console": "관리자 콘솔"
+      "admin_console": "관리자 콘솔",
+      "connect_global_ooh": "글로벌 옥외광고와 연결"
     },
     "betaNotice": {
       "badge": "Beta 서비스 · 한국 우선 출시",

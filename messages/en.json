@@ -1830,5 +1830,41 @@
     "tz_label": "Timezone",
     "quiet_window": "From · To",
     "quiet_hint_overnight": "If “from” is later than “to” (e.g. 22:00–07:00), the quiet period spans midnight."
+  },
+  "notificationHistory": {
+    "title": "Notification history",
+    "subtitle": "Filter by date, category, read state, and favorites. Mark items read or unread and star what matters.",
+    "filter_from": "From",
+    "filter_to": "To",
+    "filter_category": "Category",
+    "filter_category_all": "All",
+    "filter_read_label": "Read state",
+    "filter_read_all": "All",
+    "filter_read_read": "Read",
+    "filter_read_unread": "Unread",
+    "filter_starred_label": "Favorites",
+    "filter_starred_all": "All",
+    "filter_starred_only": "Favorites only",
+    "filter_starred_off": "Without favorites",
+    "refresh": "Refresh",
+    "mark_all_read": "Mark all as read",
+    "date_utc_hint": "Date filters use midnight UTC.",
+    "loading": "Loading…",
+    "empty": "No notifications match your filters.",
+    "load_error": "Could not load notifications.",
+    "total_count": "{count} total",
+    "col_date": "When",
+    "col_category": "Category",
+    "col_title": "Message",
+    "col_actions": "Actions",
+    "mark_read": "Mark read",
+    "mark_unread": "Mark unread",
+    "star_add_aria": "Add to favorites",
+    "star_remove_aria": "Remove from favorites",
+    "open_link": "Open link"
+  },
+  "notificationCenter": {
+    "mark_all_read": "Mark all as read",
+    "view_all": "View all"
   }
 }

@@ -1760,5 +1760,41 @@
     "tz_label": "Timezone",
     "quiet_window": "From · To",
     "quiet_hint_overnight": "If “from” is later than “to” (e.g. 22:00–07:00), the quiet period spans midnight."
+  },
+  "notificationHistory": {
+    "title": "通知记录",
+    "subtitle": "按日期、类别、已读状态和收藏筛选，并可标记已读/未读与星标。",
+    "filter_from": "开始日期",
+    "filter_to": "结束日期",
+    "filter_category": "类别",
+    "filter_category_all": "全部",
+    "filter_read_label": "已读",
+    "filter_read_all": "全部",
+    "filter_read_read": "已读",
+    "filter_read_unread": "未读",
+    "filter_starred_label": "收藏",
+    "filter_starred_all": "全部",
+    "filter_starred_only": "仅收藏",
+    "filter_starred_off": "不含收藏",
+    "refresh": "刷新",
+    "mark_all_read": "全部标为已读",
+    "date_utc_hint": "日期筛选以 UTC 午夜为准。",
+    "loading": "加载中…",
+    "empty": "没有符合条件的通知。",
+    "load_error": "无法加载通知。",
+    "total_count": "共 {count} 条",
+    "col_date": "时间",
+    "col_category": "类别",
+    "col_title": "内容",
+    "col_actions": "操作",
+    "mark_read": "已读",
+    "mark_unread": "未读",
+    "star_add_aria": "加入收藏",
+    "star_remove_aria": "取消收藏",
+    "open_link": "打开链接"
+  },
+  "notificationCenter": {
+    "mark_all_read": "全部标为已读",
+    "view_all": "查看全部"
   }
 }

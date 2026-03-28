@@ -24,6 +24,7 @@ import {
   Star,
   Flag,
   Lock,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -62,6 +63,7 @@ function getMenu(role: DashboardSidebarRole): NavItem[] {
       { label: "새 미디어 등록", href: "/dashboard/media-owner/upload", icon: Upload },
       { label: "내 미디어 관리", href: "/dashboard/media-owner/medias", icon: Images },
       { label: "받은 문의함", href: "/dashboard/media-owner/inquiries", icon: Inbox },
+      { label: "알림 기록", href: "/dashboard/notifications", icon: Bell },
       { label: "문의 E2E 암호화", href: "/dashboard/media-owner/inquiry-encryption", icon: Lock },
       { label: "설정 · 알림", href: "/dashboard/media-owner/settings", icon: Settings },
       { label: "수익 현황", comingSoon: true, icon: BarChart3 },
@@ -77,6 +79,7 @@ function getMenu(role: DashboardSidebarRole): NavItem[] {
     },
     { label: "미디어 탐색", href: "/dashboard/advertiser/explore", icon: Map },
     { label: "내 문의함", href: "/dashboard/advertiser/inquiries", icon: Inbox },
+    { label: "알림 기록", href: "/dashboard/notifications", icon: Bell },
     { label: "내 캠페인", comingSoon: true, icon: BriefcaseBusiness },
     { label: "설정", href: "/dashboard/advertiser/settings", icon: Settings },
     { label: "보안", href: "/dashboard/advertiser/settings/security", icon: Shield },

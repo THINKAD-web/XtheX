@@ -1760,5 +1760,41 @@
     "tz_label": "Timezone",
     "quiet_window": "From · To",
     "quiet_hint_overnight": "If “from” is later than “to” (e.g. 22:00–07:00), the quiet period spans midnight."
+  },
+  "notificationHistory": {
+    "title": "通知履歴",
+    "subtitle": "日付・カテゴリ・既読・お気に入りで絞り込み、既読/未読や星を変更できます。",
+    "filter_from": "開始日",
+    "filter_to": "終了日",
+    "filter_category": "カテゴリ",
+    "filter_category_all": "すべて",
+    "filter_read_label": "既読",
+    "filter_read_all": "すべて",
+    "filter_read_read": "既読",
+    "filter_read_unread": "未読",
+    "filter_starred_label": "お気に入り",
+    "filter_starred_all": "すべて",
+    "filter_starred_only": "お気に入りのみ",
+    "filter_starred_off": "お気に入り以外",
+    "refresh": "更新",
+    "mark_all_read": "すべて既読にする",
+    "date_utc_hint": "日付は UTC の 0 時基準です。",
+    "loading": "読み込み中…",
+    "empty": "条件に一致する通知はありません。",
+    "load_error": "通知を読み込めませんでした。",
+    "total_count": "合計 {count} 件",
+    "col_date": "日時",
+    "col_category": "カテゴリ",
+    "col_title": "内容",
+    "col_actions": "操作",
+    "mark_read": "既読",
+    "mark_unread": "未読",
+    "star_add_aria": "お気に入りに追加",
+    "star_remove_aria": "お気に入りを解除",
+    "open_link": "リンクを開く"
+  },
+  "notificationCenter": {
+    "mark_all_read": "すべて既読にする",
+    "view_all": "すべて表示"
   }
 }

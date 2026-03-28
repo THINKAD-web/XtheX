@@ -493,12 +493,14 @@ model Notification {
   message   String           @db.Text
   link      String?
   read      Boolean          @default(false)
+  starred   Boolean          @default(false)
   createdAt DateTime         @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, read])
   @@index([userId, createdAt])
+  @@index([userId, starred])
 }
 
 model News {

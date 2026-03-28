@@ -1830,5 +1830,41 @@
     "tz_label": "시간대",
     "quiet_window": "시작 · 종료",
     "quiet_hint_overnight": "시작이 종료보다 늦으면(예: 22:00–07:00) 자정을 넘겨 적용됩니다."
+  },
+  "notificationHistory": {
+    "title": "알림 기록",
+    "subtitle": "날짜·카테고리·읽음 상태·즐겨찾기로 알림을 찾고, 읽음/안읽음과 별을 바꿀 수 있습니다.",
+    "filter_from": "시작일",
+    "filter_to": "종료일",
+    "filter_category": "카테고리",
+    "filter_category_all": "전체",
+    "filter_read_label": "읽음",
+    "filter_read_all": "전체",
+    "filter_read_read": "읽음",
+    "filter_read_unread": "안 읽음",
+    "filter_starred_label": "즐겨찾기",
+    "filter_starred_all": "전체",
+    "filter_starred_only": "즐겨찾기만",
+    "filter_starred_off": "즐겨찾기 제외",
+    "refresh": "새로고침",
+    "mark_all_read": "모두 읽음 처리",
+    "date_utc_hint": "날짜 필터는 UTC 기준 자정입니다.",
+    "loading": "불러오는 중…",
+    "empty": "조건에 맞는 알림이 없습니다.",
+    "load_error": "알림을 불러오지 못했습니다.",
+    "total_count": "총 {count}건",
+    "col_date": "일시",
+    "col_category": "카테고리",
+    "col_title": "내용",
+    "col_actions": "동작",
+    "mark_read": "읽음",
+    "mark_unread": "안 읽음",
+    "star_add_aria": "즐겨찾기 추가",
+    "star_remove_aria": "즐겨찾기 해제",
+    "open_link": "링크 열기"
+  },
+  "notificationCenter": {
+    "mark_all_read": "모두 읽음 처리",
+    "view_all": "전체 보기"
   }
 }

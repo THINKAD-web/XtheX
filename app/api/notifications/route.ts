@@ -83,5 +83,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   }
 
+  if (action === "markUnread") {
+    const id = (body as { id?: string }).id;
+    if (!id || typeof id !== "string") {
+      return NextResponse.json({ error: "Missing id" }, { status: 400 });
+    }
+    await prisma.notification.updateMany({
+      where: { id, userId: user.id },
+      data: { read: false },
+    });
+    return NextResponse.json({ ok: true });
+  }
+
   return NextResponse.json({ error: "Invalid action" }, { status: 400 });
 }

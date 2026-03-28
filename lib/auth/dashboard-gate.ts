@@ -50,6 +50,26 @@ export async function gateMediaOwnerDashboard(): Promise<UserByClerkRow> {
 /**
  * 관리자 전용 라우트 (예: /admin/medias).
  */
+/**
+ * 알림 히스토리 등 공용 대시보드 하위 경로. 로그인 + 광고주/매체사/관리자.
+ */
+export async function gateDashboardNotifications(): Promise<UserByClerkRow> {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) redirect(await getLoginPath());
+
+  const row = await findUserById(session.user.id);
+  if (!row) redirect(await getLoginPath());
+
+  if (
+    row.role === UserRole.ADVERTISER ||
+    row.role === UserRole.MEDIA_OWNER ||
+    row.role === UserRole.ADMIN
+  ) {
+    return row;
+  }
+  redirect(await getLocalizedPath("/"));
+}
+
 export async function gateAdminDashboard(): Promise<UserByClerkRow> {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect(await getLoginPath());

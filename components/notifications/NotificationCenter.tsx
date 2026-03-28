@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { Bell } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,7 @@ function truncateMessage(text: string, max = 80): string {
 }
 
 export function NotificationCenter() {
+  const t = useTranslations("notificationCenter");
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationRow[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -184,14 +186,14 @@ export function NotificationCenter() {
               disabled={marking || unreadCount === 0}
               onClick={() => void markAllRead()}
             >
-              Mark all as read
+              {t("mark_all_read")}
             </Button>
             <Link
               href="/dashboard/notifications"
               className="text-center text-sm font-medium text-primary hover:underline"
               onClick={() => setOpen(false)}
             >
-              View all
+              {t("view_all")}
             </Link>
           </div>
         </div>

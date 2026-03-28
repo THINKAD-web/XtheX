@@ -7,6 +7,7 @@ import { CurrencySwitcher } from "@/components/CurrencySwitcher";
 import { AuthNav } from "@/components/auth/auth-nav";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
+import { SearchAutocomplete } from "@/components/search/SearchAutocomplete";
 import { landing } from "@/lib/landing-theme";
 import { getLocale } from "next-intl/server";
 
@@ -51,6 +52,7 @@ export async function SiteHeader() {
           ))}
         </nav>
         <div className="justify-self-end flex shrink-0 items-center gap-1.5 sm:gap-3">
+          <SearchAutocomplete className="hidden sm:block" />
           <NotificationCenter />
           <OmniCartHeaderBtn />
           <ThemeToggle />

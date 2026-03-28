@@ -21,6 +21,7 @@ import { FeaturesSectionClient } from "@/components/home/FeaturesSectionClient";
 import { HowItWorksSectionClient } from "@/components/home/HowItWorksSectionClient";
 import { CrossBorderCaseCard } from "@/components/home/CrossBorderCaseCard";
 import { ScrollReveal } from "@/components/scroll-reveal";
+import { RecentlyViewedSection } from "@/components/medias/RecentlyViewedSection";
 
 const LazyPulse = () => (
   <div className="h-64 animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800" />
@@ -248,6 +249,8 @@ export default async function Home({
         <ScrollReveal direction="up" delay={0.05}>
           <MediaMixSearchSection />
         </ScrollReveal>
+
+        <RecentlyViewedSection className="border-b border-zinc-100 dark:border-zinc-800" />
 
         <HomeSolidDaypartWrapper>
           <ScrollReveal direction="up">

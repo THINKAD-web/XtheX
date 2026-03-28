@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { addRecentlyViewed } from "@/hooks/useRecentlyViewed";
 
 type Props = {
   mediaId: string;
@@ -9,7 +10,7 @@ type Props = {
 export function ViewCountTracker({ mediaId }: Props) {
   React.useEffect(() => {
     if (!mediaId) return;
-    // fire-and-forget (field 없으면 서버에서 skipped)
+    addRecentlyViewed(mediaId);
     fetch(`/api/media/${encodeURIComponent(mediaId)}/view`, {
       method: "POST",
     }).catch(() => {});

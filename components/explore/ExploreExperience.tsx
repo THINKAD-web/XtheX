@@ -1006,7 +1006,7 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
         currency={preferredCurrency}
       />
 
-      {view === "list" && selectedIds.length > 0 ? (
+      {selectedIds.length > 0 ? (
         <div className="fixed inset-x-0 bottom-4 z-[90] px-4">
           <div className="mx-auto flex w-full max-w-4xl flex-wrap items-center justify-between gap-3 rounded-2xl border border-emerald-200/70 bg-white/95 p-4 shadow-xl ring-1 ring-emerald-500/10 backdrop-blur dark:border-emerald-900/40 dark:bg-zinc-950/90 dark:ring-emerald-400/10">
             <p className="text-sm font-medium text-zinc-800 dark:text-zinc-100">
@@ -1021,6 +1021,15 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
               >
                 {tv("compare.open")}
               </Button>
+              <Link
+                href={`/compare?ids=${selectedIds.join(",")}`}
+                className={cn(
+                  "inline-flex h-10 items-center justify-center rounded-md border border-emerald-300 bg-white px-4 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-50 dark:border-emerald-800 dark:bg-zinc-900 dark:text-emerald-300 dark:hover:bg-zinc-800",
+                  selectedIds.length < 2 && "pointer-events-none opacity-50",
+                )}
+              >
+                {locale === "ko" ? "상세 비교" : "Full Compare"}
+              </Link>
               <Button type="button" variant="secondary" onClick={clearSelected}>
                 {tv("compare.clear")}
               </Button>

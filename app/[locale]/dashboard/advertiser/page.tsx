@@ -1,11 +1,12 @@
 import { CampaignStatus } from "@prisma/client";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Activity, CheckCircle, Clock, Heart } from "lucide-react";
+import { Heart } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { gateAdvertiserDashboard } from "@/lib/auth/dashboard-gate";
 import { landing } from "@/lib/landing-theme";
 import { prisma } from "@/lib/prisma";
+import { CampaignStatusKpis } from "@/components/dashboard/CampaignStatusKpis";
 import { DashboardStatsSection } from "@/components/dashboard/DashboardStatsSection";
 import { DashboardNotificationBanner } from "@/components/layout/DashboardNotificationBanner";
 import { AdvertiserAnalyticsSection } from "@/components/analytics/AdvertiserAnalyticsSection";
@@ -39,6 +40,7 @@ function statusLabel(
 export default async function AdvertiserDashboardPage() {
   const user = await gateAdvertiserDashboard();
   const t = await getTranslations("dashboard.advertiser");
+  const tm = await getTranslations("dashboard.mobile");
   const locale = await getLocale();
 
   const displayName =
@@ -89,35 +91,16 @@ export default async function AdvertiserDashboardPage() {
           </p>
         </section>
 
-        <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="flex items-center gap-4 rounded-xl border bg-card p-4 shadow-sm">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/40">
-              <Activity className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">{t("card_active")}</p>
-              <p className="text-2xl font-bold">{activeCount}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 rounded-xl border bg-card p-4 shadow-sm">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/40">
-              <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">{t("card_completed")}</p>
-              <p className="text-2xl font-bold">{completedCount}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 rounded-xl border bg-card p-4 shadow-sm">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/40">
-              <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">{t("card_pending")}</p>
-              <p className="text-2xl font-bold">{pendingCount}</p>
-            </div>
-          </div>
-        </section>
+        <CampaignStatusKpis
+          swipeHint={tm("swipe_kpis_hint")}
+          carouselAriaLabel={tm("carousel_campaign_status")}
+          activeCount={activeCount}
+          completedCount={completedCount}
+          pendingCount={pendingCount}
+          labelActive={t("card_active")}
+          labelCompleted={t("card_completed")}
+          labelPending={t("card_pending")}
+        />
 
         <DashboardStatsSection role="ADVERTISER" />
 

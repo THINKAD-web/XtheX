@@ -639,6 +639,23 @@
       "stat_monthly_impressions": "Est. monthly impressions",
       "won": "KRW",
       "nav_explore": "Explore"
+    },
+    "mobile": {
+      "swipe_kpis_hint": "Swipe sideways for more",
+      "carousel_campaign_status": "Campaign status summary",
+      "carousel_stats_advertiser": "Advertiser key metrics",
+      "carousel_stats_media_owner": "Media owner key metrics",
+      "carousel_quick_actions": "Quick actions",
+      "nav_bar_aria": "Dashboard bottom navigation",
+      "nav_home": "Home",
+      "nav_explore": "Explore",
+      "nav_inquiries": "Inquiries",
+      "nav_notifications": "Alerts",
+      "nav_menu": "Menu",
+      "nav_upload": "Upload",
+      "nav_admin_home": "Admin",
+      "nav_admin_medias": "Media",
+      "nav_admin_inquiries": "Inquiries"
     }
   },
   "admin": {

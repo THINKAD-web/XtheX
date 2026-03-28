@@ -632,6 +632,23 @@
       "stat_monthly_impressions": "预估月曝光",
       "won": "韩元",
       "nav_explore": "探索"
+    },
+    "mobile": {
+      "swipe_kpis_hint": "左右滑动查看更多",
+      "carousel_campaign_status": "活动状态摘要",
+      "carousel_stats_advertiser": "广告主关键指标",
+      "carousel_stats_media_owner": "媒体方关键指标",
+      "carousel_quick_actions": "快捷操作",
+      "nav_bar_aria": "仪表盘底部导航",
+      "nav_home": "首页",
+      "nav_explore": "探索",
+      "nav_inquiries": "询盘",
+      "nav_notifications": "通知",
+      "nav_menu": "菜单",
+      "nav_upload": "上传",
+      "nav_admin_home": "管理",
+      "nav_admin_medias": "媒体",
+      "nav_admin_inquiries": "询盘"
     }
   },
   "admin": {

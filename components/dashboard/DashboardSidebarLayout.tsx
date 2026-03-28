@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { DashboardSidebar, type DashboardSidebarRole } from "./DashboardSidebar";
+import { MobileDashboardBottomNav } from "./MobileDashboardBottomNav";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -53,6 +54,7 @@ export function DashboardSidebarLayout({ role, className, children }: Props) {
         onToggleCollapsed={() => setCollapsed((v) => !v)}
         mobileOpen={mobileOpen}
         onMobileOpenChange={setMobileOpen}
+        suppressFloatingMobileMenuButton
       />
 
       <div className="pt-0">
@@ -60,11 +62,17 @@ export function DashboardSidebarLayout({ role, className, children }: Props) {
           className={cn(
             "mx-auto w-full px-4 sm:px-6 lg:px-8",
             "lg:pl-[calc(var(--xthex-sidebar-w)+24px)]",
+            "pb-[calc(4.25rem+env(safe-area-inset-bottom))] lg:pb-0",
           )}
         >
           {children}
         </div>
       </div>
+
+      <MobileDashboardBottomNav
+        role={role}
+        onOpenFullMenu={() => setMobileOpen(true)}
+      />
     </div>
   );
 }

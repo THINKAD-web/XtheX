@@ -8,6 +8,7 @@ import {
 import { gateMediaOwnerDashboard } from "@/lib/auth/dashboard-gate";
 import { landing } from "@/lib/landing-theme";
 import { DashboardStatsSection } from "@/components/dashboard/DashboardStatsSection";
+import { MediaOwnerQuickActions } from "@/components/dashboard/MediaOwnerQuickActions";
 import { prisma } from "@/lib/prisma";
 import { DashboardNotificationBanner } from "@/components/layout/DashboardNotificationBanner";
 
@@ -22,6 +23,7 @@ export const metadata: Metadata = {
 export default async function MediaOwnerDashboardPage() {
   const user = await gateMediaOwnerDashboard();
   const t = await getTranslations("dashboard.mediaOwner");
+  const tm = await getTranslations("dashboard.mobile");
   const mediasForMap = await prisma.media.findMany({
     where: {
       createdById: user.id,
@@ -99,32 +101,14 @@ export default async function MediaOwnerDashboardPage() {
           <h2 id="media-owner-quick-actions" className="sr-only">
             Quick actions
           </h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <Link
-              href="/dashboard/media-owner/upload"
-              className={`${landing.card} flex min-h-[120px] flex-col justify-center border-emerald-200/50 bg-white/90 text-center transition-all duration-200 hover:border-emerald-400/60 hover:shadow-md dark:border-emerald-900/30`}
-            >
-              <span className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">
-                {t("quick_register")}
-              </span>
-            </Link>
-            <Link
-              href="/dashboard/media-owner/medias"
-              className={`${landing.card} flex min-h-[120px] flex-col justify-center border-sky-200/50 bg-white/90 text-center transition-all duration-200 hover:border-sky-400/60 hover:shadow-md dark:border-sky-900/30`}
-            >
-              <span className="text-sm font-semibold text-blue-700 dark:text-sky-300">
-                {t("quick_medias")}
-              </span>
-            </Link>
-            <Link
-              href="/dashboard/media-owner/inquiries"
-              className={`${landing.card} flex min-h-[120px] flex-col justify-center bg-white/90 text-center transition-all duration-200 hover:shadow-md`}
-            >
-              <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                {t("quick_inquiries_contracts")}
-              </span>
-            </Link>
-          </div>
+          <MediaOwnerQuickActions
+            cardClass={landing.card}
+            swipeHint={tm("swipe_kpis_hint")}
+            carouselAriaLabel={tm("carousel_quick_actions")}
+            registerLabel={t("quick_register")}
+            mediasLabel={t("quick_medias")}
+            inquiriesLabel={t("quick_inquiries_contracts")}
+          />
         </section>
 
         <section

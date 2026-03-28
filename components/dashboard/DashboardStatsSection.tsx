@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
 
 const StatCards = dynamic(
   () => import("@/components/dashboard/StatCards").then((m) => m.StatCards),
@@ -56,6 +57,7 @@ function isMediaOwnerStats(v: unknown): v is MediaOwnerStats {
 }
 
 export function DashboardStatsSection({ role }: { role: Role }) {
+  const tm = useTranslations("dashboard.mobile");
   const [loading, setLoading] = React.useState(true);
   const [data, setData] = React.useState<AdvertiserStats | MediaOwnerStats | null>(null);
 
@@ -147,6 +149,8 @@ export function DashboardStatsSection({ role }: { role: Role }) {
       <>
         <StatCards
           loading={loading}
+          swipeHint={tm("swipe_kpis_hint")}
+          swipeAriaLabel={tm("carousel_stats_advertiser")}
           cards={[
             {
               label: "총 문의",
@@ -207,6 +211,8 @@ export function DashboardStatsSection({ role }: { role: Role }) {
     <>
       <StatCards
         loading={loading}
+        swipeHint={tm("swipe_kpis_hint")}
+        swipeAriaLabel={tm("carousel_stats_media_owner")}
         cards={[
           { label: "등록 미디어 수", value: m.totalMedias.toLocaleString(), tone: "emerald" },
           { label: "승인된 미디어", value: m.publishedMedias.toLocaleString(), tone: "blue" },

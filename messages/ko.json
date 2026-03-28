@@ -639,6 +639,23 @@
       "stat_monthly_impressions": "월 예상 노출",
       "won": "원",
       "nav_explore": "탐색"
+    },
+    "mobile": {
+      "swipe_kpis_hint": "좌우로 밀어 더 보기",
+      "carousel_campaign_status": "캠페인 상태 요약",
+      "carousel_stats_advertiser": "광고주 핵심 지표",
+      "carousel_stats_media_owner": "매체사 핵심 지표",
+      "carousel_quick_actions": "빠른 작업",
+      "nav_bar_aria": "대시보드 하단 메뉴",
+      "nav_home": "홈",
+      "nav_explore": "탐색",
+      "nav_inquiries": "문의",
+      "nav_notifications": "알림",
+      "nav_menu": "메뉴",
+      "nav_upload": "등록",
+      "nav_admin_home": "관리자",
+      "nav_admin_medias": "미디어",
+      "nav_admin_inquiries": "문의"
     }
   },
   "admin": {

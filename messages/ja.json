@@ -632,6 +632,23 @@
       "stat_monthly_impressions": "月間予想インプレッション",
       "won": "ウォン",
       "nav_explore": "探索"
+    },
+    "mobile": {
+      "swipe_kpis_hint": "横にスワイプして続きを表示",
+      "carousel_campaign_status": "キャンペーン状況",
+      "carousel_stats_advertiser": "広告主の主要指標",
+      "carousel_stats_media_owner": "メディアオーナーの主要指標",
+      "carousel_quick_actions": "クイックアクション",
+      "nav_bar_aria": "ダッシュボード下部ナビ",
+      "nav_home": "ホーム",
+      "nav_explore": "探索",
+      "nav_inquiries": "問い合わせ",
+      "nav_notifications": "通知",
+      "nav_menu": "メニュー",
+      "nav_upload": "登録",
+      "nav_admin_home": "管理",
+      "nav_admin_medias": "メディア",
+      "nav_admin_inquiries": "問い合わせ"
     }
   },
   "admin": {

@@ -109,6 +109,8 @@ type Props = {
   onToggleCollapsed: () => void;
   mobileOpen: boolean;
   onMobileOpenChange: (open: boolean) => void;
+  /** true면 모바일 좌상단 햄버거 대신 하단 내비「메뉴」만 사용 */
+  suppressFloatingMobileMenuButton?: boolean;
 };
 
 export function DashboardSidebar({
@@ -117,6 +119,7 @@ export function DashboardSidebar({
   onToggleCollapsed,
   mobileOpen,
   onMobileOpenChange,
+  suppressFloatingMobileMenuButton = false,
 }: Props) {
   const pathname = usePathname() ?? "";
   const { text: roleText, tone } = roleLabel(role);
@@ -215,18 +218,20 @@ export function DashboardSidebar({
 
   return (
     <>
-      {/* Mobile hamburger (below fixed top header) */}
-      <button
-        type="button"
-        onClick={() => onMobileOpenChange(true)}
-        className={cn(
-          "lg:hidden fixed left-3 top-[68px] z-[60] inline-flex h-10 w-10 items-center justify-center rounded-xl",
-          "border border-zinc-200 bg-white/95 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/90",
-        )}
-        aria-label="Open sidebar"
-      >
-        <Menu className="h-5 w-5 text-zinc-700 dark:text-zinc-200" />
-      </button>
+      {/* Mobile hamburger — 하단 내비 사용 시 숨김 */}
+      {!suppressFloatingMobileMenuButton ? (
+        <button
+          type="button"
+          onClick={() => onMobileOpenChange(true)}
+          className={cn(
+            "lg:hidden fixed left-3 top-[68px] z-[60] inline-flex h-10 w-10 items-center justify-center rounded-xl",
+            "border border-zinc-200 bg-white/95 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/90",
+          )}
+          aria-label="Open sidebar"
+        >
+          <Menu className="h-5 w-5 text-zinc-700 dark:text-zinc-200" />
+        </button>
+      ) : null}
 
       {/* Desktop sidebar */}
       <aside

@@ -17,6 +17,9 @@ import { Link } from "@/i18n/navigation";
 import type { ExploreApiItem } from "@/lib/explore/explore-item";
 import { usePreferredCurrency } from "@/components/usePreferredCurrency";
 import { convertCurrency, formatCurrency } from "@/lib/currency";
+import { encryptInquiryPayload } from "@/lib/crypto/inquiry-e2e-browser";
+import { E2E_INQUIRY_PLACEHOLDER } from "@/lib/crypto/inquiry-e2e-constants";
+import { EncryptionBadge } from "@/components/encryption/EncryptionBadge";
 
 const schema = z.object({
   message: z.string().min(5).max(8000),
@@ -60,6 +63,31 @@ export function InquiryModal({
   const { data: session, status } = useSession();
   const preferredCurrency = usePreferredCurrency(locale);
   const [submitting, setSubmitting] = React.useState(false);
+  const mediaIds = React.useMemo(() => medias?.map((m) => m.id) ?? [], [medias]);
+  const [e2eKeys, setE2eKeys] = React.useState<Record<string, string | null>>({});
+
+  React.useEffect(() => {
+    if (!open || mediaIds.length === 0) return;
+    let cancelled = false;
+    void (async () => {
+      const next: Record<string, string | null> = {};
+      await Promise.all(
+        mediaIds.map(async (id) => {
+          try {
+            const r = await fetch(`/api/medias/${id}/inquiry-e2e-key`);
+            const j = (await r.json()) as { enabled?: boolean; publicKeySpki?: string | null };
+            next[id] = r.ok && j.enabled && j.publicKeySpki ? String(j.publicKeySpki) : null;
+          } catch {
+            next[id] = null;
+          }
+        }),
+      );
+      if (!cancelled) setE2eKeys(next);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [open, mediaIds]);
 
   const {
     register,
@@ -100,9 +128,9 @@ export function InquiryModal({
 
   if (!open || !medias || medias.length === 0) return null;
 
-  const mediaIds = medias.map((m) => m.id);
   const titleLine =
     medias.length === 1 ? medias[0]!.title : t("multi_title", { count: medias.length });
+  const anyE2e = mediaIds.some((id) => Boolean(e2eKeys[id]));
 
   async function onSubmit(values: FormValues) {
     setSubmitting(true);
@@ -119,17 +147,38 @@ export function InquiryModal({
       const contactEmail = values.contactEmail?.trim() || undefined;
       const contactPhone = values.contactPhone?.trim() || undefined;
 
+      const needsEmailForE2e = mediaIds.some((id) => Boolean(e2eKeys[id]));
+      if (needsEmailForE2e && !contactEmail) {
+        toast.error(t("e2e_need_email"));
+        return;
+      }
+
+      let sentE2e = false;
       for (const mediaId of mediaIds) {
+        const pk = e2eKeys[mediaId];
+        let messageOut = values.message.trim();
+        let envelope: string | undefined;
+        let phoneOut = contactPhone;
+        if (pk) {
+          envelope = await encryptInquiryPayload(pk, {
+            message: values.message.trim(),
+            ...(contactPhone ? { contactPhone } : {}),
+          });
+          messageOut = E2E_INQUIRY_PLACEHOLDER;
+          phoneOut = undefined;
+          sentE2e = true;
+        }
         const res = await fetch("/api/inquiry", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             mediaId,
-            message: values.message.trim(),
+            message: messageOut,
+            ...(envelope ? { sensitiveEnvelope: envelope } : {}),
             desiredPeriod: values.desiredPeriod?.trim() || undefined,
             budget,
             contactEmail,
-            contactPhone,
+            contactPhone: phoneOut,
             locale,
           }),
         });
@@ -141,10 +190,14 @@ export function InquiryModal({
       }
 
       toast.success(t("toast_ok"), {
-        description:
+        description: [
+          sentE2e ? t("e2e_toast") : null,
           budget != null && inputBudget != null
             ? `${formatCurrency(inputBudget, preferredCurrency, locale === "ko" ? "ko-KR" : "en-US")} → ${formatCurrency(budget, "KRW", "ko-KR")} (KRW 저장)`
-            : undefined,
+            : null,
+        ]
+          .filter(Boolean)
+          .join(" · ") || undefined,
       });
       onClose();
     } catch (e) {
@@ -197,6 +250,12 @@ export function InquiryModal({
           </div>
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {anyE2e ? (
+              <div className="flex flex-wrap items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-3 py-2">
+                <EncryptionBadge label={t("e2e_badge")} className="normal-case tracking-normal" />
+                <p className="text-xs text-zinc-600 dark:text-zinc-400">{t("e2e_hint")}</p>
+              </div>
+            ) : null}
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1">
                 <Label htmlFor="inq-contact-email">{t("contact_email")}</Label>

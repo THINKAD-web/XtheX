@@ -627,6 +627,7 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
                   error: t("booking_error"),
                   loginRequired: t("login_required"),
                   contactEmail: t("contact_email"),
+                  e2eReady: t("e2e_booking_ready"),
                 }}
               />
             </article>

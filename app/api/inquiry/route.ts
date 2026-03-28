@@ -7,23 +7,63 @@ import { authOptions } from "@/lib/auth/config";
 import { revalidatePath } from "next/cache";
 import { sendInquiryConfirmation } from "@/lib/email/send-email";
 import { withRateLimit } from "@/lib/security/rate-limit";
+import { E2E_INQUIRY_PLACEHOLDER } from "@/lib/crypto/inquiry-e2e-constants";
+import { parseInquiryE2eEnvelope } from "@/lib/crypto/inquiry-e2e-schema";
 
 export const runtime = "nodejs";
 
 const bodySchema = z
   .object({
     mediaId: z.string().uuid(),
-    message: z.string().min(5).max(8000),
+    message: z.string().max(8000),
+    sensitiveEnvelope: z.string().max(120_000).optional(),
     desiredPeriod: z.string().max(200).optional(),
     budget: z.coerce.number().int().nonnegative().optional(),
     contactEmail: z.string().email().optional(),
     contactPhone: z.string().max(40).optional(),
     locale: z.string().max(12).optional(), // for revalidatePath convenience
   })
-  .refine((v) => Boolean(v.contactEmail?.trim() || v.contactPhone?.trim()), {
-    message: "Provide contactEmail or contactPhone",
-    path: ["contactEmail"],
-  });
+  .superRefine((data, ctx) => {
+    if (data.sensitiveEnvelope?.trim()) {
+      if (data.message !== E2E_INQUIRY_PLACEHOLDER) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Invalid E2E message marker",
+          path: ["message"],
+        });
+      }
+      if (!parseInquiryE2eEnvelope(data.sensitiveEnvelope.trim())) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Invalid sensitive envelope",
+          path: ["sensitiveEnvelope"],
+        });
+      }
+      if (!data.contactEmail?.trim()) {
+        ctx.addIssue({
+          code: "custom",
+          message: "contactEmail required for E2E inquiries",
+          path: ["contactEmail"],
+        });
+      }
+    } else if (data.message.trim().length < 5) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Message too short",
+        path: ["message"],
+      });
+    }
+  })
+  .refine(
+    (v) => {
+      if (v.sensitiveEnvelope?.trim()) return Boolean(v.contactEmail?.trim());
+      return Boolean(v.contactEmail?.trim() || v.contactPhone?.trim());
+    },
+    {
+      message: "Provide contactEmail or contactPhone",
+      path: ["contactEmail"],
+    },
+  );
 
 export async function POST(req: Request) {
   const rl = withRateLimit(req, { limit: 10, windowMs: 60_000 });
@@ -61,15 +101,18 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Media not found" }, { status: 404 });
   }
 
+  const e2e = Boolean(data.sensitiveEnvelope?.trim());
   const created = await prisma.inquiry.create({
     data: {
       advertiserId,
       mediaId: data.mediaId,
-      message: data.message.trim(),
+      message: e2e ? E2E_INQUIRY_PLACEHOLDER : data.message.trim(),
+      sensitiveEnvelope: e2e ? data.sensitiveEnvelope!.trim() : null,
+      e2eEncrypted: e2e,
       desiredPeriod: data.desiredPeriod?.trim() || null,
       budget: data.budget ?? null,
       contactEmail: data.contactEmail?.trim().toLowerCase() || null,
-      contactPhone: data.contactPhone?.trim() || null,
+      contactPhone: e2e ? null : data.contactPhone?.trim() || null,
       status: "PENDING",
       adminMemo: null,
     },
@@ -93,7 +136,9 @@ export async function POST(req: Request) {
     sendInquiryConfirmation({
       to: contactEmail,
       mediaTitle: mediaInfo?.mediaName ?? "매체",
-      message: data.message.trim(),
+      message: e2e
+        ? "[E2E] Your inquiry was sent with end-to-end encryption. The media owner decrypts it in their dashboard; plaintext is not stored on our servers."
+        : data.message.trim(),
       inquiryId: created.id,
     }).catch((err) => console.error("[inquiry] email send failed:", err));
   }

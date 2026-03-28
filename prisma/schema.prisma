@@ -214,6 +214,8 @@ model User {
   smsOtpEnabled         Boolean           @default(false)
   phoneE164             String?
   securityPhoneVerified Boolean           @default(false)
+  /** RSA-OAEP (SPKI) base64 for inquiry E2E; media owner holds matching PKCS#8 offline. */
+  inquiryE2ePublicKeySpki String?         @db.Text
 
   loginDevices          LoginDevice[]
   webAuthnCredentials   WebAuthnCredential[]
@@ -404,6 +406,9 @@ model Inquiry {
   advertiserId  String        @db.Uuid
   mediaId       String        @db.Uuid
   message       String        @db.Text
+  /** AES-GCM envelope (JSON); message field uses E2E placeholder when set. */
+  sensitiveEnvelope String?   @db.Text
+  e2eEncrypted      Boolean   @default(false)
   desiredPeriod String?
   budget        Int?          // KRW
   contactEmail  String?

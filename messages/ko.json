@@ -315,7 +315,11 @@
         "submit": "보내기",
         "cancel": "취소",
         "toast_ok": "문의가 접수되었습니다.",
-        "toast_error": "문의 전송에 실패했습니다."
+        "toast_error": "문의 전송에 실패했습니다.",
+        "e2e_badge": "E2E 암호화",
+        "e2e_hint": "문의 내용과 전화번호는 브라우저에서 매체 소유자 공개키로 암호화된 뒤 전송됩니다.",
+        "e2e_toast": "종단간 암호화로 전송되었습니다.",
+        "e2e_need_email": "암호화 문의에는 이메일이 필요합니다."
       }
     }
   },
@@ -960,6 +964,7 @@
     "submit_booking": "예약 요청 보내기",
     "booking_success": "예약 요청이 접수되었습니다!",
     "booking_error": "요청 중 오류가 발생했습니다. 다시 시도해 주세요.",
+    "e2e_booking_ready": "이 매체는 문의 암호화를 사용 중입니다. 요청 내용은 브라우저에서 매체 소유자만 풀 수 있게 암호화됩니다.",
     "login_required": "예약하려면 로그인이 필요합니다.",
     "contact_email": "연락처 이메일",
     "sun": "일",
@@ -1755,5 +1760,39 @@
     "toast_passkey_remove_failed": "패스키를 삭제하지 못했습니다.",
     "toast_device_removed": "기기를 해지했습니다.",
     "toast_device_remove_failed": "기기를 해지하지 못했습니다."
+  },
+  "encryption": {
+    "meta_title": "문의 암호화 | XtheX",
+    "badge_e2e": "E2E",
+    "badge_short": "E2E",
+    "badge_active": "암호화 사용 중",
+    "back_dashboard": "대시보드로",
+    "setup_title": "문의 종단간(E2E) 암호화",
+    "setup_subtitle": "광고주가 공개키로 문의 본문·전화를 암호화해 보냅니다. 오프라인에 보관한 개인키로만 복호화할 수 있습니다.",
+    "loading": "불러오는 중…",
+    "step_generate": "키 쌍을 생성하고 개인키 파일을 다운로드하세요.",
+    "step_store_private": "개인키는 안전하게 보관하세요(비밀번호 관리자·오프라인 백업). XtheX에 업로드하지 마세요.",
+    "step_publish_public": "아래에 공개키(SPKI base64)를 붙여넣고 저장하세요. 계정에만 저장됩니다.",
+    "cta_generate": "키 생성 및 개인키 다운로드",
+    "public_spki_label": "공개키 (base64 SPKI)",
+    "public_spki_ph": "생성 후 붙여넣거나 백업에서 복사",
+    "cta_save": "공개키 저장",
+    "cta_clear": "E2E 끄기",
+    "saving": "저장 중…",
+    "warning_private": "개인키를 잃으면 암호화된 문의는 복구할 수 없습니다.",
+    "toast_load_failed": "암호화 설정을 불러오지 못했습니다.",
+    "toast_keygen": "개인키가 다운로드되었습니다. 공개키를 계정에 저장하세요.",
+    "toast_keygen_failed": "키를 만들지 못했습니다.",
+    "toast_invalid_key": "공개키가 너무 짧습니다.",
+    "toast_saved": "공개키를 저장했습니다.",
+    "toast_save_failed": "저장하지 못했습니다.",
+    "toast_cleared": "문의 암호화를 껐습니다.",
+    "toast_clear_failed": "끄기에 실패했습니다.",
+    "owner_hint": "PKCS#8 개인키(PEM)를 붙여넣으면 이 브라우저에서만 복호화합니다. 서버로 전송되지 않습니다.",
+    "decrypt_pem_ph": "-----BEGIN PRIVATE KEY----- …",
+    "decrypt_cta": "복호화",
+    "decrypt_busy": "복호화 중…",
+    "decrypt_failed": "복호화에 실패했습니다. 개인키를 확인하세요.",
+    "decrypt_phone_label": "전화 (암호문에서 복호화)"
   }
 }

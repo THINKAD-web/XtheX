@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { ContractRowActions } from "@/components/contract/ContractRowActions";
+import { EncryptionBadge } from "@/components/encryption/EncryptionBadge";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -29,6 +30,7 @@ export default async function AdvertiserInquiriesPage({
 }) {
   const user = await gateAdvertiserDashboard();
   const t = await getTranslations("dashboard.advertiser");
+  const te = await getTranslations("encryption");
   const locale = await getLocale();
   const sp = (await searchParams) ?? {};
   const status = typeof sp.status === "string" ? sp.status : "ALL";
@@ -145,7 +147,15 @@ export default async function AdvertiserInquiriesPage({
                     </td>
                     <td className="px-4 py-3">{r.desiredPeriod ?? "—"}</td>
                     <td className="px-4 py-3">
-                      <span className="line-clamp-2">{r.message}</span>
+                      <div className="flex flex-col gap-1">
+                        {r.e2eEncrypted ? (
+                          <EncryptionBadge
+                            label={te("badge_short")}
+                            className="w-fit normal-case tracking-normal"
+                          />
+                        ) : null}
+                        <span className="line-clamp-2">{r.message}</span>
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-xs text-zinc-500">
                       {r.createdAt.toLocaleString(locale)}

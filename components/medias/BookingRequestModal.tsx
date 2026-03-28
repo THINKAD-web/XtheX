@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import * as React from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,6 +9,9 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { CalendarCheck } from "lucide-react";
+import { encryptInquiryPayload } from "@/lib/crypto/inquiry-e2e-browser";
+import { E2E_INQUIRY_PLACEHOLDER } from "@/lib/crypto/inquiry-e2e-constants";
+import { EncryptionBadge } from "@/components/encryption/EncryptionBadge";
 
 interface BookingRequestModalProps {
   mediaId: string;
@@ -28,6 +31,7 @@ interface BookingRequestModalProps {
     error: string;
     loginRequired: string;
     contactEmail: string;
+    e2eReady?: string;
   };
 }
 
@@ -37,15 +41,34 @@ export function BookingRequestModal({
   locale,
   labels,
 }: BookingRequestModalProps) {
-  const [open, setOpen] = useState(false);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [budget, setBudget] = useState("");
-  const [notes, setNotes] = useState("");
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [open, setOpen] = React.useState(false);
+  const [startDate, setStartDate] = React.useState("");
+  const [endDate, setEndDate] = React.useState("");
+  const [budget, setBudget] = React.useState("");
+  const [notes, setNotes] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [status, setStatus] = React.useState<"idle" | "loading" | "success" | "error">("idle");
+  const [e2ePk, setE2ePk] = React.useState<string | null>(null);
 
-  const handleSubmit = useCallback(
+  React.useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const r = await fetch(`/api/medias/${mediaId}/inquiry-e2e-key`);
+        const j = (await r.json()) as { enabled?: boolean; publicKeySpki?: string | null };
+        if (!cancelled && r.ok && j.enabled && j.publicKeySpki) {
+          setE2ePk(String(j.publicKeySpki));
+        }
+      } catch {
+        /* ignore */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [mediaId]);
+
+  const handleSubmit = React.useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
       setStatus("loading");
@@ -53,12 +76,25 @@ export function BookingRequestModal({
       const period = startDate && endDate ? `${startDate} ~ ${endDate}` : undefined;
 
       try {
+        const plainMessage =
+          `[Booking Request] ${mediaName}\n${labels.campaignPeriod}: ${period ?? "N/A"}\n${labels.budget}: ${budget || "N/A"}\n\n${notes}`.trim();
+        let messageOut = plainMessage;
+        let envelope: string | undefined;
+        if (e2ePk) {
+          if (!email.trim()) {
+            setStatus("error");
+            return;
+          }
+          envelope = await encryptInquiryPayload(e2ePk, { message: plainMessage });
+          messageOut = E2E_INQUIRY_PLACEHOLDER;
+        }
         const res = await fetch("/api/inquiry", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             mediaId,
-            message: `[Booking Request] ${mediaName}\n${labels.campaignPeriod}: ${period ?? "N/A"}\n${labels.budget}: ${budget || "N/A"}\n\n${notes}`.trim(),
+            message: messageOut,
+            ...(envelope ? { sensitiveEnvelope: envelope } : {}),
             desiredPeriod: period,
             budget: budget ? parseInt(budget, 10) : undefined,
             contactEmail: email || undefined,
@@ -78,7 +114,7 @@ export function BookingRequestModal({
         setStatus("error");
       }
     },
-    [mediaId, mediaName, startDate, endDate, budget, notes, email, locale, labels],
+    [mediaId, mediaName, startDate, endDate, budget, notes, email, locale, labels, e2ePk],
   );
 
   const resetAndClose = () => {
@@ -127,6 +163,12 @@ export function BookingRequestModal({
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
+              {e2ePk && labels.e2eReady ? (
+                <div className="flex flex-wrap items-center gap-2 rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-3 py-2">
+                  <EncryptionBadge label="E2E" className="normal-case tracking-normal" />
+                  <p className="text-[11px] text-emerald-100/90">{labels.e2eReady}</p>
+                </div>
+              ) : null}
               {/* Campaign Period */}
               <fieldset className="space-y-2">
                 <legend className="text-xs font-medium text-zinc-400">

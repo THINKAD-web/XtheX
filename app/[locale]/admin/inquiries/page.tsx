@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { EncryptionBadge } from "@/components/encryption/EncryptionBadge";
 
 function dateLocale(locale: string) {
   if (locale === "ko") return "ko-KR";
@@ -65,6 +66,8 @@ export default async function AdminInquiriesPage({
       </div>
     );
   }
+
+  const te = await getTranslations("encryption");
 
   const sp = (await searchParams) ?? {};
   const q = typeof sp.q === "string" ? sp.q.trim() : "";
@@ -202,7 +205,15 @@ export default async function AdminInquiriesPage({
                       : t("common.dash")}
                   </TableCell>
                   <TableCell className="max-w-xs text-sm text-zinc-700">
-                    <span className="line-clamp-3">{row.message}</span>
+                    <div className="flex flex-col gap-1">
+                      {row.e2eEncrypted ? (
+                        <EncryptionBadge
+                          label={te("badge_short")}
+                          className="w-fit normal-case tracking-normal"
+                        />
+                      ) : null}
+                      <span className="line-clamp-3">{row.message}</span>
+                    </div>
                   </TableCell>
                   <TableCell className="text-xs text-zinc-500">
                     {row.createdAt.toLocaleString(dl)}

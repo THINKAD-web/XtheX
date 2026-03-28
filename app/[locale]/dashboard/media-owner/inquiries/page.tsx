@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { gateMediaOwnerDashboard } from "@/lib/auth/dashboard-gate";
 import { landing } from "@/lib/landing-theme";
 import { prisma } from "@/lib/prisma";
+import { MediaOwnerInquiryMessageCell } from "@/components/media-owner/MediaOwnerInquiryMessageCell";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -103,8 +104,12 @@ export default async function MediaOwnerInquiriesPage() {
                       {r.budget != null ? `${r.budget.toLocaleString()}원` : "—"}
                     </td>
                     <td className="px-4 py-3">{r.desiredPeriod ?? "—"}</td>
-                    <td className="px-4 py-3">
-                      <span className="line-clamp-2">{r.message}</span>
+                    <td className="px-4 py-3 align-top">
+                      <MediaOwnerInquiryMessageCell
+                        message={r.message}
+                        sensitiveEnvelope={r.sensitiveEnvelope}
+                        e2eEncrypted={r.e2eEncrypted}
+                      />
                     </td>
                     <td className="px-4 py-3 text-xs text-zinc-500">
                       {r.createdAt.toLocaleString(locale)}

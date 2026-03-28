@@ -23,6 +23,7 @@ import {
   X,
   Star,
   Flag,
+  Lock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -61,6 +62,7 @@ function getMenu(role: DashboardSidebarRole): NavItem[] {
       { label: "새 미디어 등록", href: "/dashboard/media-owner/upload", icon: Upload },
       { label: "내 미디어 관리", href: "/dashboard/media-owner/medias", icon: Images },
       { label: "받은 문의함", href: "/dashboard/media-owner/inquiries", icon: Inbox },
+      { label: "문의 E2E 암호화", href: "/dashboard/media-owner/inquiry-encryption", icon: Lock },
       { label: "수익 현황", comingSoon: true, icon: BarChart3 },
     ];
   }

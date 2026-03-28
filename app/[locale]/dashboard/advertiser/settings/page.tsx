@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Settings, Shield } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { PushNotificationButton } from "@/components/pwa/PushNotificationButton";
+import { NotificationCategoryPrefs } from "@/components/notifications/NotificationCategoryPrefs";
 
 export const metadata: Metadata = {
   title: "Settings | XtheX",
@@ -54,6 +55,9 @@ export default async function SettingsPage({
             : "Enable push notifications to receive real-time updates about new inquiries, campaign status changes, and recommended media."}
         </p>
         <PushNotificationButton />
+        <div className="pt-2">
+          <NotificationCategoryPrefs />
+        </div>
       </section>
 
       <section className="space-y-4">

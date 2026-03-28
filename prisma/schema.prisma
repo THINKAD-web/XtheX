@@ -216,6 +216,8 @@ model User {
   securityPhoneVerified Boolean           @default(false)
   /** RSA-OAEP (SPKI) base64 for inquiry E2E; media owner holds matching PKCS#8 offline. */
   inquiryE2ePublicKeySpki String?         @db.Text
+  /** Per NotificationType: false = muted in-app; missing/true = on. */
+  notificationCategoryPrefs Json?
 
   loginDevices          LoginDevice[]
   webAuthnCredentials   WebAuthnCredential[]

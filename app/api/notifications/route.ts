@@ -1,30 +1,36 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth/session";
+import { getDisabledNotificationTypes } from "@/lib/notifications/prefs-shared";
 
 export const runtime = "nodejs";
 
 export async function GET() {
   const session = await getAuthSession();
-  if (!session?.user?.email) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
+    where: { id: session.user.id },
+    select: { id: true, notificationCategoryPrefs: true },
   });
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
+  const disabled = getDisabledNotificationTypes(user.notificationCategoryPrefs);
+  const typeWhere =
+    disabled.length > 0 ? { type: { notIn: disabled } as const } : {};
+
   const [notifications, unreadCount] = await Promise.all([
     prisma.notification.findMany({
-      where: { userId: user.id },
+      where: { userId: user.id, ...typeWhere },
       orderBy: { createdAt: "desc" },
       take: 20,
     }),
     prisma.notification.count({
-      where: { userId: user.id, read: false },
+      where: { userId: user.id, read: false, ...typeWhere },
     }),
   ]);
 
@@ -33,12 +39,13 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const session = await getAuthSession();
-  if (!session?.user?.email) {
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
+    where: { id: session.user.id },
+    select: { id: true },
   });
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });

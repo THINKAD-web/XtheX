@@ -670,7 +670,8 @@
       "col_size": "Size",
       "col_created": "Created",
       "col_action": "Action",
-      "empty_pending": "No pending proposals."
+      "empty_pending": "No pending proposals.",
+      "print": "Print"
     },
     "actions": {
       "approve": "Approve",
@@ -729,7 +730,8 @@
     "medias": {
       "back": "← Admin",
       "aiUpload": "AI upload",
-      "demoMedias": "Create 3 demo medias"
+      "demoMedias": "Create 3 demo medias",
+      "excelExport": "Excel Download"
     },
     "mediaReview": {
       "title": "Media review",

@@ -46,7 +46,8 @@
       "col_size": "Tamaño",
       "col_created": "Creado",
       "col_action": "Acción",
-      "empty_pending": "No hay propuestas pendientes."
+      "empty_pending": "No hay propuestas pendientes.",
+      "print": "Imprimir"
     },
     "actions": {
       "approve": "Aprobar",
@@ -105,7 +106,8 @@
     "medias": {
       "back": "← Admin",
       "aiUpload": "Carga con IA",
-      "demoMedias": "Crear 3 medios de demostración"
+      "demoMedias": "Crear 3 medios de demostración",
+      "excelExport": "Descargar Excel"
     },
     "mediasClient": {
       "industry": "Sector",

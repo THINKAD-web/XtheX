@@ -358,7 +358,21 @@ body {
     display: none !important;
   }
   body {
-    background: #fff;
-    color: #111;
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .print\:hidden {
+    display: none !important;
+  }
+  nav, footer, [data-sidebar], [data-radix-popper-content-wrapper] {
+    display: none !important;
+  }
+  .pt-14 {
+    padding-top: 0 !important;
+  }
+  * {
+    box-shadow: none !important;
   }
 }

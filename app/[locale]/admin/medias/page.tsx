@@ -90,6 +90,7 @@ export default async function AdminMediasPage({ params, searchParams }: PageProp
             back: tm("back"),
             aiUpload: tm("aiUpload"),
             demoMedias: tm("demoMedias"),
+            excelExport: tm("excelExport"),
           }}
         />
 

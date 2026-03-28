@@ -17,6 +17,7 @@ import { AdminActions } from "@/components/admin/admin-actions";
 import { AdminQuickNav } from "@/components/admin/admin-quick-nav";
 import { AdminNewsFetchButton } from "@/components/admin/admin-news-fetch-button";
 import { AdminDatabaseSetupMessage } from "@/components/admin/admin-database-setup-message";
+import { AdminPrintButton } from "@/components/admin/AdminPrintButton";
 import { AdminDashboardCharts } from "@/components/admin/AdminDashboardCharts";
 import { AdminDashboardStats } from "@/components/admin/AdminDashboardStats";
 import { AdminRecentInquiries } from "@/components/admin/AdminRecentInquiries";
@@ -249,11 +250,14 @@ export default async function AdminPage({
       <section className="relative border-t border-border bg-gradient-to-b from-muted/30 via-background to-background py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="space-y-12 lg:space-y-16">
-            <header>
-              <h1 className="text-3xl font-bold tracking-tight text-foreground lg:text-4xl">{tHome("title")}</h1>
-              <p className="mt-3 max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground lg:text-lg">
-                {tHome("subtitle")}
-              </p>
+            <header className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight text-foreground lg:text-4xl">{tHome("title")}</h1>
+                <p className="mt-3 max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground lg:text-lg">
+                  {tHome("subtitle")}
+                </p>
+              </div>
+              <AdminPrintButton label={tHome("print")} />
             </header>
 
             <AdminDashboardStats
@@ -273,11 +277,11 @@ export default async function AdminPage({
               <AdminTopMedia medias={topMediaRows} />
             </div>
 
-            <div className={cn(panel, "p-6 sm:p-8")}>
+            <div className={cn(panel, "print:hidden p-6 sm:p-8")}>
               <AdminQuickNav t={tHome} />
             </div>
 
-            <div className={cn(panel, "p-6 sm:p-8")}>
+            <div className={cn(panel, "print:hidden p-6 sm:p-8")}>
               <p className="mb-4 text-sm font-semibold text-foreground">RSS 뉴스 관리</p>
               <AdminNewsFetchButton />
             </div>
@@ -345,7 +349,7 @@ export default async function AdminPage({
                         <TableCell className="text-muted-foreground">
                           {new Date(p.createdAt).toLocaleString(dateLocale)}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="print:hidden">
                           <AdminActions proposalId={p.id} />
                         </TableCell>
                       </TableRow>

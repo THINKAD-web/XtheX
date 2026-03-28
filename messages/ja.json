@@ -663,7 +663,8 @@
       "col_size": "サイズ",
       "col_created": "作成日",
       "col_action": "操作",
-      "empty_pending": "承認待ちの提案はありません。"
+      "empty_pending": "承認待ちの提案はありません。",
+      "print": "印刷"
     },
     "actions": {
       "approve": "承認",
@@ -722,7 +723,8 @@
     "medias": {
       "back": "← 管理",
       "aiUpload": "AIアップロード",
-      "demoMedias": "デモメディア3件を作成"
+      "demoMedias": "デモメディア3件を作成",
+      "excelExport": "Excelダウンロード"
     },
     "mediaReview": {
       "title": "メディア審査",

@@ -670,7 +670,8 @@
       "col_size": "크기",
       "col_created": "등록일",
       "col_action": "작업",
-      "empty_pending": "대기 중인 제안서가 없습니다."
+      "empty_pending": "대기 중인 제안서가 없습니다.",
+      "print": "인쇄"
     },
     "actions": {
       "approve": "승인",
@@ -729,7 +730,8 @@
     "medias": {
       "back": "← 관리자",
       "aiUpload": "AI 업로드",
-      "demoMedias": "데모 매체 3개 생성"
+      "demoMedias": "데모 매체 3개 생성",
+      "excelExport": "엑셀 다운로드"
     },
     "mediaReview": {
       "title": "매체 검수",

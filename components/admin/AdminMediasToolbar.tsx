@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocalDaypart } from "@/hooks/use-local-daypart";
 import { cn } from "@/lib/utils";
@@ -13,7 +14,7 @@ export function AdminMediasToolbar({
 }: {
   locale: string;
   createDemoMediasAction: () => Promise<void>;
-  labels: { back: string; aiUpload: string; demoMedias: string };
+  labels: { back: string; aiUpload: string; demoMedias: string; excelExport: string };
 }) {
   const isDay = useLocalDaypart() === "day";
 
@@ -50,6 +51,22 @@ export function AdminMediasToolbar({
           {labels.demoMedias}
         </Button>
       </form>
+      <a href="/api/admin/medias-export" download>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className={cn(
+            "gap-1.5",
+            isDay
+              ? "border-zinc-300 text-zinc-800 hover:bg-zinc-100"
+              : "border-zinc-600 text-zinc-300 hover:border-zinc-400 hover:text-white",
+          )}
+        >
+          <Download className="h-4 w-4" />
+          {labels.excelExport}
+        </Button>
+      </a>
     </div>
   );
 }

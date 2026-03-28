@@ -663,7 +663,8 @@
       "col_size": "尺寸",
       "col_created": "创建时间",
       "col_action": "操作",
-      "empty_pending": "暂无待审核提案。"
+      "empty_pending": "暂无待审核提案。",
+      "print": "打印"
     },
     "actions": {
       "approve": "通过",
@@ -722,7 +723,8 @@
     "medias": {
       "back": "← 管理后台",
       "aiUpload": "AI 上传",
-      "demoMedias": "创建 3 条演示媒体"
+      "demoMedias": "创建 3 条演示媒体",
+      "excelExport": "Excel 下载"
     },
     "mediaReview": {
       "title": "媒体审核",

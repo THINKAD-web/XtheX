@@ -4,6 +4,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { revalidateMediaReviewSurfaces } from "@/lib/admin/revalidate-media-public";
 import { requireAdminApi } from "@/lib/auth/require-admin-api";
+import { firePartnerMediaWebhook } from "@/lib/partner-api/notify-media-webhook";
 
 const bodySchema = z.object({
   reason: z.string().max(5000).optional(),
@@ -54,6 +55,16 @@ export async function POST(req: Request, context: RouteContext) {
       adminMemo: memoParts || null,
     },
   });
+
+  if (media.createdById) {
+    firePartnerMediaWebhook(media.createdById, {
+      source: "xthex",
+      event: "media.status_changed",
+      mediaId: id,
+      status: MediaStatus.REJECTED,
+      updatedAt: new Date().toISOString(),
+    });
+  }
 
   revalidateMediaReviewSurfaces(id);
 

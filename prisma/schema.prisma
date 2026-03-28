@@ -221,6 +221,9 @@ model User {
   partnershipAppsReviewed  PartnershipApplication[] @relation("PartnershipAppReviewer")
   partnershipContractsCreated PartnershipContract[] @relation("PartnershipContractCreator")
 
+  partnerApiKeys       PartnerApiKey[]
+  partnerMediaWebhook  PartnerMediaWebhook?
+
   twoFactorSecret       String?
   twoFactorEnabled      Boolean           @default(false)
   twoFactorBackupCodes  String?           @db.Text
@@ -749,6 +752,48 @@ model PartnershipContract {
 
   @@index([applicationId])
   @@index([status, createdAt])
+}
+
+/** 매체사 파트너 REST API 키 (시크릿은 SHA-256 해시만 저장) */
+model PartnerApiKey {
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @db.Uuid
+  name       String
+  keyPrefix  String
+  keyHash    String    @unique
+  createdAt  DateTime  @default(now())
+  revokedAt  DateTime?
+  lastUsedAt DateTime?
+
+  user   User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  usages PartnerApiUsage[]
+
+  @@index([userId])
+}
+
+model PartnerApiUsage {
+  id        String   @id @default(uuid()) @db.Uuid
+  keyId     String   @db.Uuid
+  path      String
+  method    String
+  status    Int
+  createdAt DateTime @default(now())
+
+  key PartnerApiKey @relation(fields: [keyId], references: [id], onDelete: Cascade)
+
+  @@index([keyId, createdAt])
+}
+
+/** 매체 변경 시 POST 콜백 (HTTPS URL) */
+model PartnerMediaWebhook {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @unique @db.Uuid
+  url       String
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum AbExperimentStatus {

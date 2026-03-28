@@ -8,6 +8,7 @@ import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { z } from "zod";
 import { formTypeToCategory } from "@/lib/media/media-owner-form-types";
+import { firePartnerMediaWebhook } from "@/lib/partner-api/notify-media-webhook";
 
 export const runtime = "nodejs";
 
@@ -187,6 +188,14 @@ export async function PUT(req: Request, ctx: { params: Promise<{ id: string }> }
   revalidatePath("/dashboard/media-owner");
   revalidatePath("/explore");
 
+  firePartnerMediaWebhook(userId, {
+    source: "xthex",
+    event: "media.updated",
+    mediaId: updated.id,
+    status: updated.status,
+    updatedAt: updated.updatedAt.toISOString(),
+  });
+
   return NextResponse.json({ ok: true, media: updated, message: "Updated" });
 }
 
@@ -217,8 +226,22 @@ export async function DELETE(
       where: { id },
       data: { status: MediaStatus.ARCHIVED },
     });
+    firePartnerMediaWebhook(userId, {
+      source: "xthex",
+      event: "media.status_changed",
+      mediaId: id,
+      status: MediaStatus.ARCHIVED,
+      updatedAt: new Date().toISOString(),
+    });
   } else {
     await prisma.media.delete({ where: { id } });
+    firePartnerMediaWebhook(userId, {
+      source: "xthex",
+      event: "media.deleted",
+      mediaId: id,
+      status: "DELETED",
+      updatedAt: new Date().toISOString(),
+    });
   }
 
   // Best-effort revalidation (localized paths depend on caller; we revalidate common ones).

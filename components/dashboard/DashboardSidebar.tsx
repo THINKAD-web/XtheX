@@ -30,6 +30,7 @@ import {
   SquareSplitHorizontal,
   ChartColumn,
   TrendingUp,
+  KeyRound,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -70,6 +71,7 @@ function getMenu(role: DashboardSidebarRole): NavItem[] {
       { label: "성과 보기", href: "/dashboard/performance", icon: Activity },
       { label: "새 미디어 등록", href: "/dashboard/media-owner/upload", icon: Upload },
       { label: "내 미디어 관리", href: "/dashboard/media-owner/medias", icon: Images },
+      { label: "파트너 API", href: "/dashboard/media-owner/partner-api", icon: KeyRound },
       { label: "받은 문의함", href: "/dashboard/media-owner/inquiries", icon: Inbox },
       { label: "알림 기록", href: "/dashboard/notifications", icon: Bell },
       { label: "문의 E2E 암호화", href: "/dashboard/media-owner/inquiry-encryption", icon: Lock },

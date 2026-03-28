@@ -31,6 +31,7 @@ import {
   ChartColumn,
   TrendingUp,
   KeyRound,
+  Gavel,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -90,6 +91,7 @@ function getMenu(role: DashboardSidebarRole): NavItem[] {
       icon: Sparkles,
     },
     { label: "미디어 탐색", href: "/dashboard/advertiser/explore", icon: Map },
+    { label: "입찰 자동화", href: "/dashboard/advertiser/auto-bidding", icon: Gavel },
     { label: "내 문의함", href: "/dashboard/advertiser/inquiries", icon: Inbox },
     { label: "알림 기록", href: "/dashboard/notifications", icon: Bell },
     { label: "내 캠페인", comingSoon: true, icon: BriefcaseBusiness },

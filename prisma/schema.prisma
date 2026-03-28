@@ -224,6 +224,9 @@ model User {
   partnerApiKeys       PartnerApiKey[]
   partnerMediaWebhook  PartnerMediaWebhook?
 
+  autoBidRules AutoBidRule[]
+  autoBidRuns  AutoBidRun[]
+
   twoFactorSecret       String?
   twoFactorEnabled      Boolean           @default(false)
   twoFactorBackupCodes  String?           @db.Text
@@ -473,6 +476,53 @@ model Inquiry {
   @@index([status])
   @@index([advertiserId, createdAt])
   @@index([mediaId, createdAt])
+}
+
+enum AutoBidRuleStatus {
+  ACTIVE
+  PAUSED
+}
+
+/** 광고주 자동 문의(입찰) 규칙: 조건에 맞는 매체에 일괄 문의 생성 */
+model AutoBidRule {
+  id                  String            @id @default(uuid()) @db.Uuid
+  userId              String            @db.Uuid
+  name                String
+  /** 매체 price(원) 상한 — null인 매체도 포함 */
+  maxBudgetKrw        Int
+  /** ISO-3166-1 alpha-2 코드 배열 JSON; 빈 배열이면 국가 제한 없음 */
+  countryCodes        Json
+  periodStart         DateTime
+  periodEnd           DateTime
+  status              AutoBidRuleStatus @default(PAUSED)
+  messageTemplate     String            @db.Text
+  maxInquiriesPerRun  Int               @default(5)
+  /** 자동 실행·크론 시 최소 간격(시간). 수동 실행은 force로 우회 가능 */
+  minHoursBetweenRuns Int               @default(6)
+  lastRunAt           DateTime?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  runs AutoBidRun[]
+
+  @@index([userId, status])
+  @@index([status, periodStart, periodEnd])
+}
+
+model AutoBidRun {
+  id                String   @id @default(uuid()) @db.Uuid
+  ruleId            String   @db.Uuid
+  userId            String   @db.Uuid
+  matchedCount      Int
+  createdInquiryIds Json
+  createdAt         DateTime @default(now())
+
+  rule AutoBidRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  user User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([ruleId, createdAt])
+  @@index([userId, createdAt])
 }
 
 // --- Advanced keyword targeting for DOOH ---

@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth/config";
 import { revalidatePath } from "next/cache";
 import { sendInquiryConfirmation } from "@/lib/email/send-email";
+import { withRateLimit } from "@/lib/security/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -25,6 +26,9 @@ const bodySchema = z
   });
 
 export async function POST(req: Request) {
+  const rl = withRateLimit(req, { limit: 10, windowMs: 60_000 });
+  if (rl) return rl;
+
   let json: unknown;
   try {
     json = await req.json();

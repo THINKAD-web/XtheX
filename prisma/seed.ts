@@ -25,6 +25,7 @@ const SEED_USER_EMAILS = [
   "partner1@xthex.test",
   "partner2@xthex.test",
   "admin@xthex.test",
+  "advertiser@xthex.test",
 ] as const;
 
 /**
@@ -69,6 +70,7 @@ const IDS = {
     partner1: "11111111-1111-1111-1111-111111111111",
     partner2: "22222222-2222-2222-2222-222222222222",
     admin: "33333333-3333-3333-3333-333333333333",
+    advertiser: "44444444-4444-4444-4444-444444444444",
   },
   proposals: {
     seoulBillboard: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
@@ -93,6 +95,11 @@ const IDS = {
     nycSubway:         "fade000d-000d-4000-a000-00000000000d",
     lujiazuiBillboard: "fade000e-000e-4000-a000-00000000000e",
     nanjingDigital:    "fade000f-000f-4000-a000-00000000000f",
+    londonPiccadilly:  "fade0010-0010-4000-a000-000000000010",
+    berlinTransit:     "fade0011-0011-4000-a000-000000000011",
+    parisChamps:       "fade0012-0012-4000-a000-000000000012",
+    sydneyDigital:     "fade0013-0013-4000-a000-000000000013",
+    dubaiWall:         "fade0014-0014-4000-a000-000000000014",
   },
 };
 
@@ -150,7 +157,25 @@ async function main() {
     },
   });
 
-  // ── Media 테스트 매체 15개 (미디어믹스 AI 검색용) ──────────────
+  const advertiser = await prisma.user.upsert({
+    where: { clerkId: "test_advertiser" },
+    create: {
+      id: IDS.users.advertiser,
+      clerkId: "test_advertiser",
+      role: UserRole.ADVERTISER,
+      onboardingCompleted: true,
+      email: "advertiser@xthex.test",
+      name: "Test Advertiser",
+    },
+    update: {
+      role: UserRole.ADVERTISER,
+      onboardingCompleted: true,
+      email: "advertiser@xthex.test",
+      name: "Test Advertiser",
+    },
+  });
+
+  // ── Media 테스트 매체 20개 (미디어믹스 AI 검색용) ──────────────
   const mediaInputs = [
     // Seoul (6)
     {
@@ -366,6 +391,81 @@ async function main() {
       globalCountryCode: "CN", currency: CurrencyCode.KRW,
       createdById: partner2.id,
     },
+    // London (1)
+    {
+      id: IDS.media.londonPiccadilly,
+      mediaName: "피카딜리 서커스 LED",
+      category: MediaCategory.BILLBOARD,
+      description: "Piccadilly Circus iconic curved LED screen. One of the world's most famous advertising locations.",
+      locationJson: { address: "Piccadilly Circus, London", district: "Westminster", lat: 51.5099, lng: -0.1342 },
+      price: 180_000_000, cpm: 28_000,
+      exposureJson: { daily_traffic: 300000, monthly_impressions: 9000000 },
+      images: ["https://placehold.co/800x600?text=Piccadilly+LED"],
+      tags: ["billboard", "LED", "piccadilly", "landmark"], audienceTags: ["tourists", "all-ages", "global"],
+      trustScore: 97, status: MediaStatus.PUBLISHED,
+      globalCountryCode: "GB", currency: CurrencyCode.USD,
+      createdById: partner1.id,
+    },
+    // Berlin (1)
+    {
+      id: IDS.media.berlinTransit,
+      mediaName: "베를린 U-Bahn 교통 광고",
+      category: MediaCategory.TRANSIT,
+      description: "Berlin U-Bahn station digital screens across major transit hubs. Reaches diverse commuter demographics.",
+      locationJson: { address: "Alexanderplatz, Berlin", district: "Mitte", lat: 52.5219, lng: 13.4132 },
+      price: 12_000_000, cpm: 6_000,
+      exposureJson: { daily_traffic: 180000, monthly_impressions: 5400000 },
+      images: ["https://placehold.co/800x600?text=Berlin+U-Bahn"],
+      tags: ["transit", "U-Bahn", "berlin", "digital"], audienceTags: ["commuters", "youth", "locals"],
+      trustScore: 84, status: MediaStatus.PUBLISHED,
+      globalCountryCode: "DE", currency: CurrencyCode.EUR,
+      createdById: partner2.id,
+    },
+    // Paris (1)
+    {
+      id: IDS.media.parisChamps,
+      mediaName: "샹젤리제 디지털 보드",
+      category: MediaCategory.DIGITAL_BOARD,
+      description: "Champs-Élysées premium digital billboard. High-end retail corridor with global luxury brand presence.",
+      locationJson: { address: "Champs-Élysées, Paris", district: "8e arrondissement", lat: 48.8698, lng: 2.3076 },
+      price: 90_000_000, cpm: 26_000,
+      exposureJson: { daily_traffic: 350000, monthly_impressions: 10500000 },
+      images: ["https://placehold.co/800x600?text=Champs+Elysees"],
+      tags: ["digital", "champs-elysees", "luxury", "premium"], audienceTags: ["luxury", "tourists", "30-50s"],
+      trustScore: 94, status: MediaStatus.PUBLISHED,
+      globalCountryCode: "FR", currency: CurrencyCode.EUR,
+      createdById: partner1.id,
+    },
+    // Sydney (1)
+    {
+      id: IDS.media.sydneyDigital,
+      mediaName: "시드니 하버 디지털 사이니지",
+      category: MediaCategory.DIGITAL_BOARD,
+      description: "Sydney Harbour waterfront digital signage near Opera House. Tourist and event-heavy zone.",
+      locationJson: { address: "Circular Quay, Sydney", district: "Sydney CBD", lat: -33.8568, lng: 151.2153 },
+      price: 40_000_000, cpm: 18_000,
+      exposureJson: { daily_traffic: 200000, monthly_impressions: 6000000 },
+      images: ["https://placehold.co/800x600?text=Sydney+Harbour"],
+      tags: ["digital", "sydney", "harbour", "tourism"], audienceTags: ["tourists", "event-goers", "all-ages"],
+      trustScore: 88, status: MediaStatus.PUBLISHED,
+      globalCountryCode: "AU", currency: CurrencyCode.USD,
+      createdById: partner2.id,
+    },
+    // Dubai (1)
+    {
+      id: IDS.media.dubaiWall,
+      mediaName: "두바이 몰 대형 월 광고",
+      category: MediaCategory.WALL,
+      description: "Dubai Mall exterior mega wall wrap. The world's most visited shopping destination (80M+ annual visitors).",
+      locationJson: { address: "Dubai Mall, Dubai", district: "Downtown Dubai", lat: 25.1972, lng: 55.2744 },
+      price: 120_000_000, cpm: 24_000,
+      exposureJson: { daily_traffic: 220000, monthly_impressions: 6600000 },
+      images: ["https://placehold.co/800x600?text=Dubai+Mall+Wall"],
+      tags: ["wall", "dubai-mall", "mega", "luxury"], audienceTags: ["luxury", "tourists", "global", "families"],
+      trustScore: 92, status: MediaStatus.PUBLISHED,
+      globalCountryCode: "AE", currency: CurrencyCode.USD,
+      createdById: partner1.id,
+    },
   ];
 
   for (const m of mediaInputs) {
@@ -391,7 +491,7 @@ async function main() {
       },
     });
   }
-  console.log(`[seed] Media 매체 ${mediaInputs.length}개 upsert 완료`);
+  console.log(`[seed] Media 매체 ${mediaInputs.length}개 (7개국) upsert 완료`);
 
   const proposalInputs: Array<{
     id: string;
@@ -595,6 +695,56 @@ async function main() {
       },
     });
   }
+
+  // ── 테스트 문의 10개 (advertiser → 다양한 매체) ─────────────────
+  const inquiryMediaIds = [
+    IDS.media.gangnamLed,
+    IDS.media.coexDigital,
+    IDS.media.hongdaeTransit,
+    IDS.media.shibuyaBillboard,
+    IDS.media.timesSquareLed,
+    IDS.media.londonPiccadilly,
+    IDS.media.parisChamps,
+    IDS.media.dubaiWall,
+    IDS.media.gwanghwamun,
+    IDS.media.sydneyDigital,
+  ];
+
+  const inquiryMessages = [
+    "2주간 브랜드 론칭 광고를 집행하고 싶습니다. 가용 기간과 할인 가능 여부를 알려주세요.",
+    "다음 달 프로모션 기간에 맞춰 광고 집행이 가능할까요? 크리에이티브 규격도 알고 싶습니다.",
+    "We'd like to run a 4-week awareness campaign for our new product. Please share availability.",
+    "来月のキャンペーンに向けてこの媒体を利用したいです。詳細をお願いします。",
+    "Can you provide a bulk discount for 3 months continuous booking?",
+    "우리 브랜드의 타겟 고객이 20-30대 여성입니다. 이 매체가 적합한지 데이터를 공유해주세요.",
+    "Looking for premium placement for a luxury brand launch. Is prime-time slot available?",
+    "年末キャンペーン用に予約したいです。空き状況を教えてください。",
+    "해외 브랜드 한국 진출 광고입니다. 영어/한국어 크리에이티브 모두 가능한가요?",
+    "We represent a global FMCG brand. Interested in a cross-city package (Seoul + Tokyo).",
+  ];
+
+  const INQUIRY_ID_PREFIX = "fade1000-1000-4000-a000-";
+  for (let i = 0; i < 10; i++) {
+    const inquiryId = `${INQUIRY_ID_PREFIX}${String(i + 1).padStart(12, "0")}`;
+    await prisma.inquiry.upsert({
+      where: { id: inquiryId },
+      create: {
+        id: inquiryId,
+        advertiserId: advertiser.id,
+        mediaId: inquiryMediaIds[i]!,
+        message: inquiryMessages[i]!,
+        desiredPeriod: i % 2 === 0 ? "2주" : "4주",
+        budget: (i + 1) * 5_000_000,
+        contactEmail: "advertiser@xthex.test",
+        status: i < 3 ? "REPLIED" : i < 7 ? "PENDING" : "CLOSED",
+      },
+      update: {
+        message: inquiryMessages[i]!,
+        status: i < 3 ? "REPLIED" : i < 7 ? "PENDING" : "CLOSED",
+      },
+    });
+  }
+  console.log("[seed] 테스트 문의 10개 upsert 완료");
 
   await ensureHashedPasswordsForClerkUsers(prisma);
 }

@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma, isDatabaseConfigured } from "@/lib/prisma";
+import { withRateLimit } from "@/lib/security/rate-limit";
 
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
+  const rl = withRateLimit(req, { limit: 10, windowMs: 60_000 });
+  if (rl) return rl;
+
   try {
     const body = (await req.json()) as { rating?: number; message?: string };
 

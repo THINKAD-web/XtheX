@@ -9,6 +9,7 @@ import {
   fetchCandidateMedias,
 } from "@/lib/mix-media/build-proposals";
 import type { MixMediaResponse } from "@/lib/mix-media/types";
+import { withRateLimit } from "@/lib/security/rate-limit";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -16,6 +17,8 @@ export const maxDuration = 60;
 const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 
 export async function POST(req: Request) {
+  const rl = withRateLimit(req, { limit: 15, windowMs: 60_000 });
+  if (rl) return rl;
   try {
     const ct = req.headers.get("content-type") || "";
     let query = "";

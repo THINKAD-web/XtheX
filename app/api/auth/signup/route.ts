@@ -3,6 +3,8 @@ import bcrypt from "bcrypt";
 import { z } from "zod";
 import { UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { withRateLimit } from "@/lib/security/rate-limit";
+import { validateOrigin } from "@/lib/security/csrf";
 
 export const runtime = "nodejs";
 
@@ -18,6 +20,11 @@ const bodySchema = z.object({
 });
 
 export async function POST(req: Request) {
+  const rl = withRateLimit(req, { limit: 5, windowMs: 60_000 });
+  if (rl) return rl;
+  if (!validateOrigin(req)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
   let json: unknown;
   try {
     json = await req.json();

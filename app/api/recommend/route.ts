@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 import { requireAdvertiserSession } from "@/lib/recommend/api-guard";
 import { runMediaRecommendation } from "@/lib/recommend/run-recommendation";
+import { withRateLimit } from "@/lib/security/rate-limit";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
 
 export async function POST(req: Request) {
+  const rl = withRateLimit(req, { limit: 10, windowMs: 60_000 });
+  if (rl) return rl;
   const auth = await requireAdvertiserSession();
   if (!auth.ok) {
     return NextResponse.json(

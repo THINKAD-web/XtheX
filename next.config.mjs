@@ -4,6 +4,24 @@ import createNextIntlPlugin from "next-intl/plugin";
 const nextConfig = {
   /** Smaller serverless bundles on Vercel; deployment still runs `next start` via Vercel’s adapter. */
   output: "standalone",
+  poweredByHeader: false,
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(self)" },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
+        ],
+      },
+    ];
+  },
   /** clsx/tailwind-merge: avoid RSC webpack bundle edge cases (undefined .call in utils.ts). */
   serverExternalPackages: [
     "@prisma/client",

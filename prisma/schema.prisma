@@ -135,6 +135,7 @@ model Media {
   caseStudies CaseStudy[]
   wishlists   Wishlist[]
   reviews     MediaReview[]
+  recommendationDismissals RecommendationDismissal[]
 
   @@index([status, category])
   @@index([createdById])
@@ -183,6 +184,7 @@ model User {
   notifications  Notification[]
   wishlists      Wishlist[]
   mediaReviews   MediaReview[]  @relation("MediaReviewsByUser")
+  recommendationDismissals RecommendationDismissal[]
 }
 
 model Account {
@@ -456,6 +458,21 @@ model Wishlist {
   id        String   @id @default(uuid()) @db.Uuid
   userId    String   @db.Uuid
   mediaId   String   @db.Uuid
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, mediaId])
+  @@index([userId, createdAt])
+}
+
+/// 맞춤 추천에서 숨김·부정 피드백 (로그인 사용자만 DB 저장)
+model RecommendationDismissal {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  mediaId   String   @db.Uuid
+  reason    String?  @db.Text
   createdAt DateTime @default(now())
 
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)

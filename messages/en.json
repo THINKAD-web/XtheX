@@ -1177,5 +1177,22 @@
     "monthly_price": "Monthly Price",
     "inquiry_btn": "Inquire at This Price",
     "no_price": "Price on request"
+  },
+  "personalizedRecommendations": {
+    "kicker": "For you",
+    "title": "Personalized media picks",
+    "subtitle": "Ranked using your search history, campaigns, wishlist, inquiries, and region signals. Sign in for stronger personalization.",
+    "login_hint": "Sign in to include campaigns and wishlists.",
+    "reason_tooltip_trigger": "Why this recommendation",
+    "reason_title": "Why we recommend this",
+    "model_label": "Model",
+    "ml_badge": "ML-ranked",
+    "match_short": "fit",
+    "per_month": "mo",
+    "view_detail": "Details",
+    "feedback_negative": "Not for me",
+    "dismiss_aria": "Hide recommendation",
+    "toast_dismissed": "Hidden from your recommendations.",
+    "toast_feedback_thanks": "Thanks — we use this to improve picks."
   }
 }

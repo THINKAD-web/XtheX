@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { AppSiteChrome } from "@/components/layout/AppSiteChrome";
 import { ExploreClient } from "@/components/explore/explore-client";
 import { RecentlyViewedSection } from "@/components/medias/RecentlyViewedSection";
+import { PersonalizedRecommendationsSection } from "@/components/recommend/PersonalizedRecommendationsSection";
 
 export const metadata: Metadata = {
   title: "Explore Media | XtheX",
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
 export default async function ExplorePage() {
   return (
     <AppSiteChrome>
+      <PersonalizedRecommendationsSection variant="explore" />
       <RecentlyViewedSection className="border-b border-border" />
       <ExploreClient />
     </AppSiteChrome>

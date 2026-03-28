@@ -1107,5 +1107,22 @@
     "thank_you": "谢谢！",
     "thank_you_sub": "您的反馈已收到。",
     "close": "关闭"
+  },
+  "personalizedRecommendations": {
+    "kicker": "个性化推荐",
+    "title": "为您推荐的媒体",
+    "subtitle": "结合搜索记录、活动、收藏、咨询与地区偏好进行排序。登录后更准确。",
+    "login_hint": "登录后可纳入活动与收藏。",
+    "reason_tooltip_trigger": "查看推荐理由",
+    "reason_title": "推荐理由",
+    "model_label": "模型",
+    "ml_badge": "ML 排序",
+    "match_short": "匹配",
+    "per_month": "月",
+    "view_detail": "详情",
+    "feedback_negative": "不感兴趣",
+    "dismiss_aria": "隐藏推荐",
+    "toast_dismissed": "已隐藏该推荐。",
+    "toast_feedback_thanks": "感谢反馈，我们会用于改进推荐。"
   }
 }

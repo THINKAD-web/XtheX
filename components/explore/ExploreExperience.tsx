@@ -30,6 +30,7 @@ import { toast } from "sonner";
 import { usePreferredCurrency } from "@/components/usePreferredCurrency";
 import { useOmniCart } from "@/hooks/useOmniCart";
 import { exploreMediaTypeToCategory } from "@/lib/omni-cart/category";
+import { pushExploreSearchSignal } from "@/lib/recommend/explore-search-signals";
 import {
   convertCurrency,
   formatCurrency,
@@ -307,6 +308,11 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
   }
 
   function applyFilters() {
+    pushExploreSearchSignal({
+      q: draft.q,
+      district: draft.district,
+      mediaType: draft.mediaType,
+    });
     const sp = buildSearchParams(draft, preferredCurrency);
     const qs = sp.toString();
     router.replace(qs ? `${pathname}?${qs}` : pathname);

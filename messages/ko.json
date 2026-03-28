@@ -1177,5 +1177,22 @@
     "monthly_price": "월 단가",
     "inquiry_btn": "이 가격으로 문의하기",
     "no_price": "가격 문의 필요"
+  },
+  "personalizedRecommendations": {
+    "kicker": "맞춤 추천",
+    "title": "당신을 위한 매체 추천",
+    "subtitle": "검색 기록, 캠페인·찜·문의 데이터와 지역 선호를 반영한 랭킹입니다. 로그인 시 정확도가 높아집니다.",
+    "login_hint": "로그인하면 캠페인·찜 목록이 반영됩니다.",
+    "reason_tooltip_trigger": "추천 이유 보기",
+    "reason_title": "추천 이유",
+    "model_label": "모델",
+    "ml_badge": "ML 랭킹",
+    "match_short": "적합",
+    "per_month": "월",
+    "view_detail": "상세",
+    "feedback_negative": "별로예요",
+    "dismiss_aria": "추천 숨기기",
+    "toast_dismissed": "이 추천은 숨겼습니다.",
+    "toast_feedback_thanks": "피드백 반영했습니다. 더 나은 추천에 쓰입니다."
   }
 }

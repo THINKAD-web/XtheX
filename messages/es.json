@@ -160,5 +160,22 @@
     "prev": "Atrás",
     "next": "Siguiente",
     "start": "Comenzar"
+  },
+  "personalizedRecommendations": {
+    "kicker": "Para ti",
+    "title": "Medios recomendados",
+    "subtitle": "Ranking según tu búsqueda, campañas, favoritos, consultas y región. Inicia sesión para mejor personalización.",
+    "login_hint": "Inicia sesión para incluir campañas y favoritos.",
+    "reason_tooltip_trigger": "Por qué lo recomendamos",
+    "reason_title": "Motivo de la recomendación",
+    "model_label": "Modelo",
+    "ml_badge": "ML",
+    "match_short": "ajuste",
+    "per_month": "mes",
+    "view_detail": "Detalle",
+    "feedback_negative": "No me interesa",
+    "dismiss_aria": "Ocultar",
+    "toast_dismissed": "Recomendación oculta.",
+    "toast_feedback_thanks": "Gracias, usamos tu feedback para mejorar."
   }
 }

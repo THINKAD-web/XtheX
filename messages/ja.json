@@ -1107,5 +1107,22 @@
     "thank_you": "ありがとうございます！",
     "thank_you_sub": "フィードバックを受け付けました。",
     "close": "閉じる"
+  },
+  "personalizedRecommendations": {
+    "kicker": "おすすめ",
+    "title": "あなた向けのメディア",
+    "subtitle": "検索履歴・キャンペーン・お気に入り・問い合わせ・地域シグナルを反映したランキングです。ログインで精度が上がります。",
+    "login_hint": "ログインでキャンペーン・お気に入りを反映します。",
+    "reason_tooltip_trigger": "おすすめ理由",
+    "reason_title": "おすすめ理由",
+    "model_label": "モデル",
+    "ml_badge": "MLランキング",
+    "match_short": "適合",
+    "per_month": "月",
+    "view_detail": "詳細",
+    "feedback_negative": "違う",
+    "dismiss_aria": "非表示",
+    "toast_dismissed": "このおすすめを非表示にしました。",
+    "toast_feedback_thanks": "フィードバックありがとうございます。"
   }
 }

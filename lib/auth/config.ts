@@ -50,6 +50,7 @@ if (process.env.GOOGLE_CLIENT_ID?.trim() && process.env.GOOGLE_CLIENT_SECRET?.tr
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      allowDangerousEmailAccountLinking: true,
     }),
   );
 }
@@ -66,6 +67,25 @@ export const authOptions: NextAuthOptions = {
   },
   providers,
   callbacks: {
+    async signIn({ user, account, profile }) {
+      if (account?.provider === "google" && profile?.email) {
+        const existing = await prisma.user.findUnique({
+          where: { email: profile.email },
+          select: { id: true, image: true, name: true },
+        });
+        if (existing) {
+          const updates: Record<string, string> = {};
+          if (!existing.image && (user.image || (profile as any).picture))
+            updates.image = user.image || (profile as any).picture;
+          if (!existing.name && (profile.name || user.name))
+            updates.name = (profile.name || user.name)!;
+          if (Object.keys(updates).length > 0) {
+            await prisma.user.update({ where: { id: existing.id }, data: updates });
+          }
+        }
+      }
+      return true;
+    },
     async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;

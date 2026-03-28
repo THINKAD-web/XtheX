@@ -1,7 +1,7 @@
 import { CampaignStatus } from "@prisma/client";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Activity, CheckCircle, Clock } from "lucide-react";
+import { Activity, CheckCircle, Clock, Heart } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { gateAdvertiserDashboard } from "@/lib/auth/dashboard-gate";
 import { landing } from "@/lib/landing-theme";
@@ -45,7 +45,7 @@ export default async function AdvertiserDashboardPage() {
     (user.email?.includes("@") ? user.email.split("@")[0] : user.email) ||
     t("default_name");
 
-  const [recentCampaigns, activeCount, completedCount, pendingCount] =
+  const [recentCampaigns, activeCount, completedCount, pendingCount, wishlistCount] =
     await Promise.all([
       prisma.campaign.findMany({
         where: { userId: user.id },
@@ -65,6 +65,7 @@ export default async function AdvertiserDashboardPage() {
           status: { in: ["DRAFT", "SUBMITTED"] },
         },
       }),
+      prisma.wishlist.count({ where: { userId: user.id } }),
     ]);
 
   return (
@@ -154,6 +155,15 @@ export default async function AdvertiserDashboardPage() {
             >
               <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                 {t("quick_view_campaigns")}
+              </span>
+            </Link>
+            <Link
+              href="/dashboard/advertiser/wishlist"
+              className={`${landing.card} flex min-h-[120px] flex-col items-center justify-center gap-2 border-rose-200/50 bg-white/90 text-center dark:border-rose-900/30`}
+            >
+              <Heart className="h-5 w-5 text-rose-500" />
+              <span className="text-sm font-semibold text-rose-700 dark:text-rose-300">
+                {locale === "ko" ? `위시리스트 (${wishlistCount})` : `Wishlist (${wishlistCount})`}
               </span>
             </Link>
           </div>

@@ -16,6 +16,7 @@ import { getSimilarMediasForMedia } from "@/lib/medias/similar";
 import { SimilarBundleSection } from "@/components/medias/SimilarBundleSection";
 import { AddToOmniCartButton } from "@/components/medias/AddToOmniCartButton";
 import { ShareButtons } from "@/components/medias/ShareButtons";
+import { WishlistButton } from "@/components/medias/WishlistButton";
 import { MediaDetailStickyBar } from "@/components/medias/MediaDetailStickyBar";
 import { AdminMediaEditPanel } from "@/components/medias/AdminMediaEditPanel";
 import { AdminCaseStudyModal } from "@/components/medias/AdminCaseStudyModal";
@@ -291,6 +292,7 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
                 <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
                   {media.mediaName}
                 </h1>
+                <WishlistButton mediaId={media.id} />
                 <ShareButtons title={`${media.mediaName} - XtheX`} url={pageUrl} />
               </div>
               {media.description && (

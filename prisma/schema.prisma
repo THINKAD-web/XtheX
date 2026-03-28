@@ -133,6 +133,7 @@ model Media {
   createdBy User? @relation("MediaCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   inquiries   Inquiry[]
   caseStudies CaseStudy[]
+  wishlists   Wishlist[]
 
   @@index([status, category])
   @@index([createdById])
@@ -179,6 +180,7 @@ model User {
   campaigns      Campaign[]      @relation("CampaignsByUser")
   inquiriesSent  Inquiry[]      @relation("InquiryByAdvertiser")
   notifications  Notification[]
+  wishlists      Wishlist[]
 }
 
 model Account {
@@ -446,5 +448,18 @@ model News {
 
   @@index([locale, published, createdAt])
   @@index([category])
+}
+
+model Wishlist {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  mediaId   String   @db.Uuid
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, mediaId])
+  @@index([userId, createdAt])
 }
 

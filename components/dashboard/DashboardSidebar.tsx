@@ -25,6 +25,7 @@ import {
   Flag,
   Lock,
   Bell,
+  LineChart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -52,6 +53,7 @@ function getMenu(role: DashboardSidebarRole): NavItem[] {
       { label: "고객 리뷰", href: "/admin/reviews", icon: Star },
       { label: "리뷰 신고 검토", href: "/admin/review-reports", icon: Flag },
       { label: "문의 관리", href: "/admin/inquiries", icon: Inbox },
+      { label: "사용자 분석", href: "/admin/user-analytics", icon: LineChart },
       { label: "사용자 관리", comingSoon: true, icon: Users },
       { label: "전체 통계", comingSoon: true, icon: BarChart3 },
     ];

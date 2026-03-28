@@ -11,6 +11,7 @@ import { GuidedTourOverlayLazy } from "@/components/onboarding/GuidedTourOverlay
 import { OmniCartShellLazy } from "@/components/omni/OmniCartShellLazy";
 import { WelcomeModal } from "@/components/onboarding/WelcomeModal";
 import { OfflineProvider } from "@/components/offline/offline-context";
+import { ActivityBeacon } from "@/components/analytics/ActivityBeacon";
 
 const ChatWidget = dynamic(
   () => import("@/components/chat/ChatWidget").then((m) => m.ChatWidget),
@@ -38,6 +39,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       timeZone={timeZone}
     >
       <OfflineProvider>
+        <ActivityBeacon />
         <DocumentLang />
         <div className="flex min-h-screen flex-col bg-background text-foreground">
           <main className="flex-1">

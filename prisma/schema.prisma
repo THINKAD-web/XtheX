@@ -96,6 +96,16 @@ enum ForumReportTarget {
   COMMENT
 }
 
+/** 관리자·분석용 사용자 활동 로그 분류 */
+enum UserActivityCategory {
+  AUTH
+  NAV
+  API
+  SECURITY
+  DATA
+  SYSTEM
+}
+
 enum MediaReviewReportStatus {
   PENDING
   DISMISSED
@@ -221,6 +231,22 @@ model User {
 
   loginDevices          LoginDevice[]
   webAuthnCredentials   WebAuthnCredential[]
+  activityLogs          UserActivityLog[]
+}
+
+model UserActivityLog {
+  id        String               @id @default(uuid()) @db.Uuid
+  userId    String               @db.Uuid
+  action    String
+  category  UserActivityCategory
+  meta      Json?
+  createdAt DateTime             @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([createdAt])
+  @@index([category, createdAt])
 }
 
 model LoginDevice {

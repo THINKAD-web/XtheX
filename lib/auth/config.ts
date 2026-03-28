@@ -6,6 +6,7 @@ import bcrypt from "bcrypt";
 import { UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { verifyAndConsumeBackupCode, verifyTotpToken } from "@/lib/security/two-factor";
+import { logUserActivity } from "@/lib/analytics/log-user-activity";
 
 const providers: NextAuthOptions["providers"] = [
   CredentialsProvider({
@@ -151,6 +152,20 @@ export const authOptions: NextAuthOptions = {
     },
   },
   events: {
+    async signIn(message) {
+      const uid =
+        typeof message.user?.id === "string" ? message.user.id : undefined;
+      if (uid) {
+        await logUserActivity({
+          userId: uid,
+          action: "SESSION_START",
+          category: "AUTH",
+          meta: {
+            provider: message.account?.provider ?? "unknown",
+          },
+        });
+      }
+    },
     async linkAccount({ user }) {
       await prisma.user.update({
         where: { id: user.id },

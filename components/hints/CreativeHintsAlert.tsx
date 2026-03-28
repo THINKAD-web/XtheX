@@ -4,7 +4,7 @@ import * as React from "react";
 import { CloudRain, Lightbulb, X } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { getCreativeHints } from "@/lib/hints/creatives";
 import { getCreativeCopySuggestions } from "@/lib/hints/creative-copies";
 
@@ -24,7 +24,6 @@ export function CreativeHintsAlert({
   className,
 }: Props) {
   const isKo = locale === "ko";
-  const { toast } = useToast();
   const [condition, setCondition] = React.useState<string>("default");
   const [hour, setHour] = React.useState<number | null>(null);
   const [dismissed, setDismissed] = React.useState(false);
@@ -105,17 +104,12 @@ export function CreativeHintsAlert({
                         onClick={async () => {
                           try {
                             await navigator.clipboard.writeText(text);
-                            toast({
-                              title: isKo ? "복사 완료" : "Copied",
-                              description: text,
-                            });
+                            toast.success(isKo ? "복사 완료" : "Copied", { description: text });
                           } catch {
-                            toast({
-                              title: isKo ? "복사 실패" : "Copy failed",
+                            toast.error(isKo ? "복사 실패" : "Copy failed", {
                               description: isKo
                                 ? "브라우저 권한 문제로 복사에 실패했어요."
                                 : "Clipboard permission blocked.",
-                              variant: "destructive",
                             });
                           }
                         }}

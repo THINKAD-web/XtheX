@@ -37,6 +37,15 @@ export function WelcomeModal() {
     }
   }, []);
 
+  React.useEffect(() => {
+    if (!open) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") close();
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open, close]);
+
   if (!open) return null;
 
   const steps = [
@@ -56,7 +65,7 @@ export function WelcomeModal() {
       onClick={close}
     >
       <div
-        className="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-950 p-6 text-zinc-50 shadow-2xl"
+        className="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-950 p-6 text-zinc-50 shadow-2xl animate-in fade-in-0 zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -67,7 +76,7 @@ export function WelcomeModal() {
           <button
             type="button"
             onClick={close}
-            className="rounded-md border border-zinc-800 p-1.5 text-zinc-400 hover:bg-zinc-900 hover:text-zinc-200"
+            className="rounded-full border border-zinc-800 p-1.5 text-zinc-400 hover:bg-zinc-900 hover:text-zinc-200"
             aria-label="Close"
           >
             <X className="h-4 w-4" />

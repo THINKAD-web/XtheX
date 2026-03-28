@@ -16,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { PlacesAutocomplete } from "@/components/partner/places-autocomplete";
 import { CloudinaryMultiUpload } from "@/components/partner/cloudinary-upload";
 import { Loader2 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 type ProposalFormProps = {
   onCreated?: (id: string, values: { title: string; mediaType: string }) => void;
@@ -28,7 +28,6 @@ function isErrorKey(msg: string): msg is `errors.${string}` {
 
 export function ProposalForm({ onCreated }: ProposalFormProps) {
   const t = useTranslations("dashboard.partner");
-  const { toast } = useToast();
   const [submitting, setSubmitting] = React.useState(false);
 
   const errMsg = (message: string | undefined) =>
@@ -59,9 +58,7 @@ export function ProposalForm({ onCreated }: ProposalFormProps) {
           mediaType: values.mediaType,
         });
       }
-      toast({
-        title: t("toast_created"),
-      });
+      toast.success(t("toast_created"));
       form.reset({
         title: "",
         description: "",
@@ -73,9 +70,7 @@ export function ProposalForm({ onCreated }: ProposalFormProps) {
         imageUrls: [],
       });
     } catch (e) {
-      toast({
-        variant: "destructive",
-        title: t("errors.submit_failed"),
+      toast.error(t("errors.submit_failed"), {
         description:
           e instanceof Error ? e.message : t("errors.submit_failed"),
       });

@@ -23,7 +23,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -59,7 +59,6 @@ function flagFromCountryCode(code: string): string {
 export function CampaignNewDraftForm({ locale, initialMediaIds, availableMedias }: Props) {
   const t = useTranslations("omnichannel");
   const router = useRouter();
-  const { toast } = useToast();
   const [mediaIds, setMediaIds] = React.useState<string[]>(() => [...new Set(initialMediaIds)]);
   const [pendingAddId, setPendingAddId] = React.useState<string>("");
   const [comboboxOpen, setComboboxOpen] = React.useState(false);
@@ -132,10 +131,7 @@ export function CampaignNewDraftForm({ locale, initialMediaIds, availableMedias 
   const addMedia = () => {
     if (!pendingAddId) return;
     if (mediaIds.length >= MAX_SELECTED) {
-      toast({
-        variant: "destructive",
-        title: isKo ? "최대 10개까지 선택할 수 있습니다." : "You can select up to 10 media.",
-      });
+      toast.error(isKo ? "최대 10개까지 선택할 수 있습니다." : "You can select up to 10 media.");
       return;
     }
     setMediaIds((prev) => (prev.includes(pendingAddId) ? prev : [...prev, pendingAddId]));
@@ -146,10 +142,7 @@ export function CampaignNewDraftForm({ locale, initialMediaIds, availableMedias 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (mediaIds.length === 0) {
-      toast({
-        variant: "destructive",
-        title: isKo ? "최소 1개 이상의 미디어를 선택해주세요" : "Please select at least one media.",
-      });
+      toast.error(isKo ? "최소 1개 이상의 미디어를 선택해주세요" : "Please select at least one media.");
       return;
     }
 
@@ -166,8 +159,7 @@ export function CampaignNewDraftForm({ locale, initialMediaIds, availableMedias 
       });
 
       if (result.ok && result.draftId) {
-        toast({
-          title: isKo ? "캠페인 초안을 저장했습니다." : "Campaign draft saved.",
+        toast.success(isKo ? "캠페인 초안을 저장했습니다." : "Campaign draft saved.", {
           description: isKo
             ? `선택 매체 ${mediaIds.length}개가 초안에 반영되었습니다.`
             : `${mediaIds.length} selected media were added to the draft.`,
@@ -176,19 +168,15 @@ export function CampaignNewDraftForm({ locale, initialMediaIds, availableMedias 
         return;
       }
 
-      toast({
-        variant: "destructive",
-        title: ("error" in result && result.error === "no_media")
+      toast.error(
+        ("error" in result && result.error === "no_media")
           ? (isKo ? "최소 1개 이상의 미디어를 선택해주세요" : "Please select at least one media.")
           : ("error" in result && result.error === "at_least_one_channel")
             ? (isKo ? "채널을 하나 이상 선택해 주세요." : "Please select at least one channel.")
             : (isKo ? "저장에 실패했습니다." : "Failed to save."),
-      });
+      );
     } catch {
-      toast({
-        variant: "destructive",
-        title: isKo ? "저장 중 오류가 발생했습니다." : "An error occurred while saving.",
-      });
+      toast.error(isKo ? "저장 중 오류가 발생했습니다." : "An error occurred while saving.");
     } finally {
       setSubmitting(false);
     }

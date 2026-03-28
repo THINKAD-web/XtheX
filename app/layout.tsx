@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthSessionProvider } from "@/components/providers/auth-session-provider";
-import { ToastProvider } from "@/components/ui/use-toast";
 import { SonnerToaster } from "@/components/ui/sonner-toaster";
 import { BrightnessProvider } from "@/components/brightness/BrightnessPreference";
 import { BrightnessThemeBridge } from "@/components/brightness/BrightnessThemeBridge";
@@ -144,7 +143,6 @@ export default async function RootLayout({
           Skip to content
         </a>
         <AuthSessionProvider>
-          <ToastProvider>
             <BrightnessProvider>
               <ThemeProvider>
                 <BrightnessThemeBridge />
@@ -154,7 +152,6 @@ export default async function RootLayout({
                 <ServiceWorkerRegistration />
               </ThemeProvider>
             </BrightnessProvider>
-          </ToastProvider>
         </AuthSessionProvider>
       </body>
     </html>

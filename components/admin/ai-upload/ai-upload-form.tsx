@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { UploadDropzone, type FileWithStatus } from "./upload-dropzone";
 import { UploadButton } from "./upload-button";
 import {
@@ -35,7 +35,6 @@ type ApiSuccess = {
 type ApiFail = { success: false; error: string };
 
 export function AiUploadForm({ locale }: AiUploadFormProps) {
-  const { toast } = useToast();
   const [files, setFiles] = React.useState<FileWithStatus[]>([]);
   const [queue, setQueue] = React.useState<AnalysisQueueRow[] | null>(null);
   const [isProcessing, setIsProcessing] = React.useState(false);
@@ -202,22 +201,21 @@ export function AiUploadForm({ locale }: AiUploadFormProps) {
 
     setIsProcessing(false);
     if (successCount > 0) {
-      toast({
-        title:
-          failCount > 0
-            ? `${successCount}건 완료 · ${failCount}건 실패`
-            : "추출 완료",
-        description:
-          "아래 목록에서 「추출 데이터 확인·수정」을 눌러 추출된 내용을 수정·저장할 수 있습니다.",
-      });
+      toast.success(
+        failCount > 0
+          ? `${successCount}건 완료 · ${failCount}건 실패`
+          : "추출 완료",
+        {
+          description:
+            "아래 목록에서 「추출 데이터 확인·수정」을 눌러 추출된 내용을 수정·저장할 수 있습니다.",
+        },
+      );
     } else if (failCount > 0) {
-      toast({
-        title: "추출 실패",
+      toast.error("추출 실패", {
         description: "목록에서 오류 내용을 확인해 주세요.",
-        variant: "destructive",
       });
     }
-  }, [files, toast]);
+  }, [files]);
 
   const toggleDetail = React.useCallback((rowId: string) => {
     setQueue((prev) =>

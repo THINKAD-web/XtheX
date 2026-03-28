@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 type Props = {
   ids: string[];
@@ -20,7 +20,6 @@ export function ShareCompareButton({
   labelEn = "Share this comparison",
   className,
 }: Props) {
-  const { toast } = useToast();
   const [copied, setCopied] = React.useState(false);
 
   const handleShare = React.useCallback(() => {
@@ -30,18 +29,13 @@ export function ShareCompareButton({
       .writeText(url)
       .then(() => {
         setCopied(true);
-        toast({
-          title: locale === "ko" ? "링크가 복사되었습니다" : "Link copied",
-        });
+        toast.success(locale === "ko" ? "링크가 복사되었습니다" : "Link copied");
         setTimeout(() => setCopied(false), 2000);
       })
       .catch(() => {
-        toast({
-          variant: "destructive",
-          title: locale === "ko" ? "복사에 실패했습니다" : "Copy failed",
-        });
+        toast.error(locale === "ko" ? "복사에 실패했습니다" : "Copy failed");
       });
-  }, [ids, locale, toast]);
+  }, [ids, locale]);
 
   const isKo = locale === "ko";
 

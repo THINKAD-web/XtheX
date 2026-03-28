@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { saveCampaignDraft } from "@/lib/campaign/actions";
 
@@ -25,7 +25,6 @@ type Props = {
 export function OmnichannelPopup({ open, onClose, mediaIds, locale }: Props) {
   const t = useTranslations("omnichannel");
   const router = useRouter();
-  const { toast } = useToast();
   const [channels, setChannels] = React.useState<OmnichannelChannels>({
     dooh: true,
     web: false,
@@ -43,10 +42,7 @@ export function OmnichannelPopup({ open, onClose, mediaIds, locale }: Props) {
     e.preventDefault();
     const selected = [channels.dooh && "DOOH", channels.web && "Web", channels.mobile && "Mobile"].filter(Boolean);
     if (selected.length === 0) {
-      toast({
-        variant: "destructive",
-        title: isKo ? "채널을 하나 이상 선택해 주세요." : "Please select at least one channel.",
-      });
+      toast.error(isKo ? "채널을 하나 이상 선택해 주세요." : "Please select at least one channel.");
       return;
     }
     setSubmitting(true);
@@ -61,31 +57,21 @@ export function OmnichannelPopup({ open, onClose, mediaIds, locale }: Props) {
       if (result.ok && result.draftId) {
         setCampaignName("");
         onClose();
-        toast({
-          title: isKo ? "캠페인 초안으로 이동합니다" : "Opening campaign draft…",
+        toast.success(isKo ? "캠페인 초안으로 이동합니다" : "Opening campaign draft…", {
           description: isKo
             ? `매체 ${mediaIds.length}개 · ${selected.join(", ")}`
             : `${mediaIds.length} media · ${selected.join(", ")}`,
         });
         router.push(`/${locale}/campaigns/${result.draftId}`);
       } else if (!result.ok) {
-        toast({
-          variant: "destructive",
-          title: result.error === "no_media"
+        toast.error(result.error === "no_media"
             ? (isKo ? "선택된 매체가 없습니다." : "No media selected.")
-            : (isKo ? "저장에 실패했습니다." : "Failed to save."),
-        });
+            : (isKo ? "저장에 실패했습니다." : "Failed to save."));
       } else {
-        toast({
-          variant: "destructive",
-          title: isKo ? "저장에 실패했습니다." : "Failed to save.",
-        });
+        toast.error(isKo ? "저장에 실패했습니다." : "Failed to save.");
       }
     } catch {
-      toast({
-        variant: "destructive",
-        title: isKo ? "저장 중 오류가 발생했습니다." : "An error occurred while saving.",
-      });
+      toast.error(isKo ? "저장 중 오류가 발생했습니다." : "An error occurred while saving.");
     } finally {
       setSubmitting(false);
     }

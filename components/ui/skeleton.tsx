@@ -63,3 +63,32 @@ export function DashboardTableSkeleton({ rows = 5 }: { rows?: number }) {
     </div>
   );
 }
+
+export function DetailPageSkeleton() {
+  return (
+    <div className="space-y-6">
+      <Skeleton className="h-8 w-48" />
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div
+          key={i}
+          className="rounded-2xl border border-border bg-card p-5 space-y-3"
+        >
+          <Skeleton className="h-5 w-1/3" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-2/3" />
+          <Skeleton className="h-32 w-full rounded-xl" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function FilterBarSkeleton() {
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <Skeleton className="h-10 w-64 rounded-lg" />
+      <Skeleton className="h-10 w-32 rounded-lg" />
+      <Skeleton className="h-10 w-32 rounded-lg" />
+    </div>
+  );
+}

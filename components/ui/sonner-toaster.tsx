@@ -11,13 +11,15 @@ export function SonnerToaster() {
       position="top-right"
       richColors
       closeButton
+      duration={3000}
       style={{ zIndex: 100000 }}
       toastOptions={{
         classNames: {
           toast:
-            "border border-cyan-500/20 bg-white shadow-lg dark:border-cyan-500/30 dark:bg-zinc-950",
-          title: "text-zinc-900 dark:text-zinc-50",
-          description: "text-zinc-600 dark:text-zinc-400",
+            "border shadow-lg !rounded-xl",
+          title: "font-medium",
+          description: "text-sm",
+          closeButton: "!rounded-full",
         },
       }}
     />

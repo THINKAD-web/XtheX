@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { getAbMessageVariants } from "@/lib/hints/ab-message-variants";
 
 type Props = {
@@ -14,8 +14,6 @@ type Props = {
 
 export function AbMessageVariantsCard({ locale, tagCodes, className }: Props) {
   const isKo = locale === "ko";
-  const { toast } = useToast();
-
   const variants = React.useMemo(
     () => getAbMessageVariants({ tagCodes }),
     [tagCodes],
@@ -47,14 +45,9 @@ export function AbMessageVariantsCard({ locale, tagCodes, className }: Props) {
               onClick={async () => {
                 try {
                   await navigator.clipboard.writeText(text);
-                  toast({
-                    title: isKo ? "복사 완료" : "Copied",
-                    description: text,
-                  });
+                  toast.success(isKo ? "복사 완료" : "Copied", { description: text });
                 } catch {
-                  toast({
-                    variant: "destructive",
-                    title: isKo ? "복사 실패" : "Copy failed",
+                  toast.error(isKo ? "복사 실패" : "Copy failed", {
                     description: isKo
                       ? "클립보드 권한을 확인해 주세요."
                       : "Check clipboard permission.",

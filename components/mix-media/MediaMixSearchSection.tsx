@@ -3,12 +3,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
-import { toast as sonnerToast } from "sonner";
+import { toast } from "sonner";
 import { Loader2, SendHorizontal, ImagePlus, X, MapPin, Save, ExternalLink, LayoutDashboard, Maximize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link, useRouter } from "@/i18n/navigation";
-import { useToast } from "@/components/ui/use-toast";
 import type {
   MixMediaResponse,
   MixProposal,
@@ -278,7 +277,6 @@ const DEMO_TOAST_KEY = "xthex_mix_demo_login_toast";
 export function MediaMixSearchSection() {
   const { status } = useSession();
   const isSignedIn = status === "authenticated";
-  const { toast } = useToast();
   const router = useRouter();
   const tMix = useTranslations("home.mediaMix");
   const locale = useLocale();
@@ -319,7 +317,7 @@ export function MediaMixSearchSection() {
     if (!isSignedIn && typeof window !== "undefined") {
       if (!sessionStorage.getItem(DEMO_TOAST_KEY)) {
         sessionStorage.setItem(DEMO_TOAST_KEY, "1");
-        sonnerToast(tMix("demo_toast_title"), {
+        toast(tMix("demo_toast_title"), {
           description: tMix("demo_toast_description"),
           action: {
             label: tMix("demo_toast_login"),
@@ -483,29 +481,24 @@ export function MediaMixSearchSection() {
           campaign?: { id: string };
         };
         if (!res.ok || !data.ok || !data.campaign?.id) {
-          toast({
-            variant: "destructive",
-            title: tMix("save_failed_title"),
+          toast.error(tMix("save_failed_title"), {
             description: data.error ?? tMix("try_again"),
           });
           return;
         }
         setDraftCampaignId(data.campaign.id);
-        toast({
-          title: tMix("draft_saved_title"),
+        toast.success(tMix("draft_saved_title"), {
           description: tMix("draft_saved_desc"),
         });
       } catch {
-        toast({
-          variant: "destructive",
-          title: tMix("save_failed_title"),
+        toast.error(tMix("save_failed_title"), {
           description: tMix("error_network"),
         });
       } finally {
         setSavingProposalId(null);
       }
     },
-    [isSignedIn, result?.parse, toast, tMix],
+    [isSignedIn, result?.parse, tMix],
   );
 
   const submitCampaign = useCallback(async () => {
@@ -519,28 +512,23 @@ export function MediaMixSearchSection() {
       });
       const data = (await res.json()) as { ok?: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        toast({
-          variant: "destructive",
-          title: tMix("submit_failed_title"),
+        toast.error(tMix("submit_failed_title"), {
           description: data.error ?? tMix("try_again"),
         });
         return;
       }
       setDraftCampaignId(null);
-      toast({
-        title: tMix("campaign_submitted_title"),
+      toast.success(tMix("campaign_submitted_title"), {
         description: tMix("campaign_submitted_desc"),
       });
     } catch {
-      toast({
-        variant: "destructive",
-        title: tMix("submit_failed_title"),
+      toast.error(tMix("submit_failed_title"), {
         description: tMix("error_network"),
       });
     } finally {
       setSubmitting(false);
     }
-  }, [draftCampaignId, isSignedIn, toast, tMix]);
+  }, [draftCampaignId, isSignedIn, tMix]);
 
   const scaledPy = Math.round((sectionScale / 100) * 7);
   const sectionStyle: React.CSSProperties =

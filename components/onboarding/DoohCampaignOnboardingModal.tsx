@@ -42,6 +42,15 @@ export function DoohCampaignOnboardingModal({
     }
   };
 
+  React.useEffect(() => {
+    if (!open) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") close();
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open, close]);
+
   const step = steps[idx]!;
   const title = isKo ? step.titleKo : step.titleEn;
   const body = isKo ? step.bodyKo : step.bodyEn;
@@ -56,7 +65,7 @@ export function DoohCampaignOnboardingModal({
       onClick={close}
     >
       <div
-        className="w-full max-w-lg rounded-2xl border border-zinc-800 bg-zinc-950 p-5 text-zinc-50 shadow-xl"
+        className="w-full max-w-lg rounded-2xl border border-zinc-800 bg-zinc-950 p-5 text-zinc-50 shadow-xl animate-in fade-in-0 zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-3">
@@ -69,7 +78,7 @@ export function DoohCampaignOnboardingModal({
           <button
             type="button"
             onClick={close}
-            className="rounded-md border border-zinc-800 p-2 text-zinc-300 hover:bg-zinc-900"
+            className="rounded-full border border-zinc-800 p-2 text-zinc-300 hover:bg-zinc-900"
             aria-label={isKo ? "닫기" : "Close"}
           >
             <X className="h-4 w-4" />

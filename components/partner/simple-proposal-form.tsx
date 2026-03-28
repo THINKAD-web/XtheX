@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { FormMessage } from "@/components/ui/form";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { createProposal } from "@/app/[locale]/dashboard/partner/actions";
 
 const formSchema = z.object({
@@ -24,7 +24,6 @@ type Props = {
 };
 
 export function SimpleProposalForm({ onCreated }: Props) {
-  const { toast } = useToast();
   const [serverError, setServerError] = React.useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -50,9 +49,7 @@ export function SimpleProposalForm({ onCreated }: Props) {
         if (!result.ok) {
           const msg = result.error ?? "업로드에 실패했습니다.";
           setServerError(msg);
-          toast({
-            variant: "destructive",
-            title: "업로드에 실패했습니다.",
+          toast.error("업로드에 실패했습니다.", {
             description: msg,
           });
           return;
@@ -62,14 +59,10 @@ export function SimpleProposalForm({ onCreated }: Props) {
           onCreated(result.id, { title: values.title, mediaType: "OTHER" });
         }
 
-        toast({
-          title: "제안서가 업로드되었습니다!",
-        });
+        toast.success("제안서가 업로드되었습니다!");
 
         if (result.analysisError) {
-          toast({
-            variant: "destructive",
-            title: "Grok 분석 중 오류가 발생했습니다.",
+          toast.error("Grok 분석 중 오류가 발생했습니다.", {
             description: result.analysisError,
           });
         }
@@ -82,9 +75,7 @@ export function SimpleProposalForm({ onCreated }: Props) {
         const msg =
           e instanceof Error ? e.message : "업로드에 실패했습니다.";
         setServerError(msg);
-        toast({
-          variant: "destructive",
-          title: "업로드에 실패했습니다.",
+        toast.error("업로드에 실패했습니다.", {
           description: msg,
         });
       }

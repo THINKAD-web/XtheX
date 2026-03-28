@@ -79,6 +79,15 @@ export function OmniSubmitSuccessModal({
     };
   }, [open, campaignId]);
 
+  React.useEffect(() => {
+    if (!open) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open, onClose]);
+
   if (!open || !campaignId) return null;
 
   const locale = params?.locale as string | undefined;
@@ -125,6 +134,7 @@ export function OmniSubmitSuccessModal({
         className={cn(
           "relative w-full max-w-lg overflow-hidden rounded-2xl border-2 border-cyan-500/35 bg-zinc-950 shadow-2xl shadow-cyan-950/50",
           "bg-gradient-to-b from-zinc-900 via-zinc-950 to-zinc-950",
+          "animate-in fade-in-0 zoom-in-95 duration-200",
         )}
         onClick={(e) => e.stopPropagation()}
       >

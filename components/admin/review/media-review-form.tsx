@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import {
   Form,
   FormControl,
@@ -190,7 +190,6 @@ export function MediaReviewForm({
   mode = "admin_review",
 }: MediaReviewFormProps) {
   const router = useRouter();
-  const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
   const [tagInput, setTagInput] = React.useState("");
   const [selectedImageSet, setSelectedImageSet] = React.useState<Set<string>>(new Set());
@@ -405,7 +404,7 @@ export function MediaReviewForm({
     const current = form.getValues("sampleImages") ?? [];
     const remaining = 5 - current.length;
     if (remaining <= 0) {
-      toast({ title: "최대 5장까지 업로드할 수 있습니다.", variant: "destructive" });
+      toast.error("최대 5장까지 업로드할 수 있습니다.");
       e.target.value = "";
       return;
     }
@@ -419,7 +418,7 @@ export function MediaReviewForm({
       const res = await fetch("/api/admin/media-samples", { method: "POST", body: fd });
       const data = await res.json();
       if (!data.ok) {
-        toast({ title: "업로드 실패", description: data.error, variant: "destructive" });
+        toast.error("업로드 실패", { description: data.error });
         return;
       }
       const newUrls: string[] = data.urls ?? [];
@@ -432,10 +431,8 @@ export function MediaReviewForm({
         form.setValue("sampleDescriptions", [...curDescs, ...newDescs].slice(0, 5), { shouldDirty: true });
       }
     } catch (err) {
-      toast({
-        title: "업로드 실패",
+      toast.error("업로드 실패", {
         description: err instanceof Error ? err.message : String(err),
-        variant: "destructive",
       });
     } finally {
       setUploading(false);
@@ -484,7 +481,7 @@ export function MediaReviewForm({
   const handleSaveDraft = () => {
     const err = validateRequired();
     if (err) {
-      toast({ title: "입력값 확인", description: err, variant: "destructive" });
+      toast.error("입력값 확인", { description: err });
       return;
     }
     startTransition(async () => {
@@ -492,20 +489,19 @@ export function MediaReviewForm({
       if (mode === "owner_pending") {
         const result = await saveOwnerPendingMedia(media.id, payload);
         if (result.ok) {
-          toast({
-            title: "임시 저장되었습니다.",
+          toast.success("임시 저장되었습니다.", {
             description: "최종 제출 전까지 수정할 수 있습니다.",
           });
         } else {
-          toast({ title: "저장 실패", description: result.error, variant: "destructive" });
+          toast.error("저장 실패", { description: result.error });
         }
         return;
       }
       const result = await updateMediaDraft(media.id, payload);
       if (result.ok) {
-        toast({ title: "임시 저장되었습니다." });
+        toast.success("임시 저장되었습니다.");
       } else {
-        toast({ title: "저장 실패", description: result.error, variant: "destructive" });
+        toast.error("저장 실패", { description: result.error });
       }
     });
   };
@@ -513,27 +509,24 @@ export function MediaReviewForm({
   const handleFinalRegisterSubmit = () => {
     const err = validateRequired();
     if (err) {
-      toast({ title: "입력값 확인", description: err, variant: "destructive" });
+      toast.error("입력값 확인", { description: err });
       return;
     }
     startTransition(async () => {
       const payload = buildPayload();
       const saved = await saveOwnerPendingMedia(media.id, payload);
       if (!saved.ok) {
-        toast({ title: "저장 실패", description: saved.error, variant: "destructive" });
+        toast.error("저장 실패", { description: saved.error });
         return;
       }
       const submitted = await submitForReview(media.id);
       if (!submitted.ok) {
-        toast({
-          title: "최종 신청 실패",
+        toast.error("최종 신청 실패", {
           description: submitted.error,
-          variant: "destructive",
         });
         return;
       }
-      toast({
-        title: "등록 신청이 완료되었습니다.",
+      toast.success("등록 신청이 완료되었습니다.", {
         description: "관리자 검토 후 결과가 목록에 반영됩니다.",
       });
       router.push(`/${locale}/dashboard/media-owner/medias`);
@@ -543,14 +536,13 @@ export function MediaReviewForm({
   const handleAdminApprove = () => {
     const err = validateRequired();
     if (err) {
-      toast({ title: "입력값 확인", description: err, variant: "destructive" });
+      toast.error("입력값 확인", { description: err });
       return;
     }
     startTransition(async () => {
       const result = await publishMedia(media.id, buildPayload());
       if (result.ok) {
-        toast({
-          title: "미디어가 승인되었습니다.",
+        toast.success("미디어가 승인되었습니다.", {
           description: "매체사에게 승인 알림이 전달되었습니다.",
         });
         setRejectOpen(false);
@@ -558,7 +550,7 @@ export function MediaReviewForm({
         onRequestClose?.();
         router.push(`/${locale}/admin/medias`);
       } else {
-        toast({ title: "승인 실패", description: result.error, variant: "destructive" });
+        toast.error("승인 실패", { description: result.error });
       }
     });
   };
@@ -575,15 +567,12 @@ export function MediaReviewForm({
         });
         const data = (await res.json().catch(() => ({}))) as { error?: string };
         if (!res.ok) {
-          toast({
-            title: "반려 실패",
+          toast.error("반려 실패", {
             description: data.error ?? res.statusText,
-            variant: "destructive",
           });
           return;
         }
-        toast({
-          title: "미디어가 반려되었습니다.",
+        toast.success("미디어가 반려되었습니다.", {
           description: "매체사가 반려 사유를 확인할 수 있습니다.",
         });
         setRejectOpen(false);
@@ -591,10 +580,8 @@ export function MediaReviewForm({
         onRequestClose?.();
         router.push(`/${locale}/admin/medias`);
       } catch (e) {
-        toast({
-          title: "반려 실패",
+        toast.error("반려 실패", {
           description: e instanceof Error ? e.message : String(e),
-          variant: "destructive",
         });
       }
     });
@@ -605,15 +592,12 @@ export function MediaReviewForm({
     startTransition(async () => {
       const r = await submitForReview(media.id);
       if (!r.ok) {
-        toast({
-          title: "요청에 실패했습니다",
+        toast.error("요청에 실패했습니다", {
           description: r.error,
-          variant: "destructive",
         });
         return;
       }
-      toast({
-        title: "재검토 요청을 보냈습니다.",
+      toast.success("재검토 요청을 보냈습니다.", {
         description: "목록에서 승인 대기 상태를 확인해 주세요.",
       });
       router.push(`/${locale}/dashboard/media-owner/medias`);

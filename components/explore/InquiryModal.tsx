@@ -89,6 +89,15 @@ export function InquiryModal({
     });
   }, [open, session?.user, reset]);
 
+  React.useEffect(() => {
+    if (!open) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open, onClose]);
+
   if (!open || !medias || medias.length === 0) return null;
 
   const mediaIds = medias.map((m) => m.id);
@@ -156,7 +165,7 @@ export function InquiryModal({
       aria-modal
       aria-labelledby="inquiry-title"
     >
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl dark:border-zinc-700 dark:bg-zinc-950">
+      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl animate-in fade-in-0 zoom-in-95 duration-200 dark:border-zinc-700 dark:bg-zinc-950">
         <div className="mb-4 flex items-start justify-between gap-3">
           <div>
             <h2 id="inquiry-title" className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
@@ -167,7 +176,7 @@ export function InquiryModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md p-1 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            className="rounded-full p-1 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
             aria-label={t("close")}
           >
             <X className="h-5 w-5" />

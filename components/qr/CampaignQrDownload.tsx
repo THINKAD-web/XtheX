@@ -4,7 +4,7 @@ import * as React from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 type Props = {
   locale: string;
@@ -19,7 +19,6 @@ export function CampaignQrDownload({
   filename = "campaign-qr.png",
 }: Props) {
   const isKo = locale === "ko";
-  const { toast } = useToast();
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
   const [fullUrl, setFullUrl] = React.useState<string>("");
 
@@ -43,14 +42,11 @@ export function CampaignQrDownload({
       document.body.appendChild(a);
       a.click();
       a.remove();
-      toast({
-        title: isKo ? "QR PNG 다운로드 시작" : "Downloading QR PNG",
+      toast.success(isKo ? "QR PNG 다운로드 시작" : "Downloading QR PNG", {
         description: fullUrl,
       });
     } catch {
-      toast({
-        variant: "destructive",
-        title: isKo ? "다운로드 실패" : "Download failed",
+      toast.error(isKo ? "다운로드 실패" : "Download failed", {
         description: isKo ? "브라우저에서 PNG 생성에 실패했어요." : "Failed to generate PNG in browser.",
       });
     }
@@ -102,11 +98,9 @@ export function CampaignQrDownload({
               onClick={async () => {
                 try {
                   await navigator.clipboard.writeText(fullUrl);
-                  toast({ title: isKo ? "URL 복사됨" : "URL copied", description: fullUrl });
+                  toast.success(isKo ? "URL 복사됨" : "URL copied", { description: fullUrl });
                 } catch {
-                  toast({
-                    variant: "destructive",
-                    title: isKo ? "복사 실패" : "Copy failed",
+                  toast.error(isKo ? "복사 실패" : "Copy failed", {
                     description: isKo ? "클립보드 권한을 확인해 주세요." : "Check clipboard permission.",
                   });
                 }

@@ -26,7 +26,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { createMediaAction } from "@/app/[locale]/admin/medias/new/actions";
 import { cn } from "@/lib/utils";
 
@@ -122,7 +122,6 @@ function buildActionPayload(values: MediaWizardFormValues) {
 }
 
 export function MediaWizard({ locale }: { locale: string }) {
-  const { toast } = useToast();
   const router = useRouter();
   const [step, setStep] = React.useState(0);
   const [submitting, setSubmitting] = React.useState(false);
@@ -170,33 +169,26 @@ export function MediaWizard({ locale }: { locale: string }) {
       const payload = buildActionPayload(values);
       await createMediaAction(payload);
       setSuccess(true);
-      toast({
-        title: "Media created",
+      toast.success("Media created", {
         description: "The listing was saved and is pending review.",
       });
       router.refresh();
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Something went wrong";
       if (msg === "DUPLICATE_MEDIA_NAME") {
-        toast({
-          title: "Duplicate name",
+        toast.error("Duplicate name", {
           description: "A media with this name already exists. Choose another name.",
-          variant: "destructive",
         });
         return;
       }
       if (msg === "Forbidden") {
-        toast({
-          title: "Forbidden",
+        toast.error("Forbidden", {
           description: "You do not have permission to create media.",
-          variant: "destructive",
         });
         return;
       }
-      toast({
-        title: "Could not create media",
+      toast.error("Could not create media", {
         description: msg,
-        variant: "destructive",
       });
     } finally {
       setSubmitting(false);

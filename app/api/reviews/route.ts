@@ -19,19 +19,32 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const reviews = await prisma.mediaReview.findMany({
-    where: { mediaId, visible: true },
-    orderBy: { createdAt: "desc" },
-    include: {
-      user: { select: { id: true, name: true, image: true } },
-    },
-  });
+  const sort = req.nextUrl.searchParams.get("sort");
+  const orderBy =
+    sort === "rating"
+      ? [{ rating: "desc" as const }, { createdAt: "desc" as const }]
+      : { createdAt: "desc" as const };
 
-  const totalCount = reviews.length;
+  const whereVisible = { mediaId, visible: true };
+
+  const [reviews, agg] = await Promise.all([
+    prisma.mediaReview.findMany({
+      where: whereVisible,
+      orderBy,
+      include: {
+        user: { select: { id: true, name: true, image: true } },
+      },
+    }),
+    prisma.mediaReview.aggregate({
+      where: whereVisible,
+      _avg: { rating: true },
+      _count: { _all: true },
+    }),
+  ]);
+
+  const totalCount = agg._count._all;
   const averageRating =
-    totalCount > 0
-      ? reviews.reduce((sum, r) => sum + r.rating, 0) / totalCount
-      : 0;
+    agg._avg.rating != null ? Number(agg._avg.rating) : 0;
 
   return NextResponse.json({ reviews, averageRating, totalCount });
 }

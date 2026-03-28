@@ -34,6 +34,12 @@ export function AdminQuickNav({ t }: { t: TAdminHome }) {
             <Link href="/admin/inquiries" className={cn(linkOutline, "w-full sm:w-auto sm:min-w-[9.5rem]")}>
               {t("nav_inquiries")}
             </Link>
+            <Link href="/admin/reviews" className={cn(linkOutline, "w-full sm:w-auto sm:min-w-[9.5rem]")}>
+              {t("nav_reviews")}
+            </Link>
+            <Link href="/admin/review-reports" className={cn(linkOutline, "w-full sm:w-auto sm:min-w-[9.5rem]")}>
+              {t("nav_review_reports")}
+            </Link>
             <Link href="/admin/reports" className={cn(linkOutline, "w-full sm:w-auto sm:min-w-[9.5rem]")}>
               {t("nav_reports")}
             </Link>

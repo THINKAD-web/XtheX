@@ -668,7 +668,9 @@
       "col_created": "创建时间",
       "col_action": "操作",
       "empty_pending": "暂无待审核提案。",
-      "print": "打印"
+      "print": "打印",
+      "nav_reviews": "用户评价",
+      "nav_review_reports": "评价举报"
     },
     "actions": {
       "approve": "通过",
@@ -843,6 +845,23 @@
       "empty": "暂无媒体。",
       "gallery_title": "成功案例库 (6)",
       "gallery_subtitle": "点击卡片按钮可应用该案例的 filterJson。"
+    },
+    "reviewReports": {
+      "meta_title": "评价举报审核 | XtheX",
+      "meta_description": "审核被举报的媒体评价。",
+      "title": "媒体评价举报",
+      "subtitle": "驳回举报或隐藏不当评价。",
+      "empty": "暂无待处理举报。",
+      "col_date": "时间",
+      "col_media": "媒体",
+      "col_review": "评价",
+      "col_reporter": "举报人",
+      "col_reason": "原因",
+      "col_actions": "操作",
+      "dismiss": "驳回",
+      "hide_review": "隐藏评价",
+      "view_media": "查看媒体",
+      "pending": "待处理"
     }
   },
   "publicMediaDetail": {
@@ -1440,5 +1459,36 @@
         "case_body": "市中心/迪拜商场周边组合最大化国际访客触达（演示）。"
       }
     }
+  },
+  "media_reviews": {
+    "title": "评价与评分",
+    "sort_label": "排序",
+    "sort_recent": "最新",
+    "sort_rating": "评分从高到低",
+    "reviews_suffix": "条评价",
+    "rating_label": "星级（1–5）",
+    "content_placeholder": "分享您与该媒体合作或投放的体验…",
+    "submitting": "提交中…",
+    "submit": "发表评价",
+    "sign_in_prompt": "登录后即可撰写评价。",
+    "sign_in_link": "登录",
+    "sign_in_required": "请先登录。",
+    "anonymous": "匿名",
+    "empty": "暂无评价，欢迎成为第一位评价者。",
+    "error_rating_required": "请选择星级。",
+    "error_already_reviewed": "您已评价过该媒体。",
+    "error_submit_failed": "评价保存失败。",
+    "submit_success": "评价已发布。",
+    "report": "举报",
+    "report_title": "举报评价",
+    "report_desc": "将不当内容提交给管理员审核。同一评价只能举报一次。",
+    "report_reason_label": "说明（可选）",
+    "report_reason_ph": "请简要描述…",
+    "report_cancel": "取消",
+    "report_submit": "提交举报",
+    "report_submitting": "处理中…",
+    "report_success": "已收到举报，管理员将处理。",
+    "report_already": "您已举报过该评价。",
+    "report_failed": "举报失败。"
   }
 }

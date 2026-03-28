@@ -675,7 +675,9 @@
       "col_created": "Created",
       "col_action": "Action",
       "empty_pending": "No pending proposals.",
-      "print": "Print"
+      "print": "Print",
+      "nav_reviews": "Customer reviews",
+      "nav_review_reports": "Review reports"
     },
     "actions": {
       "approve": "Approve",
@@ -850,6 +852,23 @@
       "empty": "No media registered.",
       "gallery_title": "Success case gallery (6)",
       "gallery_subtitle": "Click a card button to apply that case’s filterJson."
+    },
+    "reviewReports": {
+      "meta_title": "Review reports | XtheX",
+      "meta_description": "Moderate reported media reviews.",
+      "title": "Media review reports",
+      "subtitle": "Dismiss a report or hide the reported review after review.",
+      "empty": "No pending reports.",
+      "col_date": "Reported",
+      "col_media": "Media",
+      "col_review": "Review",
+      "col_reporter": "Reporter",
+      "col_reason": "Reason",
+      "col_actions": "Actions",
+      "dismiss": "Dismiss",
+      "hide_review": "Hide review",
+      "view_media": "View media",
+      "pending": "Pending"
     }
   },
   "publicMediaDetail": {
@@ -1510,5 +1529,36 @@
         "case_body": "Downtown / Dubai Mall area mix maximized international visitor reach (demo)."
       }
     }
+  },
+  "media_reviews": {
+    "title": "Reviews & ratings",
+    "sort_label": "Sort",
+    "sort_recent": "Newest first",
+    "sort_rating": "Highest rating",
+    "reviews_suffix": "reviews",
+    "rating_label": "Rating (1–5)",
+    "content_placeholder": "Share your experience with this media…",
+    "submitting": "Submitting…",
+    "submit": "Submit review",
+    "sign_in_prompt": "Sign in to write a review.",
+    "sign_in_link": "Sign in",
+    "sign_in_required": "Please sign in.",
+    "anonymous": "Anonymous",
+    "empty": "No reviews yet. Be the first to share feedback.",
+    "error_rating_required": "Please select a star rating.",
+    "error_already_reviewed": "You have already reviewed this media.",
+    "error_submit_failed": "Could not save your review.",
+    "submit_success": "Your review was posted.",
+    "report": "Report",
+    "report_title": "Report review",
+    "report_desc": "Flag this review for admin review. You can only report the same review once.",
+    "report_reason_label": "Details (optional)",
+    "report_reason_ph": "Briefly describe the issue…",
+    "report_cancel": "Cancel",
+    "report_submit": "Submit report",
+    "report_submitting": "Sending…",
+    "report_success": "Report received. Our team will review it.",
+    "report_already": "You already reported this review.",
+    "report_failed": "Could not submit the report."
   }
 }

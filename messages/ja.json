@@ -668,7 +668,9 @@
       "col_created": "作成日",
       "col_action": "操作",
       "empty_pending": "承認待ちの提案はありません。",
-      "print": "印刷"
+      "print": "印刷",
+      "nav_reviews": "顧客レビュー",
+      "nav_review_reports": "レビュー通報"
     },
     "actions": {
       "approve": "承認",
@@ -843,6 +845,23 @@
       "empty": "登録されたメディアはありません。",
       "gallery_title": "成功事例ギャラリー (6)",
       "gallery_subtitle": "ボタンでその事例の filterJson を適用します。"
+    },
+    "reviewReports": {
+      "meta_title": "レビュー通報の確認 | XtheX",
+      "meta_description": "通報された媒体レビューをモデレートします。",
+      "title": "レビュー通報の確認",
+      "subtitle": "却下するか、レビューを非表示にします。",
+      "empty": "保留中の通報はありません。",
+      "col_date": "日時",
+      "col_media": "媒体",
+      "col_review": "レビュー",
+      "col_reporter": "通報者",
+      "col_reason": "理由",
+      "col_actions": "操作",
+      "dismiss": "却下",
+      "hide_review": "レビューを非表示",
+      "view_media": "媒体を見る",
+      "pending": "保留"
     }
   },
   "publicMediaDetail": {
@@ -1440,5 +1459,36 @@
         "case_body": "ダウンタウン・ドバイモール周辺ミックスで国際来訪者リーチ最大化（デモ）。"
       }
     }
+  },
+  "media_reviews": {
+    "title": "レビュー・評価",
+    "sort_label": "並び順",
+    "sort_recent": "新しい順",
+    "sort_rating": "評価の高い順",
+    "reviews_suffix": "件のレビュー",
+    "rating_label": "評価（1〜5）",
+    "content_placeholder": "この媒体の体験を共有してください…",
+    "submitting": "送信中…",
+    "submit": "レビューを投稿",
+    "sign_in_prompt": "レビューにはログインが必要です。",
+    "sign_in_link": "ログイン",
+    "sign_in_required": "ログインしてください。",
+    "anonymous": "匿名",
+    "empty": "まだレビューがありません。最初の投稿者になりましょう。",
+    "error_rating_required": "星の評価を選んでください。",
+    "error_already_reviewed": "すでにこの媒体にレビュー済みです。",
+    "error_submit_failed": "レビューを保存できませんでした。",
+    "submit_success": "レビューを投稿しました。",
+    "report": "報告",
+    "report_title": "レビューを報告",
+    "report_desc": "不適切な内容として管理者に確認を依頼します。同じレビューは1回だけ報告できます。",
+    "report_reason_label": "理由（任意）",
+    "report_reason_ph": "簡潔にご記入ください…",
+    "report_cancel": "キャンセル",
+    "report_submit": "報告する",
+    "report_submitting": "処理中…",
+    "report_success": "報告を受け付けました。管理者が確認します。",
+    "report_already": "すでに報告済みです。",
+    "report_failed": "報告に失敗しました。"
   }
 }

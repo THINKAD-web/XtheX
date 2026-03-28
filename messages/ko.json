@@ -675,7 +675,9 @@
       "col_created": "등록일",
       "col_action": "작업",
       "empty_pending": "대기 중인 제안서가 없습니다.",
-      "print": "인쇄"
+      "print": "인쇄",
+      "nav_reviews": "고객 리뷰",
+      "nav_review_reports": "리뷰 신고 검토"
     },
     "actions": {
       "approve": "승인",
@@ -850,6 +852,23 @@
       "empty": "등록된 미디어가 없습니다.",
       "gallery_title": "성공 사례 갤러리 (6)",
       "gallery_subtitle": "카드의 버튼을 누르면 해당 사례의 filterJson을 바로 적용합니다."
+    },
+    "reviewReports": {
+      "meta_title": "리뷰 신고 검토 | XtheX",
+      "meta_description": "신고된 매체 리뷰를 검토하고 조치합니다.",
+      "title": "리뷰 신고 검토",
+      "subtitle": "대기 중인 신고를 확인한 뒤 기각하거나 리뷰를 숨깁니다.",
+      "empty": "대기 중인 신고가 없습니다.",
+      "col_date": "접수",
+      "col_media": "매체",
+      "col_review": "리뷰",
+      "col_reporter": "신고자",
+      "col_reason": "사유",
+      "col_actions": "조치",
+      "dismiss": "기각",
+      "hide_review": "리뷰 숨김",
+      "view_media": "매체 보기",
+      "pending": "대기"
     }
   },
   "publicMediaDetail": {
@@ -1510,5 +1529,36 @@
         "case_body": "Downtown·Dubai Mall 인근 디지털 믹스로 국제 방문객 도달 극대화(데모)."
       }
     }
+  },
+  "media_reviews": {
+    "title": "리뷰 · 평점",
+    "sort_label": "정렬",
+    "sort_recent": "최신순",
+    "sort_rating": "평점 높은 순",
+    "reviews_suffix": "개의 리뷰",
+    "rating_label": "별점 (1~5)",
+    "content_placeholder": "이 매체에 대한 경험을 공유해 주세요…",
+    "submitting": "제출 중…",
+    "submit": "리뷰 작성",
+    "sign_in_prompt": "리뷰를 작성하려면 로그인이 필요합니다.",
+    "sign_in_link": "로그인",
+    "sign_in_required": "로그인이 필요합니다.",
+    "anonymous": "익명",
+    "empty": "아직 리뷰가 없습니다. 첫 리뷰를 남겨 보세요.",
+    "error_rating_required": "별점을 선택해 주세요.",
+    "error_already_reviewed": "이미 이 매체에 리뷰를 작성하셨습니다.",
+    "error_submit_failed": "리뷰를 저장하지 못했습니다.",
+    "submit_success": "리뷰가 등록되었습니다.",
+    "report": "신고",
+    "report_title": "리뷰 신고",
+    "report_desc": "부적절한 내용으로 관리자 검토를 요청합니다. 동일 리뷰는 한 번만 신고할 수 있습니다.",
+    "report_reason_label": "사유 (선택)",
+    "report_reason_ph": "간단히 적어 주세요…",
+    "report_cancel": "취소",
+    "report_submit": "신고 접수",
+    "report_submitting": "처리 중…",
+    "report_success": "신고가 접수되었습니다. 관리자가 검토합니다.",
+    "report_already": "이미 신고한 리뷰입니다.",
+    "report_failed": "신고에 실패했습니다."
   }
 }

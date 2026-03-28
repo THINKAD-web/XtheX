@@ -96,6 +96,12 @@ enum ForumReportTarget {
   COMMENT
 }
 
+enum MediaReviewReportStatus {
+  PENDING
+  DISMISSED
+  ACTIONED
+}
+
 model Media {
   id                String         @id @default(uuid()) @db.Uuid
   mediaName         String
@@ -198,6 +204,8 @@ model User {
   forumPosts     ForumPost[]    @relation("ForumPostsByAuthor")
   forumComments  ForumComment[] @relation("ForumCommentsByAuthor")
   forumReports   ForumReport[]  @relation("ForumReportsByReporter")
+  mediaReviewReportsFiled   MediaReviewReport[] @relation("MediaReviewReportsByReporter")
+  mediaReviewReportsResolved MediaReviewReport[] @relation("MediaReviewReportsResolvedBy")
 }
 
 model Account {
@@ -508,10 +516,30 @@ model MediaReview {
 
   media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
   user  User  @relation("MediaReviewsByUser", fields: [userId], references: [id], onDelete: Cascade)
+  abuseReports MediaReviewReport[]
 
   @@unique([mediaId, userId])
   @@index([mediaId, createdAt])
   @@index([userId])
+}
+
+model MediaReviewReport {
+  id           String                  @id @default(uuid()) @db.Uuid
+  reviewId     String                  @db.Uuid
+  reporterId   String                  @db.Uuid
+  reason       String?                 @db.Text
+  status       MediaReviewReportStatus @default(PENDING)
+  createdAt    DateTime                @default(now())
+  resolvedAt   DateTime?
+  resolvedById String?                 @db.Uuid
+
+  review     MediaReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  reporter   User        @relation("MediaReviewReportsByReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  resolvedBy User?       @relation("MediaReviewReportsResolvedBy", fields: [resolvedById], references: [id], onDelete: SetNull)
+
+  @@unique([reviewId, reporterId])
+  @@index([status, createdAt])
+  @@index([reviewId])
 }
 
 model ForumPost {

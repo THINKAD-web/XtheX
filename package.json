@@ -54,6 +54,7 @@
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.35.2",
     "gray-matter": "^4.0.3",
+    "jspdf": "^4.2.1",
     "leaflet": "^1.9.4",
     "leaflet.markercluster": "^1.5.3",
     "lucide-react": "^0.577.0",

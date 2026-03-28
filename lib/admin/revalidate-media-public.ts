@@ -8,9 +8,11 @@ import { routing } from "@/i18n/routing";
 export function revalidateMediaReviewSurfaces(mediaId?: string) {
   const paths = new Set<string>();
   paths.add("/admin/medias");
+  paths.add("/admin/content-approval");
   paths.add("/explore");
   for (const locale of routing.locales) {
     paths.add(`/${locale}/admin/medias`);
+    paths.add(`/${locale}/admin/content-approval`);
     paths.add(`/${locale}/explore`);
   }
   for (const p of paths) {

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
 import { Settings, Shield } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { PushNotificationButton } from "@/components/pwa/PushNotificationButton";
 import { NotificationCategoryPrefs } from "@/components/notifications/NotificationCategoryPrefs";
+import { ReferralInvitePanel } from "@/components/referral/ReferralInvitePanel";
 
 export const metadata: Metadata = {
   title: "Settings | XtheX",
@@ -44,6 +44,8 @@ export default async function SettingsPage({
           {isKo ? "보안 설정 열기" : "Open security settings"}
         </Link>
       </section>
+
+      <ReferralInvitePanel />
 
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">

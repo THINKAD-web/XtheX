@@ -3,6 +3,7 @@
 import * as React from "react";
 import { signIn, getSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +41,7 @@ export function SignupForm({
   loadingLabel,
   hasAccount,
 }: Props) {
+  const tRef = useTranslations("referral");
   const router = useRouter();
   const searchParams = useSearchParams();
   const paramRole = searchParams.get("role")?.toUpperCase();
@@ -54,6 +56,7 @@ export function SignupForm({
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [role, setRole] = React.useState<(typeof ROLES)[number]>(initialRole);
+  const [referralCode, setReferralCode] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [touched, setTouched] = React.useState<Record<string, boolean>>({});
@@ -88,6 +91,13 @@ export function SignupForm({
     }
   }, [paramRole]);
 
+  React.useEffect(() => {
+    const ref = searchParams.get("ref");
+    if (!ref) return;
+    const norm = ref.trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8);
+    setReferralCode(norm);
+  }, [searchParams]);
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -101,12 +111,24 @@ export function SignupForm({
           email: email.trim(),
           password,
           role,
+          ...(referralCode.trim()
+            ? { referralCode: referralCode.trim().toUpperCase() }
+            : {}),
         }),
       });
       const data = (await res.json().catch(() => ({}))) as {
         error?: string | Record<string, unknown>;
+        code?: string;
       };
       if (!res.ok) {
+        if (data.code === "REFERRAL_INVALID") {
+          setError(tRef("errors.invalid"));
+          return;
+        }
+        if (data.code === "REFERRAL_SELF") {
+          setError(tRef("errors.self"));
+          return;
+        }
         const msg =
           typeof data.error === "string"
             ? data.error
@@ -242,6 +264,27 @@ export function SignupForm({
             </label>
           </div>
         </fieldset>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-foreground" htmlFor="referral">
+            {tRef("signup_label")}
+          </label>
+          <Input
+            id="referral"
+            name="referralCode"
+            autoComplete="off"
+            maxLength={8}
+            placeholder={tRef("signup_placeholder")}
+            value={referralCode}
+            onChange={(e) =>
+              setReferralCode(
+                e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8),
+              )
+            }
+            className="h-11 font-mono tracking-wider"
+          />
+          <p className="text-xs text-muted-foreground">{tRef("signup_hint")}</p>
+        </div>
 
         <Button type="submit" className="h-11 w-full" disabled={loading}>
           {loading ? loadingLabel : submitLabel}

@@ -408,6 +408,30 @@
     "cta_signup": "会員登録",
     "footer_back": "← Home"
   },
+  "referral": {
+    "section_title": "友だち招待",
+    "section_subtitle": "招待コードを共有すると、お互いにボーナスポイントがもらえます。",
+    "your_code": "あなたの招待コード",
+    "copy_link": "リンクをコピー",
+    "share": "共有",
+    "share_title": "XtheXの友だち招待",
+    "share_body": "XtheXに登録して招待コード {code} を入力すると、お互いにボーナスポイントがもらえます。",
+    "credit_balance": "リワードポイント",
+    "invited_count": "招待で登録した友だち",
+    "bonus_hint": "友だちがコードで登録すると: 友だち {refereePts}pt · あなた {referrerPts}pt",
+    "loading": "読み込み中…",
+    "load_error": "招待情報を読み込めませんでした。",
+    "toast_copied": "招待リンクをコピーしました。",
+    "toast_shared": "共有しました。",
+    "toast_share_failed": "コピーに失敗しました。もう一度お試しください。",
+    "signup_label": "友だち招待コード（任意）",
+    "signup_placeholder": "8文字のコード",
+    "signup_hint": "もらったコードがあれば入力してください。登録時にボーナスポイントが付与されます。",
+    "errors": {
+      "invalid": "招待コードが無効です。",
+      "self": "自分の招待コードは使えません。"
+    }
+  },
   "dashboard": {
     "partner": {
       "page_title": "パートナーダッシュボード",

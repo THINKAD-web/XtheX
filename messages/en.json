@@ -415,6 +415,30 @@
     "cta_signup": "Sign up",
     "footer_back": "← Home"
   },
+  "referral": {
+    "section_title": "Invite friends",
+    "section_subtitle": "Share your code — you and your friend both earn bonus points when they sign up.",
+    "your_code": "Your invite code",
+    "copy_link": "Copy link",
+    "share": "Share",
+    "share_title": "Join me on XtheX",
+    "share_body": "Sign up on XtheX with my code {code} — we both get bonus points.",
+    "credit_balance": "Your reward points",
+    "invited_count": "Friends who joined",
+    "bonus_hint": "When a friend signs up with your code: they get {refereePts} pts · you get {referrerPts} pts",
+    "loading": "Loading…",
+    "load_error": "Could not load referral info.",
+    "toast_copied": "Invite link copied.",
+    "toast_shared": "Shared successfully.",
+    "toast_share_failed": "Could not copy. Please try again.",
+    "signup_label": "Friend invite code (optional)",
+    "signup_placeholder": "8-character code",
+    "signup_hint": "If a friend shared a code, enter it to receive bonus points when you sign up.",
+    "errors": {
+      "invalid": "That invite code is not valid.",
+      "self": "You cannot use your own invite code."
+    }
+  },
   "dashboard": {
     "partner": {
       "page_title": "Partner dashboard",

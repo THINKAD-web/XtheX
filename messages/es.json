@@ -415,6 +415,30 @@
     "cta_signup": "Sign up",
     "footer_back": "← Home"
   },
+  "referral": {
+    "section_title": "Invitar amigos",
+    "section_subtitle": "Comparte tu código: tú y tu amigo reciben puntos bonus al registrarse.",
+    "your_code": "Tu código de invitación",
+    "copy_link": "Copiar enlace",
+    "share": "Compartir",
+    "share_title": "Únete a XtheX",
+    "share_body": "Regístrate en XtheX con el código {code} — ambos recibimos puntos bonus.",
+    "credit_balance": "Tus puntos de recompensa",
+    "invited_count": "Amigos que se registraron",
+    "bonus_hint": "Si un amigo se registra con tu código: él recibe {refereePts} pts · tú recibes {referrerPts} pts",
+    "loading": "Cargando…",
+    "load_error": "No se pudo cargar la información de invitación.",
+    "toast_copied": "Enlace de invitación copiado.",
+    "toast_shared": "Compartido correctamente.",
+    "toast_share_failed": "No se pudo copiar. Inténtalo de nuevo.",
+    "signup_label": "Código de invitación (opcional)",
+    "signup_placeholder": "Código de 8 caracteres",
+    "signup_hint": "Si un amigo te pasó un código, introdúcelo para recibir puntos al registrarte.",
+    "errors": {
+      "invalid": "Ese código de invitación no es válido.",
+      "self": "No puedes usar tu propio código."
+    }
+  },
   "dashboard": {
     "partner": {
       "page_title": "Partner dashboard",

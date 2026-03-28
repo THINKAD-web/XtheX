@@ -415,6 +415,30 @@
     "cta_signup": "회원가입",
     "footer_back": "← Home"
   },
+  "referral": {
+    "section_title": "친구 초대",
+    "section_subtitle": "초대 코드를 공유하면 친구와 나 모두 보너스 포인트를 받습니다.",
+    "your_code": "내 초대 코드",
+    "copy_link": "링크 복사",
+    "share": "공유",
+    "share_title": "XtheX 친구 초대",
+    "share_body": "XtheX에 가입하고 초대 코드 {code}를 입력하면 우리 모두 보너스 포인트를 받아요.",
+    "credit_balance": "내 리워드 포인트",
+    "invited_count": "초대로 가입한 친구",
+    "bonus_hint": "친구가 코드로 가입하면 친구 {refereePts}pt · 나 {referrerPts}pt",
+    "loading": "불러오는 중…",
+    "load_error": "초대 정보를 불러오지 못했습니다.",
+    "toast_copied": "초대 링크를 복사했습니다.",
+    "toast_shared": "공유를 완료했습니다.",
+    "toast_share_failed": "복사에 실패했습니다. 다시 시도해 주세요.",
+    "signup_label": "친구 초대 코드 (선택)",
+    "signup_placeholder": "8자 코드",
+    "signup_hint": "친구에게 받은 코드가 있으면 입력하세요. 가입 시 보너스 포인트를 드립니다.",
+    "errors": {
+      "invalid": "유효하지 않은 초대 코드입니다.",
+      "self": "본인의 초대 코드는 사용할 수 없습니다."
+    }
+  },
   "dashboard": {
     "partner": {
       "page_title": "파트너 대시보드",

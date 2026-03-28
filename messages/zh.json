@@ -408,6 +408,30 @@
     "cta_signup": "注册",
     "footer_back": "← Home"
   },
+  "referral": {
+    "section_title": "邀请好友",
+    "section_subtitle": "分享邀请码，好友与您都能获得奖励积分。",
+    "your_code": "我的邀请码",
+    "copy_link": "复制链接",
+    "share": "分享",
+    "share_title": "邀请加入 XtheX",
+    "share_body": "在 XtheX 注册并填写邀请码 {code}，你我都能获得奖励积分。",
+    "credit_balance": "我的奖励积分",
+    "invited_count": "通过邀请注册的好友",
+    "bonus_hint": "好友使用代码注册：好友得 {refereePts} 分 · 您得 {referrerPts} 分",
+    "loading": "加载中…",
+    "load_error": "无法加载邀请信息。",
+    "toast_copied": "已复制邀请链接。",
+    "toast_shared": "分享完成。",
+    "toast_share_failed": "复制失败，请重试。",
+    "signup_label": "好友邀请码（可选）",
+    "signup_placeholder": "8 位代码",
+    "signup_hint": "若有好友分享的代码请填写，注册成功可获得奖励积分。",
+    "errors": {
+      "invalid": "邀请码无效。",
+      "self": "不能使用自己的邀请码。"
+    }
+  },
   "dashboard": {
     "partner": {
       "page_title": "合作伙伴仪表板",

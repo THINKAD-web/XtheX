@@ -5,6 +5,7 @@ import { Link } from "@/i18n/navigation";
 import { gateMediaOwnerDashboard } from "@/lib/auth/dashboard-gate";
 import { PushNotificationButton } from "@/components/pwa/PushNotificationButton";
 import { NotificationCategoryPrefs } from "@/components/notifications/NotificationCategoryPrefs";
+import { ReferralInvitePanel } from "@/components/referral/ReferralInvitePanel";
 
 export const metadata: Metadata = {
   title: "Settings | XtheX",
@@ -24,6 +25,8 @@ export default async function MediaOwnerSettingsPage() {
           {isKo ? "설정" : "Settings"}
         </h1>
       </div>
+
+      <ReferralInvitePanel />
 
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">

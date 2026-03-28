@@ -229,6 +229,18 @@ model User {
   /** Per NotificationType: false = muted in-app; missing/true = on. */
   notificationCategoryPrefs Json?
 
+  /** 친구 초대용 고유 코드 (대문자·숫자). 최초 조회 시 발급. */
+  referralCode         String?   @unique
+  /** 가입 시 추천인 User.id (1회만 설정) */
+  referredById         String?   @db.Uuid
+  /** 추천 리워드 누적 포인트(플랫폼 크레딧 등에 활용 가능) */
+  referralCreditPoints Int       @default(0)
+
+  referredBy User?  @relation("UserReferrals", fields: [referredById], references: [id], onDelete: SetNull)
+  referrals  User[] @relation("UserReferrals")
+
+  @@index([referredById])
+
   loginDevices          LoginDevice[]
   webAuthnCredentials   WebAuthnCredential[]
   activityLogs          UserActivityLog[]

@@ -6,7 +6,11 @@ import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { landing } from "@/lib/landing-theme";
-import { getExploreSearchSignalsForApi } from "@/lib/recommend/explore-search-signals";
+import {
+  EXPLORE_SEARCH_SIGNALS_STORAGE_KEY,
+  getExploreSearchSignalsForApi,
+  subscribeToExploreSearchSignalsChanged,
+} from "@/lib/recommend/explore-search-signals";
 import type { PersonalizedRecoItem } from "@/lib/recommend/personalized-engine";
 import { usePreferredCurrency } from "@/components/usePreferredCurrency";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
@@ -44,36 +48,55 @@ export function PersonalizedRecommendationsSection({
   dismissedRef.current = dismissed;
   recentRef.current = recentlyViewedIds;
 
-  const load = React.useCallback(async () => {
-    setLoading(true);
-    try {
-      const searchSignals = getExploreSearchSignalsForApi();
-      const res = await fetch("/api/personalized-recommendations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          locale,
-          searchSignals,
-          dismissedIds: dismissedRef.current,
-          recentlyViewedIds: recentRef.current,
-        }),
-      });
-      const json = (await res.json()) as { ok?: boolean; items?: PersonalizedRecoItem[] };
-      if (!res.ok || !json.ok || !json.items) {
+  const load = React.useCallback(
+    async (background = false) => {
+      if (!background) setLoading(true);
+      try {
+        const searchSignals = getExploreSearchSignalsForApi();
+        const res = await fetch("/api/personalized-recommendations", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            locale,
+            searchSignals,
+            dismissedIds: dismissedRef.current,
+            recentlyViewedIds: recentRef.current,
+          }),
+        });
+        const json = (await res.json()) as { ok?: boolean; items?: PersonalizedRecoItem[] };
+        if (!res.ok || !json.ok || !json.items) {
+          setItems([]);
+          return;
+        }
+        setItems(json.items.slice(0, 5));
+      } catch {
         setItems([]);
-        return;
+      } finally {
+        setLoading(false);
       }
-      setItems(json.items.slice(0, 5));
-    } catch {
-      setItems([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [locale]);
+    },
+    [locale],
+  );
 
   React.useEffect(() => {
-    void load();
+    void load(false);
   }, [load, dismissedKey, recentKey]);
+
+  React.useEffect(() => {
+    return subscribeToExploreSearchSignalsChanged(() => {
+      void load(true);
+    });
+  }, [load]);
+
+  React.useEffect(() => {
+    function onStorage(e: StorageEvent) {
+      if (e.storageArea !== localStorage) return;
+      if (e.key !== null && e.key !== EXPLORE_SEARCH_SIGNALS_STORAGE_KEY) return;
+      void load(true);
+    }
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [load]);
 
   async function persistFeedback(mediaId: string, action: "dismiss" | "negative") {
     try {

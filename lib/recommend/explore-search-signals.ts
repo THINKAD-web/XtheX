@@ -1,5 +1,19 @@
-const STORAGE_KEY = "xthex:explore-search-signals:v1";
+export const EXPLORE_SEARCH_SIGNALS_STORAGE_KEY = "xthex:explore-search-signals:v1";
 const MAX_SIGNALS = 24;
+
+const SIGNALS_CHANGED_EVENT = "xthex-explore-search-signals-changed";
+
+function notifySignalsChanged() {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent(SIGNALS_CHANGED_EVENT));
+}
+
+/** 같은 탭에서 필터 적용 시 */
+export function subscribeToExploreSearchSignalsChanged(listener: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener(SIGNALS_CHANGED_EVENT, listener);
+  return () => window.removeEventListener(SIGNALS_CHANGED_EVENT, listener);
+}
 
 export type ExploreSearchSignal = {
   q?: string;
@@ -11,7 +25,7 @@ export type ExploreSearchSignal = {
 function readAll(): ExploreSearchSignal[] {
   if (typeof window === "undefined") return [];
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(EXPLORE_SEARCH_SIGNALS_STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed)) return [];
@@ -29,7 +43,10 @@ function readAll(): ExploreSearchSignal[] {
 function writeAll(signals: ExploreSearchSignal[]) {
   if (typeof window === "undefined") return;
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(signals.slice(0, MAX_SIGNALS)));
+    localStorage.setItem(
+      EXPLORE_SEARCH_SIGNALS_STORAGE_KEY,
+      JSON.stringify(signals.slice(0, MAX_SIGNALS)),
+    );
   } catch {
     // ignore
   }
@@ -57,6 +74,7 @@ export function pushExploreSearchSignal(partial: Omit<ExploreSearchSignal, "at">
     );
   });
   writeAll([next, ...prev]);
+  notifySignalsChanged();
 }
 
 export function getExploreSearchSignalsForApi(): ExploreSearchSignal[] {

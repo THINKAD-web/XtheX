@@ -163,7 +163,8 @@
     "sign_up": "Sign up",
     "currency": "Currency",
     "templates": "Templates",
-    "billing": "Billing"
+    "billing": "Billing",
+    "trends": "Trends"
   },
   "blog": {
     "nav_label": "Blog"
@@ -1441,5 +1442,73 @@
     "tx_creative_review": "Creative review service",
     "tx_pending_campaign": "Campaign balance (pending)",
     "tx_addon_analytics": "Add-on · performance report"
+  },
+  "trends": {
+    "meta_title": "Regional OOH trends | XtheX",
+    "meta_description": "Explore out-of-home trends by city—popular formats, benchmark budgets, and case studies—with map popups and PDF export.",
+    "kicker": "Insights",
+    "title": "Regional OOH trend report",
+    "subtitle": "Demo insights across major cities. Click markers for detail, then print or save as PDF for the full report or a single region.",
+    "map_hint": "Click a marker on the map to open that city’s trend detail.",
+    "map_popup": "Open {name} report — click",
+    "download_full_pdf": "Full report PDF",
+    "download_region_pdf": "This region PDF",
+    "pdf_print_hint": "In the print dialog, choose “Save as PDF”.",
+    "popular_label": "Popular media",
+    "avg_budget_label": "Avg. weekly budget (guide)",
+    "yoy_label": "Year over year",
+    "yoy_value": "+{n}% YoY",
+    "trend_summary_label": "Trend summary",
+    "case_title_label": "Success story",
+    "cards_title": "Browse by city",
+    "close": "Close",
+    "report_title": "Regional OOH trend report",
+    "report_doc_title": "{region} — OOH trend snapshot",
+    "report_doc_full": "All regions — OOH trend report",
+    "report_footer": "XtheX demo report; not live market data.",
+    "regions": {
+      "seoul": {
+        "name": "Seoul",
+        "popular_media": "Subway PSD · Gangnam & Hongdae digital boards",
+        "trend_summary": "Digital OOH is growing on commute and social routes; prime evening slots are more competitive.",
+        "case_title": "Global beauty brand Q1 push",
+        "case_body": "Three-week Gangnam/Hongdae digital mix delivered ~118% of planned impressions (demo benchmark)."
+      },
+      "tokyo": {
+        "name": "Tokyo",
+        "popular_media": "Shibuya/Shinjuku large format · office-tower networks",
+        "trend_summary": "Landmark screens plus business districts remain the preferred mix for launches.",
+        "case_title": "B2B SaaS awareness flight",
+        "case_body": "Office digital + Shibuya hero boards improved reach to IT decision-makers (demo scenario)."
+      },
+      "nyc": {
+        "name": "New York",
+        "popular_media": "Times Square–class digital · street furniture",
+        "trend_summary": "Premium digital plus proximity formats stand out for retail and fintech.",
+        "case_title": "Flagship opening tie-in",
+        "case_body": "Two-week Manhattan core push supported store visits (demo readout)."
+      },
+      "shanghai": {
+        "name": "Shanghai",
+        "popular_media": "Nanjing Road digital · mall networks",
+        "trend_summary": "Mall + CBD dual coverage and large-format demand are rebounding quickly.",
+        "case_title": "EV model launch",
+        "case_body": "Lujiazui + mall digital mix lifted awareness among young urban buyers (demo)."
+      },
+      "london": {
+        "name": "London",
+        "popular_media": "Tube digital · bus T-sides",
+        "trend_summary": "Sustainability and programmatic buying are trending; transit + roadside digital stay reliable.",
+        "case_title": "Fashion retail season",
+        "case_body": "West End digital plus buses helped grow offline footfall (demo)."
+      },
+      "dubai": {
+        "name": "Dubai",
+        "popular_media": "Skyline digital · premium mall screens",
+        "trend_summary": "Strong tourism and luxury demand; landmark hero units command relatively firm CPMs.",
+        "case_title": "Luxury resort opening",
+        "case_body": "Downtown / Dubai Mall area mix maximized international visitor reach (demo)."
+      }
+    }
   }
 }

@@ -163,7 +163,8 @@
     "sign_up": "회원가입",
     "currency": "통화",
     "templates": "캠페인 템플릿",
-    "billing": "결제 · 청구"
+    "billing": "결제 · 청구",
+    "trends": "트렌드"
   },
   "blog": {
     "nav_label": "블로그"
@@ -1441,5 +1442,73 @@
     "tx_creative_review": "소재 검수 서비스",
     "tx_pending_campaign": "캠페인 잔금 (대기)",
     "tx_addon_analytics": "애드온 · 성과 리포트"
+  },
+  "trends": {
+    "meta_title": "지역별 OOH 트렌드 | XtheX",
+    "meta_description": "주요 도시별 옥외광고 트렌드, 인기 매체, 평균 예산·성공 사례를 지도에서 확인하고 PDF로 저장하세요.",
+    "kicker": "리서치",
+    "title": "지역별 트렌드 리포트",
+    "subtitle": "데모 데이터 기반 인사이트입니다. 마커를 눌러 지역 상세를 보고, 전체 또는 지역 단위로 리포트를 인쇄·PDF 저장할 수 있습니다.",
+    "map_hint": "지도의 마커를 클릭하면 해당 도시의 트렌드 상세가 열립니다.",
+    "map_popup": "「{name}」상세 보기 — 클릭",
+    "download_full_pdf": "전체 리포트 PDF",
+    "download_region_pdf": "이 지역 PDF",
+    "pdf_print_hint": "인쇄 창에서 «PDF로 저장»을 선택하세요.",
+    "popular_label": "인기 매체",
+    "avg_budget_label": "평균 주간 예산(참고)",
+    "yoy_label": "전년 대비",
+    "yoy_value": "+{n}% YoY",
+    "trend_summary_label": "트렌드 요약",
+    "case_title_label": "성공 사례",
+    "cards_title": "지역 카드",
+    "close": "닫기",
+    "report_title": "지역별 OOH 트렌드 리포트",
+    "report_doc_title": "{region} — OOH 트렌드 스냅샷",
+    "report_doc_full": "전체 지역 OOH 트렌드 리포트",
+    "report_footer": "XtheX 데모 리포트입니다. 실제 시장 데이터와 다를 수 있습니다.",
+    "regions": {
+      "seoul": {
+        "name": "서울",
+        "popular_media": "지하철 PSD · 강남·홍대 디지털보드",
+        "trend_summary": "통근·소셜 동선 중심으로 디지털 OOH 비중이 확대되고, 야간 프라임 슬롯 경쟁이 심화됩니다.",
+        "case_title": "글로벌 뷰티 브랜드 Q1 캠페인",
+        "case_body": "강남·홍대 디지털 믹스 3주 운영으로 목표 노출 대비 약 118% 달성(데모 집계)."
+      },
+      "tokyo": {
+        "name": "도쿄",
+        "popular_media": "시부야·신주쿠 대형 디지털 · 오피스가 네트워크",
+        "trend_summary": "비즈니스 디스트릭트와 랜드마크 스크린의 조합이 브랜드 런칭에 선호됩니다.",
+        "case_title": "B2B SaaS 브랜드 인지 캠페인",
+        "case_body": "오피스가 + 시부야 대형 포맷 병행으로 IT 의사결정자 도달률 개선(데모 시나리오)."
+      },
+      "nyc": {
+        "name": "뉴욕",
+        "popular_media": "타임스퀘어급 디지털 · 스트리트 퍼니처",
+        "trend_summary": "프리미엄 디지털과 근접 매체의 하이브리드가 리테일·핀테크에 두드러집니다.",
+        "case_title": "플래그십 오픈 연계 캠페인",
+        "case_body": "맨해튼 핵심 상권 2주 집중으로 매장 방문 유도 성과 보고(데모)."
+      },
+      "shanghai": {
+        "name": "상하이",
+        "popular_media": "난징루 디지털 · 쇼핑몰 네트워크",
+        "trend_summary": "몰·CBD 동시 노출과 대형 포맷 수요가 빠르게 회복 중입니다.",
+        "case_title": "신에너지 차량 런칭",
+        "case_body": "루자쭈이·쇼핑몰 디지털 조합으로 젊은 층 인지도 상승(데모)."
+      },
+      "london": {
+        "name": "런던",
+        "popular_media": "지하철 디지털 · 버스 T-Side",
+        "trend_summary": "친환경·프로그래매틱 구매 논의가 늘고, 트랜짓+가로변 디지털이 안정적입니다.",
+        "case_title": "패션 리테일 시즌 캠페인",
+        "case_body": "웨스트엔드 디지털과 버스 상품 병행으로 오프라인 트래픽 증가(데모)."
+      },
+      "dubai": {
+        "name": "두바이",
+        "popular_media": "스카이라인 디지털 · 몰 프리미엄 스크린",
+        "trend_summary": "관광·럭셔리 브랜드 수요가 높고, 초대형 랜드마크 매체 CPM이 상대적으로 강세입니다.",
+        "case_title": "럭셔리 리조트 오프닝",
+        "case_body": "Downtown·Dubai Mall 인근 디지털 믹스로 국제 방문객 도달 극대화(데모)."
+      }
+    }
   }
 }

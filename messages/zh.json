@@ -163,7 +163,8 @@
     "sign_up": "注册",
     "currency": "货币",
     "templates": "活动模板",
-    "billing": "账单"
+    "billing": "账单",
+    "trends": "趋势"
   },
   "blog": {
     "nav_label": "博客"
@@ -1371,5 +1372,73 @@
     "tx_creative_review": "素材审核服务",
     "tx_pending_campaign": "活动尾款（待付）",
     "tx_addon_analytics": "附加 · 数据报告"
+  },
+  "trends": {
+    "meta_title": "区域 OOH 趋势 | XtheX",
+    "meta_description": "按城市查看户外广告趋势、热门形式、参考预算与案例，支持地图弹窗与 PDF 导出。",
+    "kicker": "洞察",
+    "title": "区域趋势报告",
+    "subtitle": "基于演示数据的洞察。点击地图标记查看详情，可打印或保存完整/单城 PDF。",
+    "map_hint": "点击地图上的标记即可打开该城市趋势详情。",
+    "map_popup": "查看「{name}」详情",
+    "download_full_pdf": "完整报告 PDF",
+    "download_region_pdf": "本区域 PDF",
+    "pdf_print_hint": "在打印对话框中选择「另存为 PDF」。",
+    "popular_label": "热门媒体",
+    "avg_budget_label": "平均周预算（参考）",
+    "yoy_label": "同比",
+    "yoy_value": "同比 +{n}%",
+    "trend_summary_label": "趋势摘要",
+    "case_title_label": "成功案例",
+    "cards_title": "按城市浏览",
+    "close": "关闭",
+    "report_title": "区域 OOH 趋势报告",
+    "report_doc_title": "{region} — OOH 趋势快照",
+    "report_doc_full": "全部区域 OOH 趋势报告",
+    "report_footer": "XtheX 演示报告，非实时市场数据。",
+    "regions": {
+      "seoul": {
+        "name": "首尔",
+        "popular_media": "地铁 PSD · 江南/弘大数字大屏",
+        "trend_summary": "通勤与社交动线上数字户外占比上升，黄金时段竞争加剧。",
+        "case_title": "国际美妆品牌 Q1 推广",
+        "case_body": "江南与弘大数字组合投放三周，曝光约达目标的 118%（演示数据）。"
+      },
+      "tokyo": {
+        "name": "东京",
+        "popular_media": "涩谷/新宿大型数字屏 · 写字楼网络",
+        "trend_summary": "商务区叠加地标大屏仍是新品发布的热门组合。",
+        "case_title": "B2B SaaS 认知投放",
+        "case_body": "写字楼数字 + 涩谷主视觉屏，改善对 IT 决策者的触达（演示场景）。"
+      },
+      "nyc": {
+        "name": "纽约",
+        "popular_media": "时代广场级数字屏 · 街道设施媒体",
+        "trend_summary": "高端数字与近场媒体的混合在零售与金融科技中尤为突出。",
+        "case_title": "旗舰店开业联动",
+        "case_body": "曼哈顿核心区两周集中投放，带动到店（演示）。"
+      },
+      "shanghai": {
+        "name": "上海",
+        "popular_media": "南京路数字屏 · 商场网络",
+        "trend_summary": "商场与 CBD 同步曝光需求回升，大画幅投放增长明显。",
+        "case_title": "新能源车上市",
+        "case_body": "陆家嘴 + 商场数字组合提升年轻都市人群认知（演示）。"
+      },
+      "london": {
+        "name": "伦敦",
+        "popular_media": "地铁数字 · 公交 T 牌",
+        "trend_summary": "可持续与程序化购买讨论增多；交通 + 路边数字仍稳健。",
+        "case_title": "时尚零售季推广",
+        "case_body": "西区数字 + 公交提升线下客流（演示）。"
+      },
+      "dubai": {
+        "name": "迪拜",
+        "popular_media": "天际线数字屏 · 高端商场大屏",
+        "trend_summary": "旅游与奢侈品牌需求旺盛，地标级媒体 CPM 相对坚挺。",
+        "case_title": "奢华度假酒店开业",
+        "case_body": "市中心/迪拜商场周边组合最大化国际访客触达（演示）。"
+      }
+    }
   }
 }

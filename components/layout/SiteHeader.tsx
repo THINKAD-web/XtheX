@@ -27,6 +27,7 @@ export async function SiteHeader() {
     { href: "/campaign-planner", label: tNav("campaign_planner") },
     { href: "/templates", label: tNav("templates") },
     { href: "/billing", label: tNav("billing") },
+    { href: "/trends", label: tNav("trends") },
     { href: "/news", label: tNews("title") },
     { href: "/blog", label: tBlog("nav_label") },
     { href: "/about", label: tNav("about") },

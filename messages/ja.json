@@ -163,7 +163,8 @@
     "sign_up": "新規登録",
     "currency": "通貨",
     "templates": "テンプレート",
-    "billing": "請求"
+    "billing": "請求",
+    "trends": "トレンド"
   },
   "blog": {
     "nav_label": "ブログ"
@@ -1371,5 +1372,73 @@
     "tx_creative_review": "クリエイティブ審査サービス",
     "tx_pending_campaign": "キャンペーン残金（未払い）",
     "tx_addon_analytics": "アドオン・レポート"
+  },
+  "trends": {
+    "meta_title": "地域別OOHトレンド | XtheX",
+    "meta_description": "主要都市の屋外広告トレンド、人気フォーマット、平均予算と事例を地図で確認しPDF保存。",
+    "kicker": "インサイト",
+    "title": "地域別トレンドレポート",
+    "subtitle": "デモデータに基づくインサイトです。マーカーで詳細を開き、全体または地域単位で印刷・PDF保存できます。",
+    "map_hint": "地図のマーカーをクリックするとその都市の詳細が開きます。",
+    "map_popup": "「{name}」の詳細を見る",
+    "download_full_pdf": "全体レポートPDF",
+    "download_region_pdf": "この地域のPDF",
+    "pdf_print_hint": "印刷ダイアログで「PDFに保存」を選んでください。",
+    "popular_label": "人気メディア",
+    "avg_budget_label": "平均週次予算（目安）",
+    "yoy_label": "前年比",
+    "yoy_value": "前年比 +{n}%",
+    "trend_summary_label": "トレンド要約",
+    "case_title_label": "成功事例",
+    "cards_title": "都市一覧",
+    "close": "閉じる",
+    "report_title": "地域別OOHトレンドレポート",
+    "report_doc_title": "{region} — OOHトレンドスナップショット",
+    "report_doc_full": "全地域OOHトレンドレポート",
+    "report_footer": "XtheXデモレポートです。実際の市場データと異なる場合があります。",
+    "regions": {
+      "seoul": {
+        "name": "ソウル",
+        "popular_media": "地下鉄PSD・江南・弘大デジタルボード",
+        "trend_summary": "通勤・ソーシャル動線でデジタルOOH比率が拡大。プライム帯の競争が激化しています。",
+        "case_title": "グローバルビューティー Q1キャンペーン",
+        "case_body": "江南・弘大デジタルミックス3週で目標インプレッション比約118%（デモ集計）。"
+      },
+      "tokyo": {
+        "name": "東京",
+        "popular_media": "渋谷・新宿大型デジタル・オフィス街ネットワーク",
+        "trend_summary": "ビジネス街とランドマークスクリーンの組み合わせがローンチに好まれています。",
+        "case_title": "B2B SaaS 認知キャンペーン",
+        "case_body": "オフィス街＋渋谷大型でIT意思決定者へのリーチ改善（デモシナリオ）。"
+      },
+      "nyc": {
+        "name": "ニューヨーク",
+        "popular_media": "タイムズスクエア級デジタル・ストリートファニチャー",
+        "trend_summary": "プレミアムデジタルと近接メディアのハイブリッドが小売・フィンテックで目立ちます。",
+        "case_title": "旗艦店オープン連動",
+        "case_body": "マンハッタン中核2週集中で来店促進（デモ）。"
+      },
+      "shanghai": {
+        "name": "上海",
+        "popular_media": "南京路デジタル・モールネットワーク",
+        "trend_summary": "モール＋CBD同時露出と大型フォーマット需要が急速に回復しています。",
+        "case_title": "EV新車ローンチ",
+        "case_body": "陸家嘴＋モールデジタルで若年都市層の認知向上（デモ）。"
+      },
+      "london": {
+        "name": "ロンドン",
+        "popular_media": "地下鉄デジタル・バスTサイド",
+        "trend_summary": "サステナビリティとプログラマティック購入の議論が増加。トランジット＋路上デジタルが安定。",
+        "case_title": "ファッション小売シーズン",
+        "case_body": "ウェストエンドデジタル＋バスでオフライン人流増（デモ）。"
+      },
+      "dubai": {
+        "name": "ドバイ",
+        "popular_media": "スカイラインデジタル・高級モールスクリーン",
+        "trend_summary": "観光・ラグジュアリー需要が高く、ランドマーク級メディアのCPMが比較的堅調です。",
+        "case_title": "ラグジュアリーリゾートオープン",
+        "case_body": "ダウンタウン・ドバイモール周辺ミックスで国際来訪者リーチ最大化（デモ）。"
+      }
+    }
   }
 }

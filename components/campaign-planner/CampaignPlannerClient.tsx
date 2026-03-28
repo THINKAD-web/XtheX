@@ -3,7 +3,8 @@
 import { useCallback, useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Sparkles, ShoppingCart, FileDown, Loader2 } from "lucide-react";
+import { Sparkles, ShoppingCart, FileDown, Loader2, MessageCircle } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -296,6 +297,13 @@ export function CampaignPlannerClient() {
               <FileDown className="h-4 w-4" />
               {t("export_pdf")}
             </Button>
+            <Link
+              href="/contact"
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-orange-500 px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-orange-400 active:scale-95 animate-cta-pulse"
+            >
+              <MessageCircle className="h-4 w-4" />
+              {t("inquiry_cta") ?? "문의하기"}
+            </Link>
           </div>
 
           {/* Recommended title */}

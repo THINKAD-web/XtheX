@@ -22,6 +22,9 @@ import { AdminMediaEditPanel } from "@/components/medias/AdminMediaEditPanel";
 import { AdminCaseStudyModal } from "@/components/medias/AdminCaseStudyModal";
 import { AvailabilityCalendar } from "@/components/medias/AvailabilityCalendar";
 import { BookingRequestModal } from "@/components/medias/BookingRequestModal";
+import { DiscountBanner } from "@/components/medias/DiscountBanner";
+import { ExitIntentPopup } from "@/components/medias/ExitIntentPopup";
+import { VerifiedBadge } from "@/components/medias/VerifiedBadge";
 import { getCurrentUser } from "@/lib/auth/rbac";
 import {
   convertCurrency,
@@ -309,6 +312,7 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
                     #{tag}
                   </span>
                 ))}
+                <VerifiedBadge locale={locale} />
                 {media.trustScore != null && (
                   <span className="ml-1 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-300 ring-1 ring-emerald-500/40">
                     Trust {media.trustScore}/100
@@ -351,9 +355,10 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
                   targetAudienceText={media.targetAudience}
                 />
               </div>
+              <DiscountBanner locale={locale} contactHref={`/${locale}/medias/${media.id}/contact`} />
               <Link
                 href={`/${locale}/medias/${media.id}/contact`}
-                className="mt-2 flex h-12 w-full items-center justify-center rounded-full bg-orange-500 px-4 text-base font-semibold text-white shadow-sm hover:bg-orange-400"
+                className="mt-2 flex h-12 w-full items-center justify-center rounded-full bg-orange-500 px-4 text-base font-semibold text-white shadow-sm hover:bg-orange-400 animate-cta-pulse"
               >
                 {t("contact_this_media")}
               </Link>
@@ -768,6 +773,7 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
           }}
         />
       )}
+      <ExitIntentPopup locale={locale} contactHref={`/${locale}/medias/${media.id}/contact`} />
     </AppSiteChrome>
   );
 }

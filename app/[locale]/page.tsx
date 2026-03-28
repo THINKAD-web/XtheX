@@ -22,6 +22,9 @@ import { HowItWorksSectionClient } from "@/components/home/HowItWorksSectionClie
 import { CrossBorderCaseCard } from "@/components/home/CrossBorderCaseCard";
 import { ScrollReveal } from "@/components/scroll-reveal";
 import { RecentlyViewedSection } from "@/components/medias/RecentlyViewedSection";
+import { ClientLogosSection } from "@/components/home/ClientLogosSection";
+import { TrustBadgesSection } from "@/components/home/TrustBadgesSection";
+import { EmailSubscriptionPopup } from "@/components/EmailSubscriptionPopup";
 
 const LazyPulse = () => (
   <div className="h-64 animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800" />
@@ -213,6 +216,10 @@ export default async function Home({
         <HomeHeroDaypart />
         <BetaNoticebar />
 
+        <ScrollReveal direction="up" delay={0.05}>
+          <ClientLogosSection />
+        </ScrollReveal>
+
         <ScrollReveal direction="up" delay={0.1}>
           <section className="border-b border-zinc-100 bg-white py-10 dark:border-zinc-800 dark:bg-zinc-950">
             <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -287,6 +294,9 @@ export default async function Home({
           <StatsSection />
         </ScrollReveal>
         <ScrollReveal direction="up">
+          <TrustBadgesSection />
+        </ScrollReveal>
+        <ScrollReveal direction="up">
           <Partners />
         </ScrollReveal>
         <ScrollReveal direction="up">
@@ -301,6 +311,7 @@ export default async function Home({
         <ScrollReveal direction="up">
           <FaqSection />
         </ScrollReveal>
+        <EmailSubscriptionPopup />
       </main>
     </AppSiteChrome>
   );

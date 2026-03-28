@@ -1,12 +1,13 @@
 "use client";
 
+import { useRef } from "react";
 import type { LucideIcon } from "lucide-react";
 import { CheckCircle, FileText, Globe, Users } from "lucide-react";
+import { motion, useInView } from "framer-motion";
 import { CountUp } from "@/components/count-up";
 import { landing } from "@/lib/landing-theme";
 import { useLandingLightChrome } from "@/hooks/use-landing-light-chrome";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
 
 const DEFAULT_ITEMS: Array<{
   end: number;
@@ -98,6 +99,9 @@ export function StatsSection({
             : "border-zinc-800/50 bg-gradient-to-b from-white to-zinc-50/90 dark:from-zinc-950 dark:to-zinc-900/50",
         );
 
+  const gridRef = useRef<HTMLDivElement>(null);
+  const gridInView = useInView(gridRef, { once: true, amount: 0.15 });
+
   return (
     <section className={sectionClass}>
       <div className={landing.container}>
@@ -117,10 +121,13 @@ export function StatsSection({
         >
           {subtitle}
         </p>
-        <div className={landing.grid4}>
-          {items.map(({ end, suffix, duration, icon: Icon, label }) => (
-            <div
+        <div ref={gridRef} className={landing.grid4}>
+          {items.map(({ end, suffix, duration, icon: Icon, label }, i) => (
+            <motion.div
               key={label}
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              animate={gridInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 30, scale: 0.95 }}
+              transition={{ duration: 0.5, delay: i * 0.1, ease: [0.25, 0.1, 0.25, 1] }}
               className={cn(
                 `${landing.card} flex flex-col items-center gap-4 px-6 py-10 text-center`,
                 isLight &&
@@ -158,7 +165,7 @@ export function StatsSection({
               >
                 {label}
               </p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

@@ -20,6 +20,7 @@ import { TestimonialsSectionClient } from "@/components/home/TestimonialsSection
 import { FeaturesSectionClient } from "@/components/home/FeaturesSectionClient";
 import { HowItWorksSectionClient } from "@/components/home/HowItWorksSectionClient";
 import { CrossBorderCaseCard } from "@/components/home/CrossBorderCaseCard";
+import { ScrollReveal } from "@/components/scroll-reveal";
 
 const LazyPulse = () => (
   <div className="h-64 animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800" />
@@ -210,66 +211,93 @@ export default async function Home({
       <main>
         <HomeHeroDaypart />
         <BetaNoticebar />
-        {/* 크로스보더 성공 사례 */}
-        <section className="border-b border-zinc-100 bg-white py-10 dark:border-zinc-800 dark:bg-zinc-950">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <p className="mb-4 text-center text-xs font-semibold uppercase tracking-widest text-zinc-400">
-              {locale.startsWith("ko") ? "실제 진행 사례" : locale.startsWith("ja") ? "実績事例" : locale.startsWith("zh") ? "真实案例" : "Real Cases"}
-            </p>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <CrossBorderCaseCard
-                tag={locale.startsWith("ko") ? "48시간" : locale.startsWith("ja") ? "48時間" : locale.startsWith("zh") ? "48小时" : "48hrs"}
-                title={locale.startsWith("ko") ? "중국 대행사 → 시부야 빌보드 확정" : locale.startsWith("ja") ? "中国代理店 → 渋谷ビルボード確定" : locale.startsWith("zh") ? "中国代理商 → 确定涩谷广告牌" : "Chinese Agency → Shibuya Billboard"}
-                description={locale.startsWith("ko") ? "인하우스 대행사가 일본 옥외광고 진행, AI 매칭으로 48시간 내 완료" : locale.startsWith("ja") ? "インハウス代理店がAIマッチングで48時間以内に日本OOH広告を完了" : locale.startsWith("zh") ? "内部代理商通过AI匹配在48小时内完成日本户外广告投放" : "In-house agency completed Japan OOH via AI matching in 48hrs"}
-                fromCountry="🇨🇳"
-                toCountry="🇯🇵"
-              />
-              <CrossBorderCaseCard
-                tag={locale.startsWith("ko") ? "글로벌" : locale.startsWith("ja") ? "グローバル" : locale.startsWith("zh") ? "全球" : "Global"}
-                title={locale.startsWith("ko") ? "일본 게임사 → 타임스스퀘어" : locale.startsWith("ja") ? "日本ゲーム会社 → タイムズスクエア" : locale.startsWith("zh") ? "日本游戏公司 → 时代广场" : "Japanese Game Co. → Times Square"}
-                description={locale.startsWith("ko") ? "신작 출시 프로모션, 뉴욕 타임스스퀘어 대형 스크린 집행" : locale.startsWith("ja") ? "新作リリース、NYタイムズスクエアの大型スクリーンに掲載" : locale.startsWith("zh") ? "新游戏发布宣传，在纽约时代广场大屏幕投放" : "New game launch promo on NYC Times Square large screen"}
-                fromCountry="🇯🇵"
-                toCountry="🇺🇸"
-              />
-              <CrossBorderCaseCard
-                tag={locale.startsWith("ko") ? "멀티시장" : locale.startsWith("ja") ? "マルチ市場" : locale.startsWith("zh") ? "多市场" : "Multi-market"}
-                title={locale.startsWith("ko") ? "한국 브랜드 → 도쿄·상하이 동시" : locale.startsWith("ja") ? "韓国ブランド → 東京・上海同時展開" : locale.startsWith("zh") ? "韩国品牌 → 东京·上海同步投放" : "Korean Brand → Tokyo & Shanghai"}
-                description={locale.startsWith("ko") ? "한 번의 요청으로 두 나라 동시 집행, 현지 계약 자동 처리" : locale.startsWith("ja") ? "1リクエストで2カ国同時掲載、現地契約を自動処理" : locale.startsWith("zh") ? "一次请求同时在两国投放，自动处理当地合同" : "Single request for 2-country campaign, auto local contract handling"}
-                fromCountry="🇰🇷"
-                toCountry="🇯🇵🇨🇳"
-              />
+
+        <ScrollReveal direction="up" delay={0.1}>
+          <section className="border-b border-zinc-100 bg-white py-10 dark:border-zinc-800 dark:bg-zinc-950">
+            <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+              <p className="mb-4 text-center text-xs font-semibold uppercase tracking-widest text-zinc-400">
+                {locale.startsWith("ko") ? "실제 진행 사례" : locale.startsWith("ja") ? "実績事例" : locale.startsWith("zh") ? "真实案例" : "Real Cases"}
+              </p>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <CrossBorderCaseCard
+                  tag={locale.startsWith("ko") ? "48시간" : locale.startsWith("ja") ? "48時間" : locale.startsWith("zh") ? "48小时" : "48hrs"}
+                  title={locale.startsWith("ko") ? "중국 대행사 → 시부야 빌보드 확정" : locale.startsWith("ja") ? "中国代理店 → 渋谷ビルボード確定" : locale.startsWith("zh") ? "中国代理商 → 确定涩谷广告牌" : "Chinese Agency → Shibuya Billboard"}
+                  description={locale.startsWith("ko") ? "인하우스 대행사가 일본 옥외광고 진행, AI 매칭으로 48시간 내 완료" : locale.startsWith("ja") ? "インハウス代理店がAIマッチングで48時間以内に日本OOH広告を完了" : locale.startsWith("zh") ? "内部代理商通过AI匹配在48小时内完成日本户外广告投放" : "In-house agency completed Japan OOH via AI matching in 48hrs"}
+                  fromCountry="🇨🇳"
+                  toCountry="🇯🇵"
+                />
+                <CrossBorderCaseCard
+                  tag={locale.startsWith("ko") ? "글로벌" : locale.startsWith("ja") ? "グローバル" : locale.startsWith("zh") ? "全球" : "Global"}
+                  title={locale.startsWith("ko") ? "일본 게임사 → 타임스스퀘어" : locale.startsWith("ja") ? "日本ゲーム会社 → タイムズスクエア" : locale.startsWith("zh") ? "日本游戏公司 → 时代广场" : "Japanese Game Co. → Times Square"}
+                  description={locale.startsWith("ko") ? "신작 출시 프로모션, 뉴욕 타임스스퀘어 대형 스크린 집행" : locale.startsWith("ja") ? "新作リリース、NYタイムズスクエアの大型スクリーンに掲載" : locale.startsWith("zh") ? "新游戏发布宣传，在纽约时代广场大屏幕投放" : "New game launch promo on NYC Times Square large screen"}
+                  fromCountry="🇯🇵"
+                  toCountry="🇺🇸"
+                />
+                <CrossBorderCaseCard
+                  tag={locale.startsWith("ko") ? "멀티시장" : locale.startsWith("ja") ? "マルチ市場" : locale.startsWith("zh") ? "多市场" : "Multi-market"}
+                  title={locale.startsWith("ko") ? "한국 브랜드 → 도쿄·상하이 동시" : locale.startsWith("ja") ? "韓国ブランド → 東京・上海同時展開" : locale.startsWith("zh") ? "韩国品牌 → 东京·上海同步投放" : "Korean Brand → Tokyo & Shanghai"}
+                  description={locale.startsWith("ko") ? "한 번의 요청으로 두 나라 동시 집행, 현지 계약 자동 처리" : locale.startsWith("ja") ? "1リクエストで2カ国同時掲載、現地契約を自動処理" : locale.startsWith("zh") ? "一次请求同时在两国投放，自动处理当地合同" : "Single request for 2-country campaign, auto local contract handling"}
+                  fromCountry="🇰🇷"
+                  toCountry="🇯🇵🇨🇳"
+                />
+              </div>
             </div>
-          </div>
-        </section>
-        <MediaMixSearchSection />
+          </section>
+        </ScrollReveal>
+
+        <ScrollReveal direction="up" delay={0.05}>
+          <MediaMixSearchSection />
+        </ScrollReveal>
+
         <HomeSolidDaypartWrapper>
-          <TrendingMediasSection locale={locale} />
-          <DashboardTabSection
-            locale={locale}
-            realtimeSlot={<RealtimeMiniDashboardSection locale={locale} />}
-            performanceSlot={<LivePerformanceDashboardSection locale={locale} />}
-          />
-          <SuccessCaseGallery
-            locale={locale}
-            cases={SUCCESS_CASES}
-            applyHrefBase={`/${locale}/admin/medias`}
-            titleKo="성공 사례 갤러리"
-            titleEn="Success case gallery"
-            subtitleKo="검증된 사례를 보고, 해당 타겟팅을 바로 적용해보세요."
-            subtitleEn="Browse proven cases and apply targeting instantly."
-            autoToneFromBrightness
-          />
+          <ScrollReveal direction="up">
+            <TrendingMediasSection locale={locale} />
+          </ScrollReveal>
+          <ScrollReveal direction="up" delay={0.1}>
+            <DashboardTabSection
+              locale={locale}
+              realtimeSlot={<RealtimeMiniDashboardSection locale={locale} />}
+              performanceSlot={<LivePerformanceDashboardSection locale={locale} />}
+            />
+          </ScrollReveal>
+          <ScrollReveal direction="up" delay={0.15}>
+            <SuccessCaseGallery
+              locale={locale}
+              cases={SUCCESS_CASES}
+              applyHrefBase={`/${locale}/admin/medias`}
+              titleKo="성공 사례 갤러리"
+              titleEn="Success case gallery"
+              subtitleKo="검증된 사례를 보고, 해당 타겟팅을 바로 적용해보세요."
+              subtitleEn="Browse proven cases and apply targeting instantly."
+              autoToneFromBrightness
+            />
+          </ScrollReveal>
         </HomeSolidDaypartWrapper>
-        <Features />
-        <HowItWorks />
-        <StatsSection />
-        <Partners />
-        <Testimonials />
-        <CtaBanner />
+
+        <ScrollReveal direction="up">
+          <Features />
+        </ScrollReveal>
+        <ScrollReveal direction="up">
+          <HowItWorks />
+        </ScrollReveal>
+        <ScrollReveal direction="up">
+          <StatsSection />
+        </ScrollReveal>
+        <ScrollReveal direction="up">
+          <Partners />
+        </ScrollReveal>
+        <ScrollReveal direction="up">
+          <Testimonials />
+        </ScrollReveal>
+        <ScrollReveal direction="up">
+          <CtaBanner />
+        </ScrollReveal>
         <div className="mx-auto max-w-4xl px-4">
           <hr className="border-t border-zinc-200 dark:border-zinc-800" />
         </div>
-        <FaqSection />
+        <ScrollReveal direction="up">
+          <FaqSection />
+        </ScrollReveal>
       </main>
     </AppSiteChrome>
   );

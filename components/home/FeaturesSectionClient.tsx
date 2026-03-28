@@ -1,6 +1,8 @@
 "use client";
 
+import { useRef } from "react";
 import { Shield, Globe, Zap, Lock } from "lucide-react";
+import { motion, useInView } from "framer-motion";
 import { Link } from "@/i18n/navigation";
 import { landing } from "@/lib/landing-theme";
 import { useLandingLightChrome } from "@/hooks/use-landing-light-chrome";
@@ -24,6 +26,8 @@ export function FeaturesSectionClient({
   cards,
 }: Props) {
   const isLight = useLandingLightChrome();
+  const gridRef = useRef<HTMLDivElement>(null);
+  const gridInView = useInView(gridRef, { once: true, amount: 0.15 });
 
   return (
     <section
@@ -52,12 +56,15 @@ export function FeaturesSectionClient({
         >
           {sectionSubtitle}
         </p>
-        <div className={landing.grid4}>
+        <div ref={gridRef} className={landing.grid4}>
           {cards.map((card, i) => {
             const Icon = ICONS[i];
             return (
-              <div
+              <motion.div
                 key={card.title}
+                initial={{ opacity: 0, y: 30 }}
+                animate={gridInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                transition={{ duration: 0.5, delay: i * 0.1, ease: [0.25, 0.1, 0.25, 1] }}
                 className={cn(
                   landing.card,
                   isLight &&
@@ -94,7 +101,7 @@ export function FeaturesSectionClient({
                 >
                   {card.desc}
                 </p>
-              </div>
+              </motion.div>
             );
           })}
         </div>

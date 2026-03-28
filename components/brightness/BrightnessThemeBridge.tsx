@@ -4,24 +4,24 @@ import * as React from "react";
 import { useTheme } from "next-themes";
 import { useBrightness } from "@/components/brightness/BrightnessPreference";
 
-/**
- * 밝기(자동/밝게/어둡게)를 next-themes와 동기화해
- * 모든 페이지의 `dark:` 변형·CSS 변수가 같은 기준을 따르게 함.
- */
 export function BrightnessThemeBridge() {
   const { pref, effective } = useBrightness();
   const { setTheme } = useTheme();
 
   React.useEffect(() => {
+    const html = document.documentElement;
+    html.classList.add("transitioning");
+
     if (pref === "bright") {
       setTheme("light");
-      return;
-    }
-    if (pref === "dim") {
+    } else if (pref === "dim") {
       setTheme("dark");
-      return;
+    } else {
+      setTheme(effective === "day" ? "light" : "dark");
     }
-    setTheme(effective === "day" ? "light" : "dark");
+
+    const tid = setTimeout(() => html.classList.remove("transitioning"), 350);
+    return () => clearTimeout(tid);
   }, [pref, effective, setTheme]);
 
   return null;

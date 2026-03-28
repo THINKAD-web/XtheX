@@ -1,6 +1,8 @@
 "use client";
 
+import { useRef } from "react";
 import { Star } from "lucide-react";
+import { motion, useInView } from "framer-motion";
 import { landing } from "@/lib/landing-theme";
 import { useLandingLightChrome } from "@/hooks/use-landing-light-chrome";
 import { cn } from "@/lib/utils";
@@ -26,6 +28,8 @@ export function TestimonialsSectionClient({
   items,
 }: Props) {
   const isDay = useLandingLightChrome();
+  const gridRef = useRef<HTMLDivElement>(null);
+  const gridInView = useInView(gridRef, { once: true, amount: 0.15 });
 
   return (
     <section
@@ -54,10 +58,13 @@ export function TestimonialsSectionClient({
         >
           {subtitle}
         </p>
-        <div className={landing.grid3}>
-          {items.map((row) => (
-            <div
+        <div ref={gridRef} className={landing.grid3}>
+          {items.map((row, i) => (
+            <motion.div
               key={row.quote}
+              initial={{ opacity: 0, y: 30 }}
+              animate={gridInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              transition={{ duration: 0.5, delay: i * 0.12, ease: [0.25, 0.1, 0.25, 1] }}
               className={cn(
                 landing.card,
                 isDay &&
@@ -118,7 +125,7 @@ export function TestimonialsSectionClient({
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

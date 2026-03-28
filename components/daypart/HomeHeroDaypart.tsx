@@ -9,6 +9,7 @@ import { useLocalDaypart } from "@/hooks/use-local-daypart";
 import { cn } from "@/lib/utils";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 const SPOTS: Record<string, string[]> = {
   ko: ["타임스스퀘어", "시부야 교차로", "강남 대형 전광판", "상하이 루자쭈이"],
@@ -30,6 +31,15 @@ export function HomeHeroDaypart() {
   const { status, data: session } = useSession();
   const part = useLocalDaypart();
   const isDay = part === "day";
+
+  const heroRef = React.useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "25%"]);
+  const contentY = useTransform(scrollYProgress, [0, 1], [0, 80]);
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
 
   const [spotIdx, setSpotIdx] = React.useState(0);
   const [fade, setFade] = React.useState(true);
@@ -57,6 +67,7 @@ export function HomeHeroDaypart() {
 
   return (
     <section
+      ref={heroRef}
       className={cn(
         "relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 pb-28 pt-32 sm:pb-32 sm:pt-36 lg:pb-36 lg:pt-40",
         "text-white",
@@ -64,15 +75,17 @@ export function HomeHeroDaypart() {
     >
       {/* Animated gradient base */}
       <div className="animate-hero-gradient absolute inset-0" />
-      {/* Background Image */}
-      <Image
-        src="/images/hero-billboard.jpg"
-        alt="Times Square Billboard"
-        fill
-        className="object-cover opacity-60"
-        priority
-        quality={80}
-      />
+      {/* Background Image with parallax */}
+      <motion.div className="absolute inset-0" style={{ y: bgY }}>
+        <Image
+          src="/images/hero-billboard.jpg"
+          alt="Times Square Billboard"
+          fill
+          className="object-cover opacity-60 scale-110"
+          priority
+          quality={80}
+        />
+      </motion.div>
       {/* Overlay */}
       <div
         className={cn(
@@ -83,7 +96,8 @@ export function HomeHeroDaypart() {
         )}
       />
 
-      <div
+      <motion.div
+        style={{ y: contentY, opacity: contentOpacity }}
         className={cn(
           "relative z-10 mx-auto max-w-4xl px-4 text-center transition-all duration-500",
           !loading && "animate-in fade-in-0 slide-in-from-bottom-3 duration-500",
@@ -143,7 +157,7 @@ export function HomeHeroDaypart() {
             </>
           ) : null}
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

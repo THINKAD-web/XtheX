@@ -54,6 +54,12 @@ export default async function AdvertiserCampaignsPage({
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <Link
+              href="/dashboard/advertiser/campaigns/performance"
+              className={landing.btnSecondary}
+            >
+              성과 분석
+            </Link>
             <Link href="/campaigns/new" className={landing.btnPrimary}>
               {t("quick_new_campaign")}
             </Link>

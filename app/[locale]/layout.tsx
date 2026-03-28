@@ -6,6 +6,7 @@ import { ConditionalSiteFooter } from "@/components/layout/ConditionalSiteFooter
 import { OnboardingGate } from "@/components/onboarding/OnboardingGate";
 import { OmniCartShellLazy } from "@/components/omni/OmniCartShellLazy";
 import { ChatWidget } from "@/components/chat/ChatWidget";
+import { FeedbackWidget } from "@/components/feedback/FeedbackWidget";
 
 type Props = { children: React.ReactNode; params: Promise<{ locale: string }> };
 
@@ -27,6 +28,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           <OnboardingGate>
             <OmniCartShellLazy />
             <ChatWidget />
+            <FeedbackWidget />
             {children}
           </OnboardingGate>
         </main>

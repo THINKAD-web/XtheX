@@ -392,6 +392,16 @@ model SavedFilterPreset {
   updatedAt DateTime @updatedAt
 }
 
+model Feedback {
+  id        String   @id @default(uuid()) @db.Uuid
+  rating    Int
+  message   String?  @db.Text
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
 model News {
   id         String    @id @default(uuid()) @db.Uuid
   slug       String?   @unique

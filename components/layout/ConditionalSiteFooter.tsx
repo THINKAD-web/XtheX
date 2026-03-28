@@ -46,6 +46,12 @@ export function ConditionalSiteFooter() {
             >
               {t("terms")}
             </Link>
+            <Link
+              href="/help"
+              className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+            >
+              {t("help")}
+            </Link>
           </nav>
           <div className="flex items-center gap-3">
             <a href="#" aria-label="Website">

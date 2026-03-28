@@ -1583,7 +1583,7 @@ export function MediaReviewForm({
                     <span className="text-xs text-zinc-300">선택</span>
                   </div>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={url} alt="" className="h-28 w-full rounded object-cover" />
+                  <img src={url} alt="Media thumbnail for selection" className="h-28 w-full rounded object-cover" />
                 </label>
               ))}
             </div>

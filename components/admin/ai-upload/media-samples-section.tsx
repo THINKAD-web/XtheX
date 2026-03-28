@@ -226,7 +226,7 @@ export const MediaSamplesSection = React.forwardRef<
               className="aspect-square overflow-hidden rounded-lg ring-1 ring-violet-800/50"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt="" className="h-full w-full object-cover" />
+              <img src={src} alt="Sample media preview" className="h-full w-full object-cover" />
             </div>
           ))}
         </div>

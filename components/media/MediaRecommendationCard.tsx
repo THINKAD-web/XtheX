@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +14,7 @@ import {
 } from "@/lib/currency";
 
 interface Props {
-  media: any; // Prisma Media 타입
+  media: any;
   aiScore: number;
   aiReason: string;
   currency?: string;
@@ -39,7 +40,7 @@ function toSupportedCurrency(v?: string): SupportedCurrency {
   return isSupportedCurrency(v) ? v : "USD";
 }
 
-export function MediaRecommendationCard({
+export const MediaRecommendationCard = memo(function MediaRecommendationCard({
   media,
   aiScore,
   aiReason,
@@ -129,4 +130,4 @@ export function MediaRecommendationCard({
       </CardContent>
     </Card>
   );
-}
+});

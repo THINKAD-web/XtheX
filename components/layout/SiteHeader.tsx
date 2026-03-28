@@ -32,7 +32,7 @@ export async function SiteHeader() {
   ];
 
   return (
-    <header className="fixed left-0 right-0 top-0 z-50 border-b border-border bg-background/90 backdrop-blur-md">
+    <header role="banner" aria-label="Site header" className="fixed left-0 right-0 top-0 z-50 border-b border-border bg-background/90 backdrop-blur-md">
       <div className={`grid h-14 grid-cols-[auto_1fr_auto] items-center gap-4 ${landing.container}`}>
         <div className="flex items-center gap-2 justify-self-start">
           <MobileNav items={navItems} />
@@ -40,7 +40,7 @@ export async function SiteHeader() {
             XtheX
           </Link>
         </div>
-        <nav className="hidden min-w-0 justify-self-center items-center gap-1 overflow-x-auto text-sm sm:flex sm:gap-5">
+        <nav aria-label="Main navigation" className="hidden min-w-0 justify-self-center items-center gap-1 overflow-x-auto text-sm sm:flex sm:gap-5">
           {navItems.map((item) => (
             <Link
               key={item.href}

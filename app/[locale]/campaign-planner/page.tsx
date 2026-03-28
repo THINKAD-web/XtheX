@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { AppSiteChrome } from "@/components/layout/AppSiteChrome";
-import { CampaignPlannerClient } from "@/components/campaign-planner/CampaignPlannerClient";
+
+const CampaignPlannerClient = dynamic(
+  () =>
+    import("@/components/campaign-planner/CampaignPlannerClient").then(
+      (m) => m.CampaignPlannerClient,
+    ),
+);
 
 export const metadata: Metadata = {
   title: "Campaign Planner | XtheX",

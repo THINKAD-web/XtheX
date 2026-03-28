@@ -119,6 +119,8 @@ export default async function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://maps.googleapis.com" />
+        <link rel="preconnect" href="https://maps.gstatic.com" crossOrigin="anonymous" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -128,13 +130,16 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         data-maps-key={mapsKey ? "set" : "not-set"}
       >
+        <a href="#main-content" className="skip-to-content">
+          Skip to content
+        </a>
         <AuthSessionProvider>
           <ToastProvider>
             <BrightnessProvider>
               <ThemeProvider>
                 <BrightnessThemeBridge />
                 <NavigationProgress />
-                {children}
+                <div id="main-content">{children}</div>
                 <SonnerToaster />
               </ThemeProvider>
             </BrightnessProvider>

@@ -40,7 +40,12 @@ const nextConfig = {
       "recharts",
       "@radix-ui/react-accordion",
       "@radix-ui/react-tooltip",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-dropdown-menu",
+      "@radix-ui/react-select",
+      "@radix-ui/react-popover",
       "framer-motion",
+      "zustand",
     ],
   },
   /**

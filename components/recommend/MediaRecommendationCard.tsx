@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { CheckCircle2, MapPin, Sparkles } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
@@ -39,7 +40,7 @@ const FLAG: Record<string, string> = {
   NL: "🇳🇱",
 };
 
-export function MediaRecommendationCard({
+export const MediaRecommendationCard = memo(function MediaRecommendationCard({
   item,
   displayCurrency,
   isSelected = false,
@@ -143,4 +144,4 @@ export function MediaRecommendationCard({
       </CardContent>
     </Card>
   );
-}
+});

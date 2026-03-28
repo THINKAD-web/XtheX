@@ -1,13 +1,20 @@
 import { setRequestLocale } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
+import dynamic from "next/dynamic";
 import { routing } from "@/i18n/routing";
 import { ConditionalSiteFooter } from "@/components/layout/ConditionalSiteFooter";
 import { OnboardingGate } from "@/components/onboarding/OnboardingGate";
 import { OmniCartShellLazy } from "@/components/omni/OmniCartShellLazy";
-import { ChatWidget } from "@/components/chat/ChatWidget";
-import { FeedbackWidget } from "@/components/feedback/FeedbackWidget";
 import { WelcomeModal } from "@/components/onboarding/WelcomeModal";
+
+const ChatWidget = dynamic(
+  () => import("@/components/chat/ChatWidget").then((m) => m.ChatWidget),
+);
+
+const FeedbackWidget = dynamic(
+  () => import("@/components/feedback/FeedbackWidget").then((m) => m.FeedbackWidget),
+);
 
 type Props = { children: React.ReactNode; params: Promise<{ locale: string }> };
 

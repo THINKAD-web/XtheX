@@ -88,6 +88,30 @@
   --animate-marquee: marquee 30s linear infinite;
 }
 
+/* Global focus-visible ring for keyboard users */
+:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Skip link for keyboard navigation */
+.skip-to-content {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 9999;
+  padding: 0.5rem 1rem;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0 0 0.5rem 0;
+  transition: left 0.2s;
+}
+.skip-to-content:focus {
+  left: 0;
+}
+
 @keyframes hero-gradient-shift {
   0% {
     background-position: 0% 50%;

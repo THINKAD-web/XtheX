@@ -1,5 +1,5 @@
-// 크로스보더 성공 사례 카드 컴포넌트
 "use client";
+import { memo } from "react";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -11,7 +11,7 @@ type Props = {
   className?: string;
 };
 
-export function CrossBorderCaseCard({ tag, title, description, fromCountry, toCountry, className }: Props) {
+export const CrossBorderCaseCard = memo(function CrossBorderCaseCard({ tag, title, description, fromCountry, toCountry, className }: Props) {
   return (
     <div className={cn(
       "relative overflow-hidden rounded-2xl border border-blue-200/60 bg-gradient-to-br from-blue-50 to-white p-5 shadow-sm dark:border-blue-800/40 dark:from-blue-950/40 dark:to-zinc-900 hover:scale-[1.02] hover:shadow-blue-200/60 hover:border-blue-300/60 transition-all duration-300 cursor-pointer",
@@ -29,4 +29,4 @@ export function CrossBorderCaseCard({ tag, title, description, fromCountry, toCo
       <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{description}</p>
     </div>
   );
-}
+});

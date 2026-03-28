@@ -26,29 +26,49 @@ export function ErrorBoundaryUI({
   showDetails = process.env.NODE_ENV === "development",
 }: Props) {
   return (
-    <div className="flex min-h-[50vh] items-center justify-center px-4">
-      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
-          <AlertTriangle className="h-6 w-6 text-destructive" />
+    <div
+      role="alert"
+      aria-live="assertive"
+      className="flex min-h-[60vh] items-center justify-center px-4"
+    >
+      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-10 text-center shadow-sm">
+        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
+          <AlertTriangle className="h-8 w-8 animate-pulse text-destructive" />
         </div>
-        <h1 className="text-lg font-semibold text-foreground">{title}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{description}</p>
+
+        <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+          {title}
+        </h1>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
+          {description}
+        </p>
 
         {showDetails && error?.message ? (
-          <pre className="mt-4 max-h-24 overflow-auto rounded-md border border-destructive/20 bg-destructive/5 p-2 text-left text-xs text-destructive">
+          <pre className="mt-5 max-h-28 overflow-auto rounded-lg border border-destructive/20 bg-destructive/5 p-3 text-left text-xs leading-relaxed text-destructive">
             {error.message}
           </pre>
         ) : null}
 
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+        {error?.digest && !showDetails ? (
+          <p className="mt-4 text-xs text-muted-foreground/60">
+            오류 코드: <code className="font-mono">{error.digest}</code>
+          </p>
+        ) : null}
+
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           {reset ? (
-            <Button type="button" onClick={reset}>
+            <Button
+              type="button"
+              size="lg"
+              className="bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700"
+              onClick={reset}
+            >
               <RefreshCw className="mr-2 h-4 w-4" />
               {retryLabel}
             </Button>
           ) : null}
           <Link href={homeHref}>
-            <Button variant="outline">
+            <Button variant="outline" size="lg">
               <Home className="mr-2 h-4 w-4" />
               {homeLabel}
             </Button>

@@ -241,7 +241,7 @@ export function MediaOwnerEditForm({ backHref, title, subtitle, initial }: Props
                     )}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={url} alt="" className="h-32 w-full object-cover" />
+                    <img src={url} alt="Uploaded media image" className="h-32 w-full object-cover" />
                     <div className="flex items-center justify-between gap-2 p-3">
                       <span className="truncate text-xs text-zinc-600">{url}</span>
                       <button

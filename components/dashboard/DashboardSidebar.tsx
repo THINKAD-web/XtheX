@@ -27,6 +27,7 @@ import {
   Bell,
   LineChart,
   ClipboardCheck,
+  SquareSplitHorizontal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -52,6 +53,7 @@ function getMenu(role: DashboardSidebarRole): NavItem[] {
       { label: "관리자 홈", href: "/admin", icon: Shield },
       { label: "미디어 관리", href: "/admin/medias", icon: Images },
       { label: "콘텐츠 승인", href: "/admin/content-approval", icon: ClipboardCheck },
+      { label: "A/B 테스트", href: "/admin/ab-testing", icon: SquareSplitHorizontal },
       { label: "고객 리뷰", href: "/admin/reviews", icon: Star },
       { label: "리뷰 신고 검토", href: "/admin/review-reports", icon: Flag },
       { label: "문의 관리", href: "/admin/inquiries", icon: Inbox },

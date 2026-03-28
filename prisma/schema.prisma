@@ -681,3 +681,49 @@ model ForumReport {
   @@index([reporterId, createdAt])
 }
 
+enum AbExperimentStatus {
+  DRAFT
+  RUNNING
+  STOPPED
+  CONCLUDED
+}
+
+enum AbVariantKey {
+  A
+  B
+}
+
+enum AbEventType {
+  IMPRESSION
+  CONVERSION
+}
+
+model AbExperiment {
+  id                 String             @id @default(uuid()) @db.Uuid
+  slug               String             @unique
+  name               String
+  status             AbExperimentStatus @default(DRAFT)
+  /** 0–100: 해당 비율만큼 변형 A, 나머지 B */
+  trafficSplitA      Int                @default(50)
+  winnerVariant      AbVariantKey?
+  /** 자동 승자 판정 시 변형별 최소 노출 수 */
+  minImpressionsAuto Int                @default(100)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  events             AbEvent[]
+}
+
+model AbEvent {
+  id           String       @id @default(uuid()) @db.Uuid
+  experimentId String       @db.Uuid
+  variant      AbVariantKey
+  type         AbEventType
+  subjectKey   String
+  createdAt    DateTime     @default(now())
+
+  experiment AbExperiment @relation(fields: [experimentId], references: [id], onDelete: Cascade)
+
+  @@index([experimentId, variant, type])
+  @@index([experimentId, createdAt])
+}
+

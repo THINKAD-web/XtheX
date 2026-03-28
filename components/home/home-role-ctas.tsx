@@ -15,6 +15,10 @@ type Props = {
   advertiserClassName: string;
   /** Extra classes for the flex wrapper */
   className?: string;
+  /** 비로그인 상태에서 매체사 가입 CTA 클릭 시 (A/B 전환 측정 등) */
+  onGuestMediaClick?: () => void;
+  /** 비로그인 상태에서 광고주 가입 CTA 클릭 시 */
+  onGuestAdvertiserClick?: () => void;
 };
 
 function roleHref(role: UserRole): string {
@@ -34,6 +38,8 @@ export function HomeRoleCtas({
   mediaClassName,
   advertiserClassName,
   className,
+  onGuestMediaClick,
+  onGuestAdvertiserClick,
 }: Props) {
   const { data: session, status } = useSession();
   const t = useTranslations("home.hero");
@@ -110,12 +116,14 @@ export function HomeRoleCtas({
       <Link
         href="/signup?role=MEDIA_OWNER"
         className={cn(mediaClassName, "justify-center text-center")}
+        onClick={() => onGuestMediaClick?.()}
       >
         {mediaLabel}
       </Link>
       <Link
         href="/signup?role=ADVERTISER"
         className={cn(advertiserClassName, "justify-center text-center")}
+        onClick={() => onGuestAdvertiserClick?.()}
       >
         {advertiserLabel}
       </Link>

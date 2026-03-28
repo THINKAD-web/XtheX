@@ -31,6 +31,9 @@ export function AdminQuickNav({ t }: { t: TAdminHome }) {
             >
               {t("nav_contentApproval")}
             </Link>
+            <Link href="/admin/ab-testing" className={cn(linkOutline, "w-full sm:w-auto sm:min-w-[9.5rem]")}>
+              {t("nav_abTesting")}
+            </Link>
             <Link href="/admin/medias/new" className={cn(linkPrimary, "w-full sm:w-auto sm:min-w-[9.5rem]")}>
               {t("nav_newMedia")}
             </Link>

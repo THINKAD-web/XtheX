@@ -2,9 +2,9 @@
 
 import * as React from "react";
 import { HomeRoleCtas } from "@/components/home/home-role-ctas";
+import { useHomeHeroAb } from "@/hooks/use-home-hero-ab";
 import { useLocale, useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
-import { landing } from "@/lib/landing-theme";
 import { useLocalDaypart } from "@/hooks/use-local-daypart";
 import { cn } from "@/lib/utils";
 import { Link } from "@/i18n/navigation";
@@ -70,6 +70,12 @@ export function HomeHeroDaypart() {
 
   const authed = status === "authenticated";
   const loading = status === "loading";
+  const abEnabled = !loading && !authed;
+  const { mediaClassName, advertiserClassName, fireConversion } = useHomeHeroAb(abEnabled);
+
+  const onSignupClick = () => {
+    fireConversion();
+  };
 
   return (
     <section
@@ -146,8 +152,10 @@ export function HomeHeroDaypart() {
           <HomeRoleCtas
             mediaLabel={t("cta_partner")}
             advertiserLabel={t("cta_explore")}
-            mediaClassName={landing.btnPrimary}
-            advertiserClassName="inline-flex h-11 min-w-[200px] items-center justify-center rounded-lg border border-zinc-400 bg-transparent px-6 text-sm font-medium text-white transition-colors duration-200 hover:bg-white/10"
+            mediaClassName={mediaClassName}
+            advertiserClassName={advertiserClassName}
+            onGuestMediaClick={onSignupClick}
+            onGuestAdvertiserClick={onSignupClick}
           />
 
           {!loading && !authed ? (

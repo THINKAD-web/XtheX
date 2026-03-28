@@ -9,6 +9,7 @@ export function OmniCartHeaderBtn() {
   return (
     <button
       type="button"
+      data-tour="tour-cart"
       onClick={() =>
         window.dispatchEvent(new CustomEvent("xthex-omni-cart-open"))
       }

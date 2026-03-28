@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { routing } from "@/i18n/routing";
 import { ConditionalSiteFooter } from "@/components/layout/ConditionalSiteFooter";
 import { OnboardingGate } from "@/components/onboarding/OnboardingGate";
+import { GuidedTourOverlayLazy } from "@/components/onboarding/GuidedTourOverlayLazy";
 import { OmniCartShellLazy } from "@/components/omni/OmniCartShellLazy";
 import { WelcomeModal } from "@/components/onboarding/WelcomeModal";
 
@@ -35,6 +36,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         <main className="flex-1">
           <OnboardingGate>
             <WelcomeModal />
+            <GuidedTourOverlayLazy />
             <OmniCartShellLazy />
             <ChatWidget />
             <FeedbackWidget />

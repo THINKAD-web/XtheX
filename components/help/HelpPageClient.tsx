@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { landing } from "@/lib/landing-theme";
 import { toast } from "sonner";
@@ -11,7 +12,9 @@ import {
   Mail,
   Send,
   Loader2,
+  Map,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type FaqCategory = "all" | "general" | "payment" | "media" | "campaign";
 
@@ -117,6 +120,8 @@ function FaqItem({
 
 export function HelpPageClient() {
   const t = useTranslations("help");
+  const tg = useTranslations("guided_tour");
+  const { status } = useSession();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<FaqCategory>("all");
   const [name, setName] = useState("");
@@ -177,6 +182,33 @@ export function HelpPageClient() {
         </div>
         <h1 className={landing.h1}>{t("title")}</h1>
         <p className={landing.lead}>{t("subtitle")}</p>
+        <div className="mx-auto mt-8 max-w-lg rounded-2xl border border-zinc-200 bg-zinc-50/80 p-5 text-left dark:border-zinc-700 dark:bg-zinc-900/40">
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15">
+              <Map className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">{tg("help_rerun_title")}</p>
+              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{tg("help_rerun_hint")}</p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mt-3 border-emerald-600/40 text-emerald-700 hover:bg-emerald-500/10 dark:text-emerald-400"
+                onClick={() => {
+                  if (status !== "authenticated") {
+                    toast.info(tg("help_sign_in"));
+                    return;
+                  }
+                  window.dispatchEvent(new CustomEvent("xthex:start-guided-tour"));
+                  toast.success(tg("help_rerun_started"));
+                }}
+              >
+                {tg("help_rerun_cta")}
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Search */}

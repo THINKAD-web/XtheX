@@ -35,6 +35,11 @@ export function WelcomeModal() {
     } catch {
       /* ignore */
     }
+    try {
+      window.dispatchEvent(new CustomEvent("xthex:welcome-closed"));
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   React.useEffect(() => {

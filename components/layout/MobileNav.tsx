@@ -4,9 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 import { Menu, X } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 
-type NavItem = { href: string; label: string };
+export type AppNavItem = { href: string; label: string; dataTour?: string };
 
-export function MobileNav({ items }: { items: NavItem[] }) {
+export function MobileNav({ items }: { items: AppNavItem[] }) {
   const [open, setOpen] = useState(false);
 
   const close = useCallback(() => setOpen(false), []);
@@ -49,6 +49,7 @@ export function MobileNav({ items }: { items: NavItem[] }) {
                 href={item.href}
                 onClick={close}
                 className="rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                {...(item.dataTour ? { "data-tour": item.dataTour } : {})}
               >
                 {item.label}
               </Link>

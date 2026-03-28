@@ -1560,5 +1560,50 @@
     "report_success": "Report received. Our team will review it.",
     "report_already": "You already reported this review.",
     "report_failed": "Could not submit the report."
+  },
+  "guided_tour": {
+    "kicker": "Guided tour",
+    "next": "Next",
+    "skip": "Skip",
+    "done": "Get started",
+    "help_rerun_title": "Interactive guide",
+    "help_rerun_hint": "Replay the header walkthrough from the beginning. Sign-in required.",
+    "help_rerun_cta": "Run guided tour again",
+    "help_sign_in": "Please sign in to run the tour.",
+    "help_rerun_started": "Starting the guided tour.",
+    "steps": {
+      "intro": {
+        "title": "Quick tour of XtheX",
+        "body": "We’ll walk through the top bar—explore, planner, search, and more. You can skip anytime and restart later from Help."
+      },
+      "explore": {
+        "title": "Explore media",
+        "body": "Browse approved OOH inventory on the map with filters. Start here when shaping a campaign idea."
+      },
+      "planner": {
+        "title": "Campaign planner",
+        "body": "Enter budget, audience, and region to get an AI-suggested media mix—great for turning a brief into numbers."
+      },
+      "templates": {
+        "title": "Campaign templates",
+        "body": "Pick a goal and industry sample to pre-fill the planner. Fast way to try scenarios."
+      },
+      "search": {
+        "title": "Global search",
+        "body": "Find media by name, region, or tags from the header search field."
+      },
+      "cart": {
+        "title": "Omni cart",
+        "body": "Add multiple placements and continue quotes or inquiries in one flow. Open it from the bag icon."
+      },
+      "account": {
+        "title": "Account",
+        "body": "Sign in for inquiries, dashboards, and notifications. Menus adapt to advertiser vs. media-owner roles."
+      },
+      "outro": {
+        "title": "You’re set",
+        "body": "Jump into Explore or the planner. Need this again? Open Help and run the guided tour any time."
+      }
+    }
   }
 }

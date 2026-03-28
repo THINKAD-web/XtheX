@@ -5,7 +5,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { OmniCartHeaderBtn } from "@/components/layout/OmniCartHeaderBtn";
 import { CurrencySwitcher } from "@/components/CurrencySwitcher";
 import { AuthNav } from "@/components/auth/auth-nav";
-import { MobileNav } from "@/components/layout/MobileNav";
+import { MobileNav, type AppNavItem } from "@/components/layout/MobileNav";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 import { SearchAutocomplete } from "@/components/search/SearchAutocomplete";
 import { landing } from "@/lib/landing-theme";
@@ -20,12 +20,12 @@ export async function SiteHeader() {
   const tNews = await getTranslations("news");
   const tBlog = await getTranslations("blog");
 
-  const navItems = [
+  const navItems: AppNavItem[] = [
     { href: "/", label: tNav("home") },
-    { href: "/explore", label: tExplore("title") },
+    { href: "/explore", label: tExplore("title"), dataTour: "tour-explore" },
     { href: "/community", label: tNav("community") },
-    { href: "/campaign-planner", label: tNav("campaign_planner") },
-    { href: "/templates", label: tNav("templates") },
+    { href: "/campaign-planner", label: tNav("campaign_planner"), dataTour: "tour-planner" },
+    { href: "/templates", label: tNav("templates"), dataTour: "tour-templates" },
     { href: "/billing", label: tNav("billing") },
     { href: "/trends", label: tNav("trends") },
     { href: "/news", label: tNews("title") },
@@ -50,13 +50,16 @@ export async function SiteHeader() {
               key={item.href}
               href={item.href}
               className="whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground"
+              {...(item.dataTour ? { "data-tour": item.dataTour } : {})}
             >
               {item.label}
             </Link>
           ))}
         </nav>
         <div className="justify-self-end flex shrink-0 items-center gap-1.5 sm:gap-3">
-          <SearchAutocomplete className="hidden sm:block" />
+          <span data-tour="tour-search" className="hidden sm:inline">
+            <SearchAutocomplete className="hidden sm:block" />
+          </span>
           <NotificationCenter />
           <OmniCartHeaderBtn />
           <ThemeToggle />
@@ -64,10 +67,9 @@ export async function SiteHeader() {
           <div className="hidden sm:flex items-center gap-1.5 sm:gap-3">
             <CurrencySwitcher locale={locale} label={tNav("currency")} />
           </div>
-          <AuthNav
-            signInLabel={tNav("sign_in")}
-            signUpLabel={tNav("sign_up")}
-          />
+          <span data-tour="tour-account" className="inline-flex items-center">
+            <AuthNav signInLabel={tNav("sign_in")} signUpLabel={tNav("sign_up")} />
+          </span>
         </div>
       </div>
     </header>

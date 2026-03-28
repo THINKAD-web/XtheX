@@ -140,6 +140,13 @@
       "gallery_subtitle": "Pulsa el botón para aplicar el filterJson del caso."
     }
   },
+  "help": {
+    "cat_all": "Todos",
+    "cat_general": "General",
+    "cat_payment": "Pagos",
+    "cat_media": "Medios",
+    "cat_campaign": "Campañas"
+  },
   "welcome": {
     "badge": "Bienvenido",
     "step1_title": "Bienvenido a XtheX",

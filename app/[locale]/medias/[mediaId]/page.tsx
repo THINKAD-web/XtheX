@@ -25,6 +25,7 @@ import { BookingRequestModal } from "@/components/medias/BookingRequestModal";
 import { DiscountBanner } from "@/components/medias/DiscountBanner";
 import { ExitIntentPopup } from "@/components/medias/ExitIntentPopup";
 import { VerifiedBadge } from "@/components/medias/VerifiedBadge";
+import { ReviewSection } from "@/components/medias/ReviewSection";
 import { getCurrentUser } from "@/lib/auth/rbac";
 import {
   convertCurrency,
@@ -701,6 +702,8 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
                 </div>
               </article>
             )}
+
+            <ReviewSection mediaId={media.id} locale={locale} />
 
             <SimilarBundleSection
               locale={locale}

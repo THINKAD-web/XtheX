@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { landing } from "@/lib/landing-theme";
 import { toast } from "sonner";
@@ -13,18 +13,88 @@ import {
   Loader2,
 } from "lucide-react";
 
-function FaqItem({ q, a }: { q: string; a: string }) {
-  const [open, setOpen] = useState(false);
+type FaqCategory = "all" | "general" | "payment" | "media" | "campaign";
+
+const FAQ_CATEGORY_MAP: Record<number, FaqCategory> = {
+  1: "general",
+  2: "general",
+  3: "general",
+  4: "payment",
+  5: "payment",
+  6: "payment",
+  7: "media",
+  8: "media",
+  9: "media",
+  10: "campaign",
+  11: "campaign",
+  12: "campaign",
+};
+
+const CATEGORIES: FaqCategory[] = [
+  "all",
+  "general",
+  "payment",
+  "media",
+  "campaign",
+];
+
+function HighlightText({
+  text,
+  highlight,
+}: {
+  text: string;
+  highlight: string;
+}) {
+  if (!highlight.trim()) return <>{text}</>;
+
+  const regex = new RegExp(
+    `(${highlight.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
+    "gi",
+  );
+  const parts = text.split(regex);
+
+  return (
+    <>
+      {parts.map((part, i) =>
+        regex.test(part) ? (
+          <mark
+            key={i}
+            className="bg-amber-300/30 text-inherit rounded-sm px-0.5"
+          >
+            {part}
+          </mark>
+        ) : (
+          part
+        ),
+      )}
+    </>
+  );
+}
+
+function FaqItem({
+  q,
+  a,
+  highlight,
+  forceOpen,
+}: {
+  q: string;
+  a: string;
+  highlight: string;
+  forceOpen: boolean;
+}) {
+  const [manualOpen, setManualOpen] = useState(false);
+  const open = forceOpen || manualOpen;
+
   return (
     <div className="border-b border-zinc-200 dark:border-zinc-700/60">
       <button
         type="button"
         className="flex w-full items-center justify-between py-5 text-left"
-        onClick={() => setOpen(!open)}
+        onClick={() => setManualOpen(!manualOpen)}
         aria-expanded={open}
       >
         <span className="pr-4 text-base font-medium text-zinc-900 dark:text-zinc-100">
-          {q}
+          <HighlightText text={q} highlight={highlight} />
         </span>
         <ChevronDown
           className={`h-5 w-5 shrink-0 text-zinc-400 transition-transform duration-200 ${
@@ -37,7 +107,9 @@ function FaqItem({ q, a }: { q: string; a: string }) {
           open ? "max-h-[500px] pb-5" : "max-h-0"
         }`}
       >
-        <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{a}</p>
+        <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+          <HighlightText text={a} highlight={highlight} />
+        </p>
       </div>
     </div>
   );
@@ -46,6 +118,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 export function HelpPageClient() {
   const t = useTranslations("help");
   const [search, setSearch] = useState("");
+  const [category, setCategory] = useState<FaqCategory>("all");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -53,12 +126,19 @@ export function HelpPageClient() {
 
   const faqKeys = Array.from({ length: 12 }, (_, i) => i + 1);
 
-  const filteredFaqs = faqKeys.filter((i) => {
-    if (!search.trim()) return true;
-    const q = t(`faq_q${i}`).toLowerCase();
-    const a = t(`faq_a${i}`).toLowerCase();
-    return q.includes(search.toLowerCase()) || a.includes(search.toLowerCase());
-  });
+  const filteredFaqs = useMemo(() => {
+    return faqKeys.filter((i) => {
+      if (category !== "all" && FAQ_CATEGORY_MAP[i] !== category) return false;
+      if (!search.trim()) return true;
+      const q = t(`faq_q${i}`).toLowerCase();
+      const a = t(`faq_a${i}`).toLowerCase();
+      return (
+        q.includes(search.toLowerCase()) || a.includes(search.toLowerCase())
+      );
+    });
+  }, [search, category, t]);
+
+  const hasSearch = search.trim().length > 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,12 +198,37 @@ export function HelpPageClient() {
         <h2 className="mb-6 text-2xl font-bold text-zinc-900 dark:text-zinc-50">
           {t("faq_title")}
         </h2>
+
+        {/* Category tabs */}
+        <div className="mb-6 flex flex-wrap gap-2">
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => setCategory(cat)}
+              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+                category === cat
+                  ? "bg-blue-600 text-white"
+                  : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+              }`}
+            >
+              {t(`cat_${cat}`)}
+            </button>
+          ))}
+        </div>
+
         <div>
           {filteredFaqs.length === 0 ? (
             <p className="py-8 text-center text-sm text-zinc-500">{t("no_results")}</p>
           ) : (
             filteredFaqs.map((i) => (
-              <FaqItem key={i} q={t(`faq_q${i}`)} a={t(`faq_a${i}`)} />
+              <FaqItem
+                key={i}
+                q={t(`faq_q${i}`)}
+                a={t(`faq_a${i}`)}
+                highlight={search.trim()}
+                forceOpen={hasSearch}
+              />
             ))
           )}
         </div>

@@ -179,6 +179,11 @@
   }
 }
 
+@keyframes chatBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
 @keyframes cta-pulse {
   0%, 100% {
     box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.5);

@@ -134,6 +134,7 @@ model Media {
   inquiries   Inquiry[]
   caseStudies CaseStudy[]
   wishlists   Wishlist[]
+  reviews     MediaReview[]
 
   @@index([status, category])
   @@index([createdById])
@@ -181,6 +182,7 @@ model User {
   inquiriesSent  Inquiry[]      @relation("InquiryByAdvertiser")
   notifications  Notification[]
   wishlists      Wishlist[]
+  mediaReviews   MediaReview[]  @relation("MediaReviewsByUser")
 }
 
 model Account {
@@ -461,5 +463,24 @@ model Wishlist {
 
   @@unique([userId, mediaId])
   @@index([userId, createdAt])
+}
+
+model MediaReview {
+  id        String   @id @default(uuid()) @db.Uuid
+  mediaId   String   @db.Uuid
+  userId    String   @db.Uuid
+  rating    Int
+  content   String?  @db.Text
+  images    String[] @default([])
+  visible   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  user  User  @relation("MediaReviewsByUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([mediaId, userId])
+  @@index([mediaId, createdAt])
+  @@index([userId])
 }
 

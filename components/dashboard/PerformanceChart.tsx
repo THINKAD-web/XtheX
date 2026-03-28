@@ -158,7 +158,6 @@ export function PerformanceChart(props: Props) {
             paddingAngle={3}
           >
             {props.data.map((_, i) => (
-              // eslint-disable-next-line react/no-array-index-key
               <Cell key={i} fill={props.colors[i % props.colors.length]} />
             ))}
           </Pie>

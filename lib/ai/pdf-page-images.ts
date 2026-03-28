@@ -189,11 +189,5 @@ export async function renderPdfPagesForVision(
     }
   }
 
-  if (out.length > 0) {
-    console.log(
-      `[pdf-page-images] Vision ${out[0]?.mime === "image/jpeg" ? "JPEG(q75)" : "PNG"} ${out.length}장 / ${numPages}페이지:`,
-      out.map((o) => o.pageNumber).join(", "),
-    );
-  }
   return out;
 }

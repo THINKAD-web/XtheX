@@ -16,7 +16,6 @@ if (typeof window === "undefined" && !process.env.DATABASE_URL?.trim()) {
 declare global {
   // allow global 'prisma' in development to prevent hot reload issues
   // (Next.js 16 + Turbopack + React 19)
-  // eslint-disable-next-line no-var
   var prisma: PrismaClient | undefined;
 }
 

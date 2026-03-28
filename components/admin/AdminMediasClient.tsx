@@ -231,7 +231,7 @@ export function AdminMediasClient({ locale, initialMedias }: Props) {
       setAppliedTemplateGroups(groups);
       await handleFilterChange(template.filterJson);
     },
-    [allTags.length, handleFilterChange],
+    [allTags, handleFilterChange],
   );
 
   const applySuccessCase = React.useCallback(
@@ -245,7 +245,7 @@ export function AdminMediasClient({ locale, initialMedias }: Props) {
       setAppliedTemplateGroups(groups);
       await handleFilterChange(sc.filterJson);
     },
-    [allTags.length, handleFilterChange],
+    [allTags, handleFilterChange],
   );
 
   React.useEffect(() => {

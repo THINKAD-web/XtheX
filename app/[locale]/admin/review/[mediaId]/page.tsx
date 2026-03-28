@@ -48,8 +48,6 @@ export default async function AdminReviewPage({
     notFound();
   }
 
-  console.log("review 페이지 로드 - 불러온 Media 데이터:", media);
-
   return (
     <div className="min-h-screen bg-black text-zinc-100">
       <div className="mx-auto max-w-6xl px-4 py-8">

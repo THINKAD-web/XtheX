@@ -66,8 +66,5 @@ export async function uploadUserMediaSampleImages(
       console.warn("[media-samples]", e);
     }
   }
-  if (urls.length > 0) {
-    console.log(`[media-samples] ${urls.length}개 업로드 → ${bucket}`);
-  }
   return urls;
 }

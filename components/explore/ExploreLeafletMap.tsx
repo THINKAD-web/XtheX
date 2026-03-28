@@ -242,7 +242,7 @@ export function ExploreLeafletMap({
         map.setView([sel.ll.lat, sel.ll.lng], ZOOM_SELECTED, { animate: true });
       }
     }
-  }, [items, selectedId, labels, remountKey]);
+  }, [items, selectedId, labels, remountKey, currency, locale]);
 
   return (
     <div className="relative overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900">

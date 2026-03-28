@@ -116,7 +116,6 @@ export default async function PartnerDashboardPage({ params }: PageProps) {
       </div>
     );
   } catch (e) {
-    // eslint-disable-next-line no-console
     console.error("Partner dashboard error:", e);
     return (
       <div className="min-h-screen bg-zinc-50 p-6 dark:bg-zinc-950">

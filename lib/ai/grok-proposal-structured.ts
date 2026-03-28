@@ -523,21 +523,12 @@ function logGrokExtractionQuality(
 ): void {
   if (items.length === 0) return;
   const tag = opts?.reparse ? "[재파싱] " : "";
-  let sum = 0;
   const warnings: string[] = [];
   const n = items.length;
   for (let i = 0; i < n; i++) {
     const it = items[i];
     const loc = it.location ?? {};
     const addr = resolveFullAddress(loc).trim();
-    let filled = 0;
-    const total = 5;
-    if (it.media_name?.trim()) filled++;
-    if (addr) filled++;
-    if (hasPriceInItem(it)) filled++;
-    if (hasNumericOrRange(it.cpm)) filled++;
-    if (hasNumericOrRange(it.daily_impressions)) filled++;
-    sum += filled / total;
 
     const label = (it.media_name ?? `항목${i + 1}`).slice(0, 48);
     if (!hasPriceInItem(it)) {
@@ -553,15 +544,8 @@ function logGrokExtractionQuality(
       warnings.push(`[${i + 1}/${n}] "${label}" — 주소(full_address/구역) 누락 의심 (warning)`);
     }
   }
-  const pct = Math.round((sum / n) * 100);
-  console.log(
-    `[grok-structured] ${tag}추출 완료: ${n}건 · 필드 충전률(평균) 약 ${pct}% (매체명·주소·가격·CPM·일노출 기준)`,
-  );
   for (const w of warnings) {
     console.warn(`[grok-structured] ${tag}${w}`);
-  }
-  if (warnings.length === 0) {
-    console.log(`[grok-structured] ${tag}누락 의심 필드: 없음 (기준 충족)`);
   }
 }
 
@@ -968,10 +952,6 @@ export async function extractStructuredProposalWithGrok(
     );
 
     if (canVision) {
-      console.log(
-        "[grok-structured] Vision 페이지:",
-        visionPages!.map((v) => v.pageNumber).join(","),
-      );
       await mergeVisionIntoExtracted(cfg, visionPages!, extracted);
     }
 

@@ -43,12 +43,6 @@ async function sendResendToMediaOwners(payload: {
   ];
 
   if (ownerIds.length === 0) {
-    if (process.env.NODE_ENV === "development") {
-      console.log(
-        "[campaign] no media owners with createdById for submitted campaign",
-        payload.campaignId,
-      );
-    }
     return;
   }
 
@@ -158,11 +152,4 @@ export async function notifyCampaignSubmitted(payload: {
     console.error("[campaign] notify media owners failed", e);
   }
 
-  if (process.env.NODE_ENV === "development") {
-    console.log(
-      "[campaign] submitted (dev)",
-      payload.campaignId,
-      payload.mediaIds.length,
-    );
-  }
 }

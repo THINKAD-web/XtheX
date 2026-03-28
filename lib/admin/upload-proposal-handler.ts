@@ -281,10 +281,6 @@ async function createDraftsFromProposalFile(
     });
   }
 
-  console.log(
-    `[upload-proposal] ${file.name}: ${total}건 초안 생성 →`,
-    previews.map((p) => p.draftId).join(", "),
-  );
   return previews;
 }
 

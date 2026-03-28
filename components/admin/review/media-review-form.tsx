@@ -314,15 +314,25 @@ export function MediaReviewForm({
     },
   });
 
-  const watchedImages = form.watch("images") ?? media.images ?? [];
-  const watchedSampleImages = form.watch("sampleImages") ?? media.sampleImages ?? [];
+  const rawWatchedImages = form.watch("images");
+  const rawWatchedSampleImages = form.watch("sampleImages");
+  const watchedImages = React.useMemo(
+    () => rawWatchedImages ?? media.images ?? [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [JSON.stringify(rawWatchedImages)],
+  );
+  const watchedSampleImages = React.useMemo(
+    () => rawWatchedSampleImages ?? media.sampleImages ?? [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [JSON.stringify(rawWatchedSampleImages)],
+  );
   const extractedCandidates = React.useMemo(
     () =>
       Array.from(
         new Set(
           [
-            ...(watchedImages ?? []),
-            ...(watchedSampleImages ?? []),
+            ...watchedImages,
+            ...watchedSampleImages,
             ...(parseHistory.extractedImages ?? []),
           ]
             .map(String)
@@ -350,9 +360,11 @@ export function MediaReviewForm({
     !!watchedSubCategory &&
     aiOriginalSubCategory !== watchedSubCategory;
 
+  const selectedImagesKey = selectedImages.join("|");
   React.useEffect(() => {
     setSelectedImageSet(new Set(selectedImages));
-  }, [selectedImages.join("|")]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedImagesKey]);
 
   React.useEffect(() => {
     const current = form.getValues("extractedImages") ?? [];

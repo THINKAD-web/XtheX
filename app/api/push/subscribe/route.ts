@@ -6,12 +6,9 @@ import { NextResponse, type NextRequest } from "next/server";
  */
 export async function POST(request: NextRequest) {
   try {
-    const subscription = await request.json();
+    await request.json();
 
     // TODO: Store subscription in database
-    // await prisma.pushSubscription.create({ data: { ... } });
-
-    console.log("[push/subscribe] Received subscription:", subscription.endpoint?.slice(0, 60));
 
     return NextResponse.json({ ok: true });
   } catch {

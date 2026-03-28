@@ -124,7 +124,7 @@ export function HelpPageClient() {
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
 
-  const faqKeys = Array.from({ length: 12 }, (_, i) => i + 1);
+  const faqKeys = useMemo(() => Array.from({ length: 12 }, (_, i) => i + 1), []);
 
   const filteredFaqs = useMemo(() => {
     return faqKeys.filter((i) => {
@@ -136,7 +136,7 @@ export function HelpPageClient() {
         q.includes(search.toLowerCase()) || a.includes(search.toLowerCase())
       );
     });
-  }, [search, category, t]);
+  }, [search, category, t, faqKeys]);
 
   const hasSearch = search.trim().length > 0;
 

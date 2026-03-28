@@ -137,6 +137,7 @@ export function SearchAutocomplete({ className }: { className?: string }) {
           className="h-8 w-full rounded-md border border-input bg-background pl-8 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring sm:w-48 lg:w-56"
           aria-label={isKo ? "매체 검색" : "Search media"}
           aria-expanded={open}
+          aria-controls="search-autocomplete-listbox"
           aria-haspopup="listbox"
           role="combobox"
           autoComplete="off"
@@ -150,6 +151,7 @@ export function SearchAutocomplete({ className }: { className?: string }) {
 
       {open && results.length > 0 && (
         <ul
+          id="search-autocomplete-listbox"
           role="listbox"
           className="absolute left-0 top-full z-[200] mt-1 w-72 overflow-hidden rounded-lg border border-border bg-popover shadow-lg"
         >

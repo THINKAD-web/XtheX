@@ -481,10 +481,6 @@ async function extractAllMediaFromProposalPdfInner(
         : undefined,
     );
     if (list.length > 0) {
-      console.log(
-        `[extract] ${label} 구조화 추출 성공 — media_items:`,
-        list.length,
-      );
       return list;
     }
   } catch (e) {

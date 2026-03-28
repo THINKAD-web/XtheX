@@ -120,6 +120,7 @@ export function AdvancedFilterBuilder({
       })),
     };
     onChange(json);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groups]);
 
   const addGroup = () => {

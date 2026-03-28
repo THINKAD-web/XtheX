@@ -23,9 +23,9 @@ export function captureException(error: unknown, context?: Record<string, unknow
 export function captureMessage(message: string, level: "info" | "warning" | "error" = "info"): void {
   if (process.env.SENTRY_DSN) {
     // Sentry.captureMessage(message, level);
-    console.log(`[sentry-placeholder:${level}]`, message);
+    console.info(`[sentry-placeholder:${level}]`, message);
     return;
   }
 
-  console.log(`[${level}]`, message);
+  console.info(`[${level}]`, message);
 }

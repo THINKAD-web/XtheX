@@ -31,7 +31,6 @@ export function StatCards({ title, cards, loading, className }: Props) {
       <div className={cn("grid gap-4 sm:grid-cols-2 lg:grid-cols-4", className)}>
         {Array.from({ length: 4 }).map((_, i) => (
           <div
-            // eslint-disable-next-line react/no-array-index-key
             key={i}
             className="h-[108px] animate-pulse rounded-2xl border border-zinc-200 bg-zinc-100/80 dark:border-zinc-800 dark:bg-zinc-900/60"
           />

@@ -80,8 +80,5 @@ export async function uploadProposalSampleImages(
       console.warn("[supabase-upload]", e);
     }
   }
-  if (urls.length > 0) {
-    console.log(`[supabase-upload] ${urls.length}개 업로드 완료 →`, bucket);
-  }
   return urls;
 }

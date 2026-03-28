@@ -71,6 +71,13 @@ enum InquiryStatus {
   CLOSED
 }
 
+/** 문의 기반 매체 예약 계약 (조건 확정 → 서명 → PDF) */
+enum InquiryContractStatus {
+  DRAFT
+  AWAITING_MEDIA_OWNER
+  COMPLETED
+}
+
 enum CurrencyCode {
   KRW
   USD
@@ -470,12 +477,32 @@ model Inquiry {
 
   advertiser User  @relation("InquiryByAdvertiser", fields: [advertiserId], references: [id], onDelete: Cascade)
   media      Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  contract   InquiryContract?
 
   @@index([advertiserId])
   @@index([mediaId])
   @@index([status])
   @@index([advertiserId, createdAt])
   @@index([mediaId, createdAt])
+}
+
+model InquiryContract {
+  id                    String                @id @default(uuid()) @db.Uuid
+  inquiryId             String                @unique @db.Uuid
+  /** 확정 예산(KRW); 문의 budget과 다를 수 있음 */
+  agreedBudgetKrw       Int?
+  agreedPeriod          String?
+  status                InquiryContractStatus @default(DRAFT)
+  advertiserSignName    String?
+  advertiserSignedAt    DateTime?
+  mediaOwnerSignName    String?
+  mediaOwnerSignedAt    DateTime?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+
+  inquiry Inquiry @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+
+  @@index([status, updatedAt])
 }
 
 enum AutoBidRuleStatus {

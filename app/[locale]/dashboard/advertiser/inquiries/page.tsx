@@ -52,6 +52,7 @@ export default async function AdvertiserInquiriesPage({
     orderBy: { createdAt: "desc" },
     take: 200,
     include: {
+      contract: { select: { id: true, status: true, advertiserSignedAt: true, mediaOwnerSignedAt: true } },
       media: {
         select: {
           id: true,
@@ -163,30 +164,20 @@ export default async function AdvertiserInquiriesPage({
                     <td className="px-4 py-3">
                       <ContractRowActions
                         locale={locale}
-                        advertiserEmail={user.email}
                         inquiry={{
                           id: r.id,
                           status: r.status,
-                          message: r.message,
-                          desiredPeriod: r.desiredPeriod,
-                          budget: r.budget,
-                          contactEmail: r.contactEmail,
-                          contactPhone: r.contactPhone,
-                          createdAtIso: r.createdAt.toISOString(),
                         }}
-                        media={{
-                          id: r.media.id,
-                          name: r.media.mediaName,
-                          type: String(r.media.category),
-                          weeklyPriceKrw: r.media.price ?? null,
-                          locationLabel:
-                            typeof r.media.locationJson === "object" &&
-                            r.media.locationJson != null &&
-                            "address" in (r.media.locationJson as any) &&
-                            typeof (r.media.locationJson as any).address === "string"
-                              ? String((r.media.locationJson as any).address)
-                              : "—",
-                        }}
+                        contract={
+                          r.contract
+                            ? {
+                                id: r.contract.id,
+                                status: r.contract.status,
+                                advertiserSignedAt: r.contract.advertiserSignedAt?.toISOString() ?? null,
+                                mediaOwnerSignedAt: r.contract.mediaOwnerSignedAt?.toISOString() ?? null,
+                              }
+                            : null
+                        }
                       />
                     </td>
                   </tr>

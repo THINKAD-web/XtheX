@@ -5,6 +5,7 @@ import { gateMediaOwnerDashboard } from "@/lib/auth/dashboard-gate";
 import { landing } from "@/lib/landing-theme";
 import { prisma } from "@/lib/prisma";
 import { MediaOwnerInquiryMessageCell } from "@/components/media-owner/MediaOwnerInquiryMessageCell";
+import { MediaOwnerContractButton } from "@/components/media-owner/MediaOwnerContractButton";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -34,6 +35,7 @@ export default async function MediaOwnerInquiriesPage() {
     orderBy: { createdAt: "desc" },
     take: 200,
     include: {
+      contract: { select: { id: true, status: true, advertiserSignedAt: true, mediaOwnerSignedAt: true } },
       media: { select: { id: true, mediaName: true, category: true } },
       advertiser: { select: { id: true, email: true } },
     },
@@ -114,11 +116,29 @@ export default async function MediaOwnerInquiriesPage() {
                     <td className="px-4 py-3 text-xs text-zinc-500">
                       {r.createdAt.toLocaleString(locale)}
                     </td>
+                    <td className="px-4 py-3">
+                      <MediaOwnerContractButton
+                        locale={locale}
+                        inquiryId={r.id}
+                        contract={
+                          r.contract
+                            ? {
+                                id: r.contract.id,
+                                status: r.contract.status,
+                                advertiserSignedAt:
+                                  r.contract.advertiserSignedAt?.toISOString() ?? null,
+                                mediaOwnerSignedAt:
+                                  r.contract.mediaOwnerSignedAt?.toISOString() ?? null,
+                              }
+                            : null
+                        }
+                      />
+                    </td>
                   </tr>
                 ))}
                 {rows.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-10 text-center text-zinc-500">
+                    <td colSpan={8} className="px-4 py-10 text-center text-zinc-500">
                       {t("inquiries_placeholder")}
                     </td>
                   </tr>

@@ -76,6 +76,7 @@ function getMenu(role: DashboardSidebarRole): NavItem[] {
     { label: "내 문의함", href: "/dashboard/advertiser/inquiries", icon: Inbox },
     { label: "내 캠페인", comingSoon: true, icon: BriefcaseBusiness },
     { label: "설정", href: "/dashboard/advertiser/settings", icon: Settings },
+    { label: "보안", href: "/dashboard/advertiser/settings/security", icon: Shield },
   ];
 }
 

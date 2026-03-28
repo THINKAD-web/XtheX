@@ -51,6 +51,25 @@ export async function sendInquiryConfirmation(payload: InquiryEmailPayload) {
   return data;
 }
 
+export async function sendSecurityOtpEmail(to: string, code: string) {
+  const resend = getResend();
+  if (!resend) {
+    console.warn("[email] RESEND_API_KEY not set — security OTP not sent");
+    return { ok: false as const, skipped: true };
+  }
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to,
+    subject: "[XtheX] Security verification code",
+    html: `<p>Your XtheX security code is:</p><p style="font-size:26px;font-weight:700;letter-spacing:6px;font-family:monospace">${code}</p><p style="color:#64748b;font-size:14px">Valid for 10 minutes. If you did not request this, ignore this email.</p>`,
+  });
+  if (error) {
+    console.error("[email] security OTP failed:", error);
+    return { ok: false as const, error };
+  }
+  return { ok: true as const };
+}
+
 export async function sendBookingConfirmation(payload: BookingEmailPayload) {
   const resend = getResend();
   if (!resend) {

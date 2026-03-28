@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { Settings } from "lucide-react";
+import { Settings, Shield } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 import { PushNotificationButton } from "@/components/pwa/PushNotificationButton";
 
 export const metadata: Metadata = {
@@ -24,6 +25,24 @@ export default async function SettingsPage({
           {isKo ? "설정" : "Settings"}
         </h1>
       </div>
+
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold">
+          {isKo ? "보안 및 2단계 인증" : "Security & two-factor authentication"}
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          {isKo
+            ? "OTP, 패스키, 이메일·SMS 채널, 로그인 기기를 관리합니다."
+            : "Manage OTP, passkeys, email/SMS channels, and signed-in devices."}
+        </p>
+        <Link
+          href="/dashboard/advertiser/settings/security"
+          className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-muted/60"
+        >
+          <Shield className="h-4 w-4 text-primary" aria-hidden />
+          {isKo ? "보안 설정 열기" : "Open security settings"}
+        </Link>
+      </section>
 
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">

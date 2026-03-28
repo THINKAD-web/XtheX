@@ -5,6 +5,7 @@ import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcrypt";
 import { UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { verifyAndConsumeBackupCode, verifyTotpToken } from "@/lib/security/two-factor";
 
 const providers: NextAuthOptions["providers"] = [
   CredentialsProvider({
@@ -12,10 +13,13 @@ const providers: NextAuthOptions["providers"] = [
     credentials: {
       email: { label: "Email", type: "email" },
       password: { label: "Password", type: "password" },
+      totpCode: { label: "Authenticator code", type: "text" },
     },
     async authorize(credentials) {
       const email = credentials?.email?.trim().toLowerCase();
       const password = credentials?.password;
+      const totpCode =
+        typeof credentials?.totpCode === "string" ? credentials.totpCode.trim() : "";
       if (!email || !password) return null;
 
       const user = await prisma.user.findUnique({
@@ -27,12 +31,34 @@ const providers: NextAuthOptions["providers"] = [
           image: true,
           password: true,
           role: true,
+          twoFactorEnabled: true,
+          twoFactorSecret: true,
+          twoFactorBackupCodes: true,
         },
       });
       if (!user?.password) return null;
 
       const ok = await bcrypt.compare(password, user.password);
       if (!ok) return null;
+
+      if (user.twoFactorEnabled && user.twoFactorSecret) {
+        if (!totpCode) return null;
+        const totpOk = verifyTotpToken(user.twoFactorSecret, totpCode);
+        if (!totpOk) {
+          const backupOk = await verifyAndConsumeBackupCode(
+            user.id,
+            totpCode,
+            async (next) => {
+              await prisma.user.update({
+                where: { id: user.id },
+                data: { twoFactorBackupCodes: next },
+              });
+            },
+            user.twoFactorBackupCodes,
+          );
+          if (!backupOk) return null;
+        }
+      }
 
       return {
         id: user.id,

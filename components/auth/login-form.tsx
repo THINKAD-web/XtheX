@@ -48,6 +48,7 @@ export function LoginForm({
   }, [searchParams, signupHref]);
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [totpCode, setTotpCode] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [touched, setTouched] = React.useState<Record<string, boolean>>({});
@@ -74,6 +75,7 @@ export function LoginForm({
         redirect: false,
         email: email.trim().toLowerCase(),
         password,
+        ...(totpCode.trim() ? { totpCode: totpCode.trim() } : {}),
       });
       if (result?.error) {
         setError("이메일 또는 비밀번호가 올바르지 않습니다.");
@@ -89,6 +91,22 @@ export function LoginForm({
         if (role != null || session?.user?.id) break;
         await new Promise((r) => setTimeout(r, 80));
       }
+      try {
+        let dk = window.localStorage.getItem("xthex_device_key");
+        if (!dk) {
+          dk = crypto.randomUUID();
+          window.localStorage.setItem("xthex_device_key", dk);
+        }
+        await fetch("/api/security/devices", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ deviceKey: dk }),
+        });
+      } catch {
+        // non-blocking
+      }
+
       const target = cb ?? postAuthRedirectPath(role);
       /** 전체 로드로 세션 쿠키가 확실히 반영되게 (미들웨어·리다이렉트 꼬임 방지) */
       window.location.assign(target);
@@ -166,6 +184,26 @@ export function LoginForm({
             <p className="text-xs text-destructive">{fieldErrors.password}</p>
           )}
         </div>
+
+        <details className="rounded-lg border border-border bg-muted/20 px-3 py-2 text-sm">
+          <summary className="cursor-pointer font-medium text-foreground">
+            2단계 인증 코드 (Authenticator / 백업 코드)
+          </summary>
+          <p className="mt-2 text-xs text-muted-foreground">
+            계정에서 OTP를 켠 경우 6자리 코드 또는 백업 코드를 입력하세요.
+          </p>
+          <Input
+            id="totpCode"
+            name="totpCode"
+            className="mt-2 h-10"
+            value={totpCode}
+            onChange={(e) => setTotpCode(e.target.value)}
+            placeholder="123456"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            aria-label="Two-factor authentication code"
+          />
+        </details>
 
         <Button type="submit" className="h-11 w-full" disabled={loading}>
           {loading ? loadingLabel : submitLabel}

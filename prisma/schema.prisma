@@ -206,6 +206,46 @@ model User {
   forumReports   ForumReport[]  @relation("ForumReportsByReporter")
   mediaReviewReportsFiled   MediaReviewReport[] @relation("MediaReviewReportsByReporter")
   mediaReviewReportsResolved MediaReviewReport[] @relation("MediaReviewReportsResolvedBy")
+
+  twoFactorSecret       String?
+  twoFactorEnabled      Boolean           @default(false)
+  twoFactorBackupCodes  String?           @db.Text
+  emailOtpEnabled       Boolean           @default(false)
+  smsOtpEnabled         Boolean           @default(false)
+  phoneE164             String?
+  securityPhoneVerified Boolean           @default(false)
+
+  loginDevices          LoginDevice[]
+  webAuthnCredentials   WebAuthnCredential[]
+}
+
+model LoginDevice {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @db.Uuid
+  deviceKey  String
+  nickname   String?
+  userAgent  String?
+  ipLast     String?
+  lastSeenAt DateTime @updatedAt
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, deviceKey])
+  @@index([userId])
+}
+
+model WebAuthnCredential {
+  credentialId        String   @id
+  userId              String   @db.Uuid
+  credentialPublicKey String   @db.Text
+  counter             Int      @default(0)
+  transports          String?
+  createdAt           DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Account {

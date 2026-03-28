@@ -50,6 +50,20 @@ export function LoginForm({
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
+  const [touched, setTouched] = React.useState<Record<string, boolean>>({});
+
+  const fieldErrors = React.useMemo(() => {
+    const errs: Record<string, string> = {};
+    if (touched.email && !email.trim()) errs.email = "이메일을 입력해 주세요.";
+    else if (touched.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))
+      errs.email = "올바른 이메일 형식이 아닙니다.";
+    if (touched.password && !password)
+      errs.password = "비밀번호를 입력해 주세요.";
+    return errs;
+  }, [email, password, touched]);
+
+  const markTouched = (field: string) =>
+    setTouched((prev) => ({ ...prev, [field]: true }));
 
   async function onCredentials(e: React.FormEvent) {
     e.preventDefault();
@@ -123,8 +137,12 @@ export function LoginForm({
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="h-11"
+            onBlur={() => markTouched("email")}
+            className={`h-11 ${fieldErrors.email ? "border-destructive focus-visible:ring-destructive" : ""}`}
           />
+          {fieldErrors.email && (
+            <p className="text-xs text-destructive">{fieldErrors.email}</p>
+          )}
         </div>
         <div className="space-y-2">
           <label
@@ -141,8 +159,12 @@ export function LoginForm({
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="h-11"
+            onBlur={() => markTouched("password")}
+            className={`h-11 ${fieldErrors.password ? "border-destructive focus-visible:ring-destructive" : ""}`}
           />
+          {fieldErrors.password && (
+            <p className="text-xs text-destructive">{fieldErrors.password}</p>
+          )}
         </div>
 
         <Button type="submit" className="h-11 w-full" disabled={loading}>

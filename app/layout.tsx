@@ -5,6 +5,7 @@ import { ToastProvider } from "@/components/ui/use-toast";
 import { SonnerToaster } from "@/components/ui/sonner-toaster";
 import { BrightnessProvider } from "@/components/brightness/BrightnessPreference";
 import { BrightnessThemeBridge } from "@/components/brightness/BrightnessThemeBridge";
+import { NavigationProgress } from "@/components/navigation-progress";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -132,6 +133,7 @@ export default async function RootLayout({
             <BrightnessProvider>
               <ThemeProvider>
                 <BrightnessThemeBridge />
+                <NavigationProgress />
                 {children}
                 <SonnerToaster />
               </ThemeProvider>

@@ -56,6 +56,21 @@ export function SignupForm({
   const [role, setRole] = React.useState<(typeof ROLES)[number]>(initialRole);
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
+  const [touched, setTouched] = React.useState<Record<string, boolean>>({});
+
+  const fieldErrors = React.useMemo(() => {
+    const errs: Record<string, string> = {};
+    if (touched.name && !name.trim()) errs.name = "이름을 입력해 주세요.";
+    if (touched.email && !email.trim()) errs.email = "이메일을 입력해 주세요.";
+    else if (touched.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))
+      errs.email = "올바른 이메일 형식이 아닙니다.";
+    if (touched.password && password.length < 8)
+      errs.password = "비밀번호는 8자 이상이어야 합니다.";
+    return errs;
+  }, [name, email, password, touched]);
+
+  const markTouched = (field: string) =>
+    setTouched((prev) => ({ ...prev, [field]: true }));
 
   const loginHrefWithParams = React.useMemo(() => {
     const sp = new URLSearchParams();
@@ -150,8 +165,12 @@ export function SignupForm({
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="h-11"
+            onBlur={() => markTouched("name")}
+            className={`h-11 ${fieldErrors.name ? "border-destructive focus-visible:ring-destructive" : ""}`}
           />
+          {fieldErrors.name && (
+            <p className="text-xs text-destructive">{fieldErrors.name}</p>
+          )}
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium text-foreground" htmlFor="email">
@@ -165,8 +184,12 @@ export function SignupForm({
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="h-11"
+            onBlur={() => markTouched("email")}
+            className={`h-11 ${fieldErrors.email ? "border-destructive focus-visible:ring-destructive" : ""}`}
           />
+          {fieldErrors.email && (
+            <p className="text-xs text-destructive">{fieldErrors.email}</p>
+          )}
         </div>
         <div className="space-y-2">
           <label
@@ -184,8 +207,12 @@ export function SignupForm({
             minLength={8}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="h-11"
+            onBlur={() => markTouched("password")}
+            className={`h-11 ${fieldErrors.password ? "border-destructive focus-visible:ring-destructive" : ""}`}
           />
+          {fieldErrors.password && (
+            <p className="text-xs text-destructive">{fieldErrors.password}</p>
+          )}
         </div>
 
         <fieldset className="space-y-2">

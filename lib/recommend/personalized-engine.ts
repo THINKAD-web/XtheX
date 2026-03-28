@@ -247,7 +247,7 @@ export async function computePersonalizedRecommendations(args: {
   });
 }
 
-type TasteBundle = {
+export type TasteBundle = {
   tokens: Set<string>;
   categories: Map<string, number>;
   countries: Set<string>;
@@ -269,7 +269,7 @@ function emptyTaste(): TasteBundle {
   };
 }
 
-async function loadUserTasteBundle(userId: string): Promise<TasteBundle> {
+export async function loadUserTasteBundle(userId: string): Promise<TasteBundle> {
   const bundle = emptyTaste();
   const [campaigns, wishlists, inquiries] = await Promise.all([
     prisma.campaign.findMany({

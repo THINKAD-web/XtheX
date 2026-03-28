@@ -29,6 +29,7 @@ import {
   ClipboardCheck,
   SquareSplitHorizontal,
   ChartColumn,
+  TrendingUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -80,6 +81,7 @@ function getMenu(role: DashboardSidebarRole): NavItem[] {
     { label: "홈", href: "/dashboard/advertiser", icon: LayoutDashboard },
     { label: "성과 보기", href: "/dashboard/performance", icon: Activity },
     { label: "캠페인 분석", href: "/dashboard/advertiser/campaign-analytics", icon: ChartColumn },
+    { label: "예측 분석", href: "/dashboard/advertiser/predictive-analytics", icon: TrendingUp },
     {
       label: "AI 추천 받기",
       href: "/dashboard/advertiser/recommendations",

@@ -161,7 +161,8 @@
     "community": "コミュニティ",
     "sign_in": "ログイン",
     "sign_up": "新規登録",
-    "currency": "通貨"
+    "currency": "通貨",
+    "templates": "テンプレート"
   },
   "blog": {
     "nav_label": "ブログ"
@@ -1032,7 +1033,8 @@
     "est_cost": "予想費用",
     "est_impressions": "予想インプレッション",
     "est_reach": "予想リーチ",
-    "media_type": "メディアタイプ"
+    "media_type": "メディアタイプ",
+    "prefilled_from_template": "テンプレートの予算・ターゲット・地域を反映しました。期間を選び、AI推奨を実行してください。"
   },
   "help": {
     "meta_title": "ヘルプセンター | XtheX",
@@ -1226,5 +1228,84 @@
     "dismiss_aria": "非表示",
     "toast_dismissed": "このおすすめを非表示にしました。",
     "toast_feedback_thanks": "フィードバックありがとうございます。"
+  },
+  "campaign_templates": {
+    "meta_title": "キャンペーンテンプレート | XtheX",
+    "meta_description": "目標・業種別のテンプレートで予算・ターゲット・推奨メディアを選び、キャンペーンプランナーに反映できます。",
+    "kicker": "テンプレートライブラリ",
+    "title": "キャンペーンテンプレート",
+    "lead": "実案件に近い設定例です。予算・年齢・地域を自動入力するので、期間を選んでAI推奨を実行するだけです。",
+    "filter_goal": "目標",
+    "filter_industry": "業種",
+    "filter_all": "すべて",
+    "empty": "条件に合うテンプレートがありません。フィルタを変更してください。",
+    "label_goal_target": "目標・ターゲット",
+    "label_media": "推奨メディア",
+    "label_budget": "予算（目安）",
+    "apply_cta": "キャンペーンプランナーに適用",
+    "goals": {
+      "awareness": "認知",
+      "launch": "ローンチ",
+      "conversion": "コンバージョン",
+      "traffic": "来店・人流"
+    },
+    "industries": {
+      "fnb": "飲食",
+      "tech": "テック・SaaS",
+      "retail": "小売",
+      "auto": "モビリティ・EV",
+      "beauty": "ビューティ",
+      "finance": "フィンテック"
+    },
+    "items": {
+      "cafe_gangnam": {
+        "title": "江南カフェ グランドオープン",
+        "desc": "SNS世代と通勤動線への短期集中。",
+        "target": "オープン認知・20代・通勤・ソーシャル動線",
+        "media": "江南デジタルボード・地下鉄PSD・バスシェルター"
+      },
+      "saas_tokyo": {
+        "title": "B2B SaaS 東京で認知",
+        "desc": "IT意思決定者に届けるオフィス街＋ランドマーク。",
+        "target": "サービス認知・30代・オフィス・ビジ街",
+        "media": "オフィス街デジタル・渋谷級大型デジタル"
+      },
+      "flagship_nyc": {
+        "title": "NY旗艦店 コンバージョン",
+        "desc": "来店・購入を狙うプレミアムOOH。",
+        "target": "来店・購入・30代・商業ハブ",
+        "media": "中核エリアデジタル・ストリートファニチャー"
+      },
+      "ev_shanghai": {
+        "title": "上海 EV新車ローンチ",
+        "desc": "都市型若年層に刺さる大型フォーマット中心。",
+        "target": "新車認知・20代・都心・モール動線",
+        "media": "大型看板・ショッピングモールデジタル"
+      },
+      "beauty_seoul": {
+        "title": "ソウル ビューティ小売 人流",
+        "desc": "試色・新商品に関心のある層へ近接メディア。",
+        "target": "来店・20代・ビューティ・ファッション動線",
+        "media": "地下鉄デジタル・明洞・弘大エリア小売スクリーン"
+      },
+      "fintech_global": {
+        "title": "フィンテック グローバル認知",
+        "desc": "空港・金融街で複数都市同時リーチ。",
+        "target": "アプリ・ブランド想起・30代・出張・旅行者",
+        "media": "空港デジタル・CBD大型デジタル（複数都市）"
+      },
+      "chain_expansion": {
+        "title": "フランチャイズ多店舗展開",
+        "desc": "デリバリー・近隣検索と連動した生活圏メディア。",
+        "target": "CV・来店・40代以上・生活圏",
+        "media": "地域単価デジタル・路線バス・シェルター"
+      },
+      "mall_weekend": {
+        "title": "モール週末人流フォーカス",
+        "desc": "週末の買い物・家族層を取り込む。",
+        "target": "週末人流・20代中心・買い物・レジャー",
+        "media": "モール内DOOH・駐車場入口デジタル"
+      }
+    }
   }
 }

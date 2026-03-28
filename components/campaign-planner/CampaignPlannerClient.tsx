@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Sparkles, ShoppingCart, FileDown, Loader2, MessageCircle } from "lucide-react";
@@ -37,8 +38,11 @@ function formatNumber(n: number): string {
   return n.toLocaleString();
 }
 
+const VALID_REGIONS = ["서울", "도쿄", "뉴욕", "상하이", "전체"] as const;
+
 export function CampaignPlannerClient() {
   const t = useTranslations("campaign_planner");
+  const searchParams = useSearchParams();
   const { addMany } = useOmniCart();
 
   const [budget, setBudget] = useState(3000);
@@ -48,6 +52,39 @@ export function CampaignPlannerClient() {
   const [endDate, setEndDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<CampaignPlannerResult | null>(null);
+  const prefilledToastKey = useRef<string | null>(null);
+
+  useEffect(() => {
+    const sp = searchParams.toString();
+    const q = new URLSearchParams(sp);
+    const b = q.get("budget");
+    const ta = q.get("targetAge");
+    const r = q.get("region");
+    const fromTpl = q.get("fromTemplate");
+    let applied = false;
+    if (b) {
+      const n = Number(b);
+      if (Number.isFinite(n)) {
+        setBudget(Math.min(50_000, Math.max(100, Math.round(n))));
+        applied = true;
+      }
+    }
+    if (ta === "20s" || ta === "30s" || ta === "40+") {
+      setTargetAge(ta);
+      applied = true;
+    }
+    if (r && (VALID_REGIONS as readonly string[]).includes(r)) {
+      setRegion(r);
+      applied = true;
+    }
+    if (fromTpl && applied) {
+      const key = `${fromTpl}:${sp}`;
+      if (prefilledToastKey.current !== key) {
+        prefilledToastKey.current = key;
+        toast.success(t("prefilled_from_template"));
+      }
+    }
+  }, [searchParams, t]);
 
   const handleSubmit = useCallback(async () => {
     if (!startDate || !endDate) {

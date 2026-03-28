@@ -161,7 +161,8 @@
     "community": "Community",
     "sign_in": "Sign in",
     "sign_up": "Sign up",
-    "currency": "Currency"
+    "currency": "Currency",
+    "templates": "Templates"
   },
   "blog": {
     "nav_label": "Blog"
@@ -1039,7 +1040,8 @@
     "est_cost": "Est. Cost",
     "est_impressions": "Est. Impressions",
     "est_reach": "Est. Reach",
-    "media_type": "Media Type"
+    "media_type": "Media Type",
+    "prefilled_from_template": "Budget, target, and region from a campaign template were applied. Pick dates and run AI recommendations."
   },
   "help": {
     "meta_title": "Help Center | XtheX",
@@ -1296,5 +1298,84 @@
     "dismiss_aria": "Hide recommendation",
     "toast_dismissed": "Hidden from your recommendations.",
     "toast_feedback_thanks": "Thanks — we use this to improve picks."
+  },
+  "campaign_templates": {
+    "meta_title": "Campaign Template Library | XtheX",
+    "meta_description": "Pick goal- and industry-based templates with budget, audience, and suggested media—then open them in the campaign planner.",
+    "kicker": "Template library",
+    "title": "Campaign templates",
+    "lead": "Each template mirrors a real brief. We pre-fill budget, target age, and region so you only set dates and run AI recommendations.",
+    "filter_goal": "Goal",
+    "filter_industry": "Industry",
+    "filter_all": "All",
+    "empty": "No templates match these filters. Try another combination.",
+    "label_goal_target": "Goal · audience",
+    "label_media": "Suggested media",
+    "label_budget": "Budget (guide)",
+    "apply_cta": "Apply in campaign planner",
+    "goals": {
+      "awareness": "Brand awareness",
+      "launch": "Launch",
+      "conversion": "Conversion",
+      "traffic": "Foot traffic"
+    },
+    "industries": {
+      "fnb": "F&B",
+      "tech": "Tech · SaaS",
+      "retail": "Retail",
+      "auto": "Mobility · EV",
+      "beauty": "Beauty",
+      "finance": "Fintech"
+    },
+    "items": {
+      "cafe_gangnam": {
+        "title": "Gangnam café grand opening",
+        "desc": "Short burst for social-native Gen Z and commuters.",
+        "target": "Launch awareness · 20s · commute & social routes",
+        "media": "Gangnam digital boards · subway PSD · bus shelters"
+      },
+      "saas_tokyo": {
+        "title": "B2B SaaS awareness — Tokyo",
+        "desc": "Reach IT buyers with office-district and iconic digital.",
+        "target": "Service awareness · 30s · office & business districts",
+        "media": "Office-tower digital · Shibuya-class large format"
+      },
+      "flagship_nyc": {
+        "title": "NYC flagship — performance",
+        "desc": "Premium DOOH mix focused on visits and purchases.",
+        "target": "Store visits & sales · 30s · high-traffic retail",
+        "media": "Core district digital · street furniture"
+      },
+      "ev_shanghai": {
+        "title": "EV launch — Shanghai",
+        "desc": "Bold formats for young urban early adopters.",
+        "target": "New model awareness · 20s · downtown & malls",
+        "media": "Large format · mall digital networks"
+      },
+      "beauty_seoul": {
+        "title": "Seoul beauty retail traffic",
+        "desc": "Proximity screens for swatches and new drops.",
+        "target": "Store traffic · 20s · beauty & fashion paths",
+        "media": "Subway digital · Myeongdong/Hongdae retail screens"
+      },
+      "fintech_global": {
+        "title": "Fintech global awareness",
+        "desc": "Airports and CBDs for multi-city reach.",
+        "target": "App & brand recall · 30s · travelers & professionals",
+        "media": "Airport digital · CBD large format (multi-city)"
+      },
+      "chain_expansion": {
+        "title": "Franchise multi-store expansion",
+        "desc": "Neighborhood CPM media tied to delivery & local search.",
+        "target": "Conversions & visits · 40+ · residential catchment",
+        "media": "Local digital · transit lines · shelters"
+      },
+      "mall_weekend": {
+        "title": "Mall weekend traffic push",
+        "desc": "Capture family and leisure shoppers on peak days.",
+        "target": "Weekend footfall · 20s-led · shopping & leisure",
+        "media": "In-mall DOOH · parking entrance digital"
+      }
+    }
   }
 }

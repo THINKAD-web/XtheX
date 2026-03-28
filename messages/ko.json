@@ -161,7 +161,8 @@
     "community": "커뮤니티",
     "sign_in": "로그인",
     "sign_up": "회원가입",
-    "currency": "통화"
+    "currency": "통화",
+    "templates": "캠페인 템플릿"
   },
   "blog": {
     "nav_label": "블로그"
@@ -1039,7 +1040,8 @@
     "est_cost": "예상 비용",
     "est_impressions": "예상 노출",
     "est_reach": "예상 도달",
-    "media_type": "매체 유형"
+    "media_type": "매체 유형",
+    "prefilled_from_template": "템플릿에서 불러온 예산·타겟·지역이 적용되었습니다. 기간을 선택한 뒤 AI 추천을 받으세요."
   },
   "help": {
     "meta_title": "고객센터 | XtheX",
@@ -1296,5 +1298,84 @@
     "dismiss_aria": "추천 숨기기",
     "toast_dismissed": "이 추천은 숨겼습니다.",
     "toast_feedback_thanks": "피드백 반영했습니다. 더 나은 추천에 쓰입니다."
+  },
+  "campaign_templates": {
+    "meta_title": "캠페인 템플릿 라이브러리 | XtheX",
+    "meta_description": "목표·산업별 템플릿으로 예산·타겟·추천 매체를 고르고 캠페인 플래너에 바로 적용하세요.",
+    "kicker": "템플릿 라이브러리",
+    "title": "캠페인 템플릿",
+    "lead": "실제 브리프에 가까운 사례를 골라 플래너에서 예산·타겟·지역을 채운 뒤 기간만 정하면 됩니다.",
+    "filter_goal": "목표",
+    "filter_industry": "산업",
+    "filter_all": "전체",
+    "empty": "조건에 맞는 템플릿이 없습니다. 필터를 바꿔 보세요.",
+    "label_goal_target": "목표 · 타겟",
+    "label_media": "추천 매체",
+    "label_budget": "예산(참고)",
+    "apply_cta": "캠페인 플래너로 적용",
+    "goals": {
+      "awareness": "브랜드 인지",
+      "launch": "런칭",
+      "conversion": "전환·실적",
+      "traffic": "유동·방문"
+    },
+    "industries": {
+      "fnb": "F&B",
+      "tech": "테크·SaaS",
+      "retail": "리테일",
+      "auto": "모빌리티·EV",
+      "beauty": "뷰티",
+      "finance": "핀테크"
+    },
+    "items": {
+      "cafe_gangnam": {
+        "title": "강남 카페 그랜드 오픈",
+        "desc": "SNS·직장인 동선을 노린 단기 집중 런칭.",
+        "target": "브랜드 첫 인지 · 20대 · 통근·소셜 동선",
+        "media": "강남권 디지털보드 · 지하철 PSD · 버스쉘터"
+      },
+      "saas_tokyo": {
+        "title": "B2B SaaS 도쿄 인지 캠페인",
+        "desc": "IT 의사결정자에게 도달하는 상향 믹스.",
+        "target": "서비스 인지 · 30대 · 오피스·비즈동선",
+        "media": "오피스가 디지털 · 시부야급 대형 디지털"
+      },
+      "flagship_nyc": {
+        "title": "뉴욕 플래그십 스토어 전환",
+        "desc": "방문·구매를 겨냥한 프리미엄 OOH.",
+        "target": "매장 방문·구매 · 30대 · 소비 허브",
+        "media": "핵심 상권 디지털 · 스트리트 퍼니처"
+      },
+      "ev_shanghai": {
+        "title": "상하이 EV 신차 런칭",
+        "desc": "도심 젊은 층에게 각인시키는 대형 포맷 중심.",
+        "target": "신차 인지 · 20대 · 도심·몰 동선",
+        "media": "대형 포맷 · 쇼핑몰 디지털 네트워크"
+      },
+      "beauty_seoul": {
+        "title": "서울 뷰티 리테일 트래픽",
+        "desc": "발색·신제품 관심층을 끌어당기는 근접 매체.",
+        "target": "매장 유입 · 20대 · 뷰티·패션 동선",
+        "media": "지하철 디지털 · 명동·홍대권 리테일 스크린"
+      },
+      "fintech_global": {
+        "title": "핀테크 글로벌 인지",
+        "desc": "공항·금융 상권으로 다지역 동시 노출.",
+        "target": "앱·브랜드 인지 · 30대 · 이동·비즈 여행객",
+        "media": "공항 디지털 · CBD 대형 디지털(복수 도시)"
+      },
+      "chain_expansion": {
+        "title": "프랜차이즈 다점포 확장",
+        "desc": "배달·근처 검색과 연계한 동네 단가 매체.",
+        "target": "전환·매장 방문 · 40대+ · 생활권",
+        "media": "동네 단가 디지털 · 노선 버스 · 쉘터"
+      },
+      "mall_weekend": {
+        "title": "몰 주말 유동 집중",
+        "desc": "주말 쇼핑·가족 단위 방문을 유도.",
+        "target": "주말 트래픽 · 20대 중심 · 쇼핑·문화",
+        "media": "몰 내부 DOOH · 주차장 입구 디지털"
+      }
+    }
   }
 }

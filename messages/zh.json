@@ -161,7 +161,8 @@
     "community": "社区",
     "sign_in": "登录",
     "sign_up": "注册",
-    "currency": "货币"
+    "currency": "货币",
+    "templates": "活动模板"
   },
   "blog": {
     "nav_label": "博客"
@@ -1032,7 +1033,8 @@
     "est_cost": "预计费用",
     "est_impressions": "预计曝光",
     "est_reach": "预计触达",
-    "media_type": "媒体类型"
+    "media_type": "媒体类型",
+    "prefilled_from_template": "已应用模板中的预算、受众与地区。请选择投放周期并运行 AI 推荐。"
   },
   "help": {
     "meta_title": "帮助中心 | XtheX",
@@ -1226,5 +1228,84 @@
     "dismiss_aria": "隐藏推荐",
     "toast_dismissed": "已隐藏该推荐。",
     "toast_feedback_thanks": "感谢反馈，我们会用于改进推荐。"
+  },
+  "campaign_templates": {
+    "meta_title": "活动模板库 | XtheX",
+    "meta_description": "按目标与行业筛选模板，包含预算、受众与推荐媒体，一键应用到活动规划器。",
+    "kicker": "模板库",
+    "title": "活动模板",
+    "lead": "每个模板贴近真实 brief。我们会预填预算、年龄段与地区，您只需选择周期并运行 AI 推荐。",
+    "filter_goal": "目标",
+    "filter_industry": "行业",
+    "filter_all": "全部",
+    "empty": "没有符合筛选条件的模板，请调整筛选。",
+    "label_goal_target": "目标 · 受众",
+    "label_media": "推荐媒体",
+    "label_budget": "预算（参考）",
+    "apply_cta": "应用到活动规划器",
+    "goals": {
+      "awareness": "品牌认知",
+      "launch": "新品/门店上市",
+      "conversion": "转化效果",
+      "traffic": "客流/到店"
+    },
+    "industries": {
+      "fnb": "餐饮",
+      "tech": "科技 · SaaS",
+      "retail": "零售",
+      "auto": "出行 · 新能源",
+      "beauty": "美妆",
+      "finance": "金融科技"
+    },
+    "items": {
+      "cafe_gangnam": {
+        "title": "江南咖啡店开业",
+        "desc": "面向社交活跃的年轻通勤族，短期高频曝光。",
+        "target": "开业认知 · 20 代 · 通勤与社交动线",
+        "media": "江南数字大牌 · 地铁 PSD · 公交候车亭"
+      },
+      "saas_tokyo": {
+        "title": "B2B SaaS 东京认知",
+        "desc": "触达 IT 决策者的商务区与地标数字屏组合。",
+        "target": "产品认知 · 30 代 · 办公与商务动线",
+        "media": "写字楼数字屏 · 涩谷级大型数字屏"
+      },
+      "flagship_nyc": {
+        "title": "纽约旗舰店转化",
+        "desc": "以到店与购买为导向的高端户外组合。",
+        "target": "到店与成交 · 30 代 · 核心商圈",
+        "media": "核心区数字屏 · 街道设施媒体"
+      },
+      "ev_shanghai": {
+        "title": "上海新能源车上市",
+        "desc": "以大画幅与商圈数字网触达年轻都市人群。",
+        "target": "新车认知 · 20 代 · 市中心与商场动线",
+        "media": "大型看板 · 商场数字屏网络"
+      },
+      "beauty_seoul": {
+        "title": "首尔美妆零售引流",
+        "desc": "贴近试色与新品兴趣人群的地铁与商圈屏。",
+        "target": "门店引流 · 20 代 · 美妆时尚动线",
+        "media": "地铁数字屏 · 明洞/弘大零售屏"
+      },
+      "fintech_global": {
+        "title": "金融科技全球认知",
+        "desc": "机场与 CBD 大屏实现多城市同步覆盖。",
+        "target": "应用与品牌记忆 · 30 代 · 商旅人群",
+        "media": "机场数字屏 · 多城 CBD 大型数字屏"
+      },
+      "chain_expansion": {
+        "title": "连锁餐饮多店扩张",
+        "desc": "结合外卖与附近搜索的生活圈性价比媒体。",
+        "target": "转化与到店 · 40 岁+ · 生活圈",
+        "media": "社区数字屏 · 公交线路 · 候车亭"
+      },
+      "mall_weekend": {
+        "title": "商场周末客流",
+        "desc": "在周末购物与家庭出行高峰集中触达。",
+        "target": "周末客流 · 以 20 代为主 · 购物休闲",
+        "media": "商场内 DOOH · 停车场入口数字屏"
+      }
+    }
   }
 }

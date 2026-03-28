@@ -22,6 +22,7 @@
       "title": "Panel de administración",
       "subtitle": "Moderación y estadísticas de la plataforma.",
       "nav_medias": "Lista de medios",
+      "nav_newMedia": "Nuevo medio",
       "nav_aiUpload": "Carga con IA",
       "nav_inquiries": "Consultas",
       "nav_reports": "Informes semanal / mensual",

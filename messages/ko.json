@@ -646,6 +646,7 @@
       "title": "관리자 대시보드",
       "subtitle": "검토 및 플랫폼 통계입니다.",
       "nav_medias": "미디어 목록",
+      "nav_newMedia": "새 매체 등록",
       "nav_aiUpload": "AI 업로드",
       "nav_inquiries": "문의 목록",
       "nav_reports": "주간/월간 보고서",

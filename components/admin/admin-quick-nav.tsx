@@ -25,6 +25,9 @@ export function AdminQuickNav({ t }: { t: TAdminHome }) {
             <Link href="/admin/medias" className={cn(linkOutline, "w-full sm:w-auto sm:min-w-[9.5rem]")}>
               {t("nav_medias")}
             </Link>
+            <Link href="/admin/medias/new" className={cn(linkPrimary, "w-full sm:w-auto sm:min-w-[9.5rem]")}>
+              {t("nav_newMedia")}
+            </Link>
             <Link href="/admin/ai-upload" className={cn(linkPrimary, "w-full sm:w-auto sm:min-w-[9.5rem]")}>
               {t("nav_aiUpload")}
             </Link>

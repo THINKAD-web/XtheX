@@ -5,6 +5,7 @@ import { OmniCartHeaderBtn } from "@/components/layout/OmniCartHeaderBtn";
 import { CurrencySwitcher } from "@/components/CurrencySwitcher";
 import { AuthNav } from "@/components/auth/auth-nav";
 import { MobileNav } from "@/components/layout/MobileNav";
+import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 import { landing } from "@/lib/landing-theme";
 import { getLocale } from "next-intl/server";
 
@@ -49,6 +50,7 @@ export async function SiteHeader() {
           ))}
         </nav>
         <div className="justify-self-end flex shrink-0 items-center gap-1.5 sm:gap-3">
+          <NotificationCenter />
           <OmniCartHeaderBtn />
           <LanguageSwitcher />
           <div className="hidden sm:flex items-center gap-1.5 sm:gap-3">

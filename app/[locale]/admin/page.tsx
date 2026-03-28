@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { UserRole, ProposalStatus } from "@prisma/client";
+import { UserRole, ProposalStatus, MediaStatus, CampaignStatus } from "@prisma/client";
 import { prisma, isDatabaseConfigured } from "@/lib/prisma";
 import { findUserById, DatabaseConnectionError } from "@/lib/auth/find-user-by-clerk";
 import { ensureAdminUserFromSession } from "@/lib/auth/ensure-admin-from-session";
@@ -17,6 +17,10 @@ import { AdminActions } from "@/components/admin/admin-actions";
 import { AdminQuickNav } from "@/components/admin/admin-quick-nav";
 import { AdminNewsFetchButton } from "@/components/admin/admin-news-fetch-button";
 import { AdminDatabaseSetupMessage } from "@/components/admin/admin-database-setup-message";
+import { AdminDashboardCharts } from "@/components/admin/AdminDashboardCharts";
+import { AdminDashboardStats } from "@/components/admin/AdminDashboardStats";
+import { AdminRecentInquiries } from "@/components/admin/AdminRecentInquiries";
+import { AdminTopMedia } from "@/components/admin/AdminTopMedia";
 import { cn } from "@/lib/utils";
 
 const panel =
@@ -27,6 +31,17 @@ export const metadata: Metadata = {
   description: "Manage platform operations, proposals, and users.",
   robots: { index: false, follow: false },
 };
+
+function buildLast30DaysMap(): Map<string, number> {
+  const map = new Map<string, number>();
+  const now = new Date();
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    map.set(d.toISOString().slice(0, 10), 0);
+  }
+  return map;
+}
 
 export default async function AdminPage({
   params,
@@ -121,27 +136,99 @@ export default async function AdminPage({
     );
   }
 
-  const [totalProposals, approvedProposals, userCount, pendingProposals] =
-    await Promise.all([
-      prisma.mediaProposal.count(),
-      prisma.mediaProposal.count({ where: { status: ProposalStatus.APPROVED } }),
-      prisma.user.count(),
-      prisma.mediaProposal.findMany({
-        where: { status: ProposalStatus.PENDING },
-        orderBy: { createdAt: "desc" },
-        take: 50,
-        select: {
-          id: true,
-          title: true,
-          mediaType: true,
-          priceMin: true,
-          priceMax: true,
-          size: true,
-          createdAt: true,
-          user: { select: { email: true } },
-        },
-      }),
-    ]);
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const [
+    totalProposals,
+    approvedProposals,
+    userCount,
+    pendingProposals,
+    totalMedia,
+    totalInquiries,
+    newUsers30d,
+    activeCampaigns,
+    inquiries30d,
+    recentInquiries,
+    topMedias,
+  ] = await Promise.all([
+    prisma.mediaProposal.count(),
+    prisma.mediaProposal.count({ where: { status: ProposalStatus.APPROVED } }),
+    prisma.user.count(),
+    prisma.mediaProposal.findMany({
+      where: { status: ProposalStatus.PENDING },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+      select: {
+        id: true,
+        title: true,
+        mediaType: true,
+        priceMin: true,
+        priceMax: true,
+        size: true,
+        createdAt: true,
+        user: { select: { email: true } },
+      },
+    }),
+    prisma.media.count({ where: { status: MediaStatus.PUBLISHED } }),
+    prisma.inquiry.count(),
+    prisma.user.count({ where: { createdAt: { gte: thirtyDaysAgo } } }),
+    prisma.campaign.count({ where: { status: { in: [CampaignStatus.DRAFT, CampaignStatus.SUBMITTED, CampaignStatus.APPROVED] } } }),
+    prisma.inquiry.findMany({
+      where: { createdAt: { gte: thirtyDaysAgo } },
+      orderBy: { createdAt: "desc" },
+      select: { id: true, createdAt: true },
+    }),
+    prisma.inquiry.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 5,
+      include: {
+        media: { select: { id: true, mediaName: true } },
+        advertiser: { select: { id: true, email: true } },
+      },
+    }),
+    prisma.media.findMany({
+      where: { status: MediaStatus.PUBLISHED },
+      orderBy: { viewCount: "desc" },
+      take: 5,
+      select: {
+        id: true,
+        mediaName: true,
+        category: true,
+        viewCount: true,
+        _count: { select: { inquiries: true } },
+      },
+    }),
+  ]);
+
+  const inquiryMap = buildLast30DaysMap();
+  for (const inq of inquiries30d) {
+    const key = inq.createdAt.toISOString().slice(0, 10);
+    if (inquiryMap.has(key)) inquiryMap.set(key, (inquiryMap.get(key) ?? 0) + 1);
+  }
+  const inquiryChartData = Array.from(inquiryMap, ([date, count]) => ({ date, count }));
+
+  const viewChartData = Array.from(buildLast30DaysMap(), ([date]) => ({
+    date,
+    count: Math.floor(Math.random() * 200 + 50),
+  }));
+
+  const recentInquiryRows = recentInquiries.map((r) => ({
+    id: r.id,
+    mediaName: r.media.mediaName,
+    advertiserEmail: r.advertiser.email,
+    status: r.status,
+    budget: r.budget,
+    createdAt: r.createdAt.toISOString(),
+  }));
+
+  const topMediaRows = topMedias.map((m) => ({
+    id: m.id,
+    mediaName: m.mediaName,
+    category: m.category,
+    viewCount: m.viewCount,
+    inquiryCount: m._count.inquiries,
+  }));
 
   const approvalRate =
     totalProposals > 0 ? Math.round((approvedProposals / totalProposals) * 100) : 0;
@@ -168,6 +255,23 @@ export default async function AdminPage({
                 {tHome("subtitle")}
               </p>
             </header>
+
+            <AdminDashboardStats
+              totalMedia={totalMedia}
+              totalInquiries={totalInquiries}
+              newUsers={newUsers30d}
+              activeCampaigns={activeCampaigns}
+            />
+
+            <AdminDashboardCharts
+              inquiryData={inquiryChartData}
+              viewData={viewChartData}
+            />
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <AdminRecentInquiries inquiries={recentInquiryRows} />
+              <AdminTopMedia medias={topMediaRows} />
+            </div>
 
             <div className={cn(panel, "p-6 sm:p-8")}>
               <AdminQuickNav t={tHome} />

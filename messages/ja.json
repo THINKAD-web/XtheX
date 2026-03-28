@@ -639,6 +639,7 @@
       "title": "管理ダッシュボード",
       "subtitle": "モデレーションとプラットフォーム統計",
       "nav_medias": "メディア一覧",
+      "nav_newMedia": "新規メディア登録",
       "nav_aiUpload": "AIアップロード",
       "nav_inquiries": "お問い合わせ",
       "nav_reports": "週次・月次レポート",

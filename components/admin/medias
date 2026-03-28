@@ -1,5 +1,0 @@
-import { OmnichannelHints } from "@/components/campaign/OmnichannelHints";
-import { PackageDiscountWidget } from "@/components/campaign/PackageDiscountWidget";
-
-<OmnichannelHints medias={selectedMedias} />
-<PackageDiscountWidget selectedMedias={selectedMedias} />

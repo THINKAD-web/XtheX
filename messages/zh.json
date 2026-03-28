@@ -639,6 +639,7 @@
       "title": "管理仪表盘",
       "subtitle": "审核与平台统计",
       "nav_medias": "媒体列表",
+      "nav_newMedia": "新建媒体",
       "nav_aiUpload": "AI 上传",
       "nav_inquiries": "询盘列表",
       "nav_reports": "周/月报",

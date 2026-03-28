@@ -646,6 +646,7 @@
       "title": "Admin dashboard",
       "subtitle": "Moderation and platform stats.",
       "nav_medias": "Media list",
+      "nav_newMedia": "New media",
       "nav_aiUpload": "AI upload",
       "nav_inquiries": "Inquiries",
       "nav_reports": "Weekly / monthly reports",

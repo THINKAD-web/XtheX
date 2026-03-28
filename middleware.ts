@@ -22,7 +22,8 @@ function isProtectedPath(pathname: string): boolean {
     path.startsWith("/admin") ||
     path.startsWith("/upload") ||
     path.startsWith("/campaigns") ||
-    path.startsWith("/recommend")
+    path.startsWith("/recommend") ||
+    path.startsWith("/community")
   );
 }
 

@@ -11,6 +11,7 @@ import { Globe, Twitter, Instagram, Linkedin } from "lucide-react";
 export function ConditionalSiteFooter() {
   const pathname = usePathname();
   const t = useTranslations("home.footer");
+  const tNav = useTranslations("nav");
   const year = new Date().getFullYear();
 
   if (pathname?.includes("/admin")) {
@@ -33,6 +34,12 @@ export function ConditionalSiteFooter() {
               className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
             >
               {t("about")}
+            </Link>
+            <Link
+              href="/community"
+              className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+            >
+              {tNav("community")}
             </Link>
             <Link
               href="/contact"

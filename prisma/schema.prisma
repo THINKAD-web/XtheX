@@ -217,6 +217,10 @@ model User {
   mediaReviewReportsFiled   MediaReviewReport[] @relation("MediaReviewReportsByReporter")
   mediaReviewReportsResolved MediaReviewReport[] @relation("MediaReviewReportsResolvedBy")
 
+  partnershipAppsSubmitted PartnershipApplication[] @relation("PartnershipAppSubmitter")
+  partnershipAppsReviewed  PartnershipApplication[] @relation("PartnershipAppReviewer")
+  partnershipContractsCreated PartnershipContract[] @relation("PartnershipContractCreator")
+
   twoFactorSecret       String?
   twoFactorEnabled      Boolean           @default(false)
   twoFactorBackupCodes  String?           @db.Text
@@ -679,6 +683,72 @@ model ForumReport {
   @@index([postId])
   @@index([commentId])
   @@index([reporterId, createdAt])
+}
+
+enum PartnershipType {
+  MEDIA_NETWORK
+  AGENCY
+  TECH_PLATFORM
+  BRAND
+  OTHER
+}
+
+enum PartnershipApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum PartnershipContractStatus {
+  DRAFT
+  ACTIVE
+  EXPIRED
+  TERMINATED
+}
+
+model PartnershipApplication {
+  id              String                       @id @default(uuid()) @db.Uuid
+  createdAt       DateTime                     @default(now())
+  updatedAt       DateTime                     @updatedAt
+  companyName     String
+  contactName     String
+  email           String
+  phone           String?
+  website         String?
+  type            PartnershipType
+  message         String                       @db.Text
+  submitterUserId String?                      @db.Uuid
+  status          PartnershipApplicationStatus @default(PENDING)
+  adminMemo       String?                      @db.Text
+  reviewedAt      DateTime?
+  reviewedById    String?                      @db.Uuid
+
+  submitterUser User?                 @relation("PartnershipAppSubmitter", fields: [submitterUserId], references: [id], onDelete: SetNull)
+  reviewedBy    User?                 @relation("PartnershipAppReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  contracts     PartnershipContract[]
+
+  @@index([status, createdAt])
+  @@index([email])
+}
+
+model PartnershipContract {
+  id            String                    @id @default(uuid()) @db.Uuid
+  createdAt     DateTime                  @default(now())
+  updatedAt     DateTime                  @updatedAt
+  applicationId String?                   @db.Uuid
+  title         String
+  summary       String?                   @db.Text
+  documentUrl   String?
+  effectiveDate DateTime?
+  endDate       DateTime?
+  status        PartnershipContractStatus @default(DRAFT)
+  createdById   String?                   @db.Uuid
+
+  application PartnershipApplication? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+  createdBy   User?                   @relation("PartnershipContractCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([applicationId])
+  @@index([status, createdAt])
 }
 
 enum AbExperimentStatus {

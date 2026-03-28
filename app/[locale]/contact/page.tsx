@@ -17,6 +17,7 @@ export default async function ContactPage({
 }) {
   const { locale } = await params;
   const t = await getTranslations("nav");
+  const tc = await getTranslations("contact");
   const isKo = locale === "ko";
 
   return (
@@ -51,6 +52,12 @@ export default async function ContactPage({
                 <p>{isKo ? "광고 집행 문의" : "Campaign inquiry"}</p>
                 <p>{isKo ? "매체 등록/승인 문의" : "Media onboarding & approval"}</p>
                 <p>{isKo ? "제휴 및 파트너십" : "Partnership requests"}</p>
+                <Link
+                  href="/partnerships/apply"
+                  className="mt-2 inline-flex h-10 items-center justify-center rounded-md bg-secondary px-4 text-sm font-medium text-secondary-foreground ring-offset-background transition-colors hover:bg-secondary/80"
+                >
+                  {tc("partnership_cta")}
+                </Link>
               </CardContent>
             </Card>
           </div>

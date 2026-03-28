@@ -1,33 +1,26 @@
 "use client";
+
 import { useState, useRef, useEffect, useCallback } from "react";
-import { MessageCircle, X, Send, Bot, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  MessageCircle,
+  X,
+  Send,
+  Bot,
+  ChevronDown,
+  ChevronUp,
+  Maximize2,
+  Minimize2,
+  Headphones,
+} from "lucide-react";
+import { usePathname } from "next/navigation";
+import { useTranslations, useLocale } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
-import { useLocale } from "next-intl";
 
 type Message = { role: "user" | "assistant"; content: string };
 
 const STORAGE_KEY = "xthex-chat-history";
-
-const QUICK_REPLIES: Record<string, string[]> = {
-  ko: ["도쿄 광고 알아보고 싶어요", "서울 매체 추천해주세요", "예산은 얼마나 필요한가요?"],
-  en: ["Tell me about Tokyo OOH ads", "Recommend Seoul media", "What budget do I need?"],
-  ja: ["東京の広告について知りたい", "ソウルの媒体を教えて", "予算はどのくらい必要？"],
-  zh: ["想了解东京户外广告", "推荐首尔媒体", "需要多少预算？"],
-};
-
-const QUICK_ACTIONS: Record<string, string[]> = {
-  ko: ["매체 추천해줘", "가격 알려줘", "문의하기"],
-  en: ["Recommend media", "Show pricing", "Contact us"],
-  ja: ["媒体おすすめ", "料金を教えて", "お問い合わせ"],
-  zh: ["推荐媒体", "查看价格", "联系我们"],
-};
-
-const GREETINGS: Record<string, string> = {
-  ko: "안녕하세요! XtheX AI 어시스턴트입니다 😊\n전 세계 옥외광고에 대해 무엇이든 물어보세요.",
-  en: "Hello! I'm the XtheX AI assistant 😊\nAsk me anything about global OOH advertising.",
-  ja: "こんにちは！XtheX AIアシスタントです 😊\n世界中の屋外広告について何でもお聞きください。",
-  zh: "您好！这是XtheX AI助手 😊\n关于全球户外广告，请随时提问。",
-};
+const STORAGE_HUMAN_KEY = "xthex-chat-human-requested";
 
 function TypingDots() {
   return (
@@ -44,15 +37,20 @@ function TypingDots() {
 }
 
 export function ChatWidget() {
+  const pathname = usePathname();
+  const t = useTranslations("liveChat");
+  const locale = useLocale();
   const [open, setOpen] = useState(false);
   const [minimized, setMinimized] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [humanRequested, setHumanRequested] = useState(false);
+  const [readCount, setReadCount] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const locale = useLocale();
-  const quickReplies = QUICK_REPLIES[locale] ?? QUICK_REPLIES.en;
-  const quickActions = QUICK_ACTIONS[locale] ?? QUICK_ACTIONS.en;
+
+  const fullyVisible = open && !minimized;
 
   useEffect(() => {
     try {
@@ -63,26 +61,48 @@ export function ChatWidget() {
           setMessages(parsed);
         }
       }
-    } catch {}
+      const h = localStorage.getItem(STORAGE_HUMAN_KEY);
+      if (h === "1") setHumanRequested(true);
+    } catch {
+      // ignore
+    }
   }, []);
 
   useEffect(() => {
     if (messages.length > 0) {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
-      } catch {}
+      } catch {
+        // ignore
+      }
     }
   }, [messages]);
 
   useEffect(() => {
+    if (humanRequested) {
+      try {
+        localStorage.setItem(STORAGE_HUMAN_KEY, "1");
+      } catch {
+        // ignore
+      }
+    }
+  }, [humanRequested]);
+
+  useEffect(() => {
+    if (fullyVisible) setReadCount(messages.length);
+  }, [fullyVisible, messages.length]);
+
+  useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading]);
+  }, [messages, loading, minimized, expanded]);
 
   useEffect(() => {
     if (open && messages.length === 0) {
-      setMessages([{ role: "assistant", content: GREETINGS[locale] ?? GREETINGS.en }]);
+      setMessages([{ role: "assistant", content: t("greeting") }]);
     }
-  }, [open, locale, messages.length]);
+  }, [open, messages.length, t]);
+
+  const unread = Math.max(0, messages.length - readCount);
 
   const send = useCallback(
     async (text: string) => {
@@ -96,53 +116,115 @@ export function ChatWidget() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: text, locale }),
         });
-        const data = (await res.json()) as { reply?: string };
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: data.reply ?? "오류가 발생했습니다." },
-        ]);
+        const data = (await res.json()) as { reply?: string; error?: string };
+        const reply = data.reply ?? t("error_generic");
+        setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
       } catch {
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: "오류가 발생했습니다. 다시 시도해주세요." },
-        ]);
+        setMessages((prev) => [...prev, { role: "assistant", content: t("error_generic") }]);
       } finally {
         setLoading(false);
       }
     },
-    [loading, locale],
+    [loading, locale, t],
   );
+
+  const requestHuman = useCallback(() => {
+    if (humanRequested) return;
+    setHumanRequested(true);
+    setMessages((prev) => [...prev, { role: "assistant", content: t("human_ack") }]);
+  }, [humanRequested, t]);
+
+  const quickReplies = [t("quick_reply_1"), t("quick_reply_2"), t("quick_reply_3")];
+  const quickActions = [t("quick_action_1"), t("quick_action_2"), t("quick_action_3")];
+
+  if (pathname?.includes("/admin")) {
+    return null;
+  }
 
   return (
     <>
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-24 left-4 z-[88] flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/30 transition-transform hover:scale-110 md:bottom-10 md:left-6"
-        aria-label="AI 채팅"
+        onClick={() => {
+          setOpen((v) => !v);
+          if (!open) setMinimized(false);
+        }}
+        className={cn(
+          "fixed bottom-36 right-4 z-[86] flex h-14 w-14 items-center justify-center rounded-full",
+          "bg-gradient-to-br from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/30",
+          "transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2",
+          "md:right-6",
+        )}
+        aria-label={t("launcher_aria")}
       >
-        {open ? <X className="h-5 w-5" /> : <MessageCircle className="h-5 w-5" />}
+        {open ? (
+          <X className="h-6 w-6" />
+        ) : (
+          <>
+            <MessageCircle className="h-6 w-6" />
+            {unread > 0 ? (
+              <span
+                className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow-md"
+                aria-label={t("badge_unread")}
+              >
+                {unread > 9 ? "9+" : unread}
+              </span>
+            ) : null}
+          </>
+        )}
       </button>
 
       {open && (
-        <div className="fixed bottom-40 left-4 z-[88] flex w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl md:bottom-28 md:left-6">
+        <div
+          className={cn(
+            "fixed z-[86] flex flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl",
+            "right-4 w-[calc(100vw-2rem)] md:right-6",
+            expanded ? "max-w-md" : "max-w-sm",
+            "bottom-[13.5rem] max-h-[min(78vh,640px)] md:bottom-[14rem]",
+          )}
+        >
           <div
-            className="flex cursor-pointer items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 px-4 py-3"
+            className="flex cursor-pointer items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 px-3 py-2.5 md:px-4"
             onClick={() => setMinimized((v) => !v)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setMinimized((v) => !v);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-expanded={!minimized}
           >
-            <Bot className="h-5 w-5 text-white" />
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-white">XtheX AI</p>
-              <p className="text-[10px] text-blue-100">Global OOH Assistant · 24/7</p>
+            <Bot className="h-5 w-5 shrink-0 text-white" />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-white">{t("title")}</p>
+              <p className="truncate text-[10px] text-blue-100">{t("subtitle")}</p>
             </div>
+            {minimized && unread > 0 ? (
+              <span className="mr-1 rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-bold text-white">
+                {unread > 9 ? "9+" : unread}
+              </span>
+            ) : null}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setExpanded((v) => !v);
+              }}
+              className="shrink-0 rounded p-1 text-white/80 hover:bg-white/10 hover:text-white"
+              aria-label={expanded ? t("restore_aria") : t("maximize_aria")}
+            >
+              {expanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+            </button>
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 setMinimized((v) => !v);
               }}
-              className="text-white/70 hover:text-white"
-              aria-label={minimized ? "Expand" : "Minimize"}
+              className="shrink-0 rounded p-1 text-white/80 hover:bg-white/10 hover:text-white"
+              aria-label={t("minimize_aria")}
             >
               {minimized ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </button>
@@ -152,8 +234,8 @@ export function ChatWidget() {
                 e.stopPropagation();
                 setOpen(false);
               }}
-              className="text-white/70 hover:text-white"
-              aria-label="Close"
+              className="shrink-0 rounded p-1 text-white/80 hover:bg-white/10 hover:text-white"
+              aria-label={t("close_aria")}
             >
               <X className="h-4 w-4" />
             </button>
@@ -161,15 +243,20 @@ export function ChatWidget() {
 
           {!minimized && (
             <>
-              <div className="flex h-64 flex-col gap-2 overflow-y-auto p-3">
+              <div
+                className={cn(
+                  "flex flex-col gap-2 overflow-y-auto p-3",
+                  expanded ? "min-h-[min(52vh,420px)] max-h-[min(52vh,420px)]" : "h-56 max-h-56",
+                )}
+              >
                 {messages.map((m, i) => (
                   <div
-                    key={i}
+                    key={`${i}-${m.content.slice(0, 12)}`}
                     className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}
                   >
                     <div
                       className={cn(
-                        "max-w-[82%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm leading-relaxed",
+                        "max-w-[88%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm leading-relaxed",
                         m.role === "user"
                           ? "rounded-br-sm bg-blue-600 text-white"
                           : "rounded-bl-sm bg-muted text-foreground",
@@ -195,7 +282,7 @@ export function ChatWidget() {
                     <button
                       key={q}
                       type="button"
-                      onClick={() => send(q)}
+                      onClick={() => void send(q)}
                       className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-[11px] font-medium text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-800/40 dark:bg-blue-950/30 dark:text-blue-300 dark:hover:bg-blue-900/40"
                     >
                       {q}
@@ -204,12 +291,12 @@ export function ChatWidget() {
                 </div>
               )}
 
-              <div className="flex items-center gap-1.5 border-t border-border px-3 py-1.5">
+              <div className="flex flex-wrap items-center gap-1.5 border-t border-border px-3 py-1.5">
                 {quickActions.map((q) => (
                   <button
                     key={q}
                     type="button"
-                    onClick={() => send(q)}
+                    onClick={() => void send(q)}
                     className="rounded-full bg-gradient-to-r from-blue-600/10 to-cyan-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-blue-600 transition-colors hover:from-blue-600/20 hover:to-cyan-500/20 dark:text-blue-400"
                   >
                     {q}
@@ -217,28 +304,44 @@ export function ChatWidget() {
                 ))}
               </div>
 
+              {!humanRequested ? (
+                <div className="border-t border-border bg-muted/30 px-3 py-2">
+                  <button
+                    type="button"
+                    onClick={requestHuman}
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-600/10 py-2 text-xs font-semibold text-emerald-800 transition-colors hover:bg-emerald-600/15 dark:border-emerald-500/35 dark:bg-emerald-950/50 dark:text-emerald-100 dark:hover:bg-emerald-900/40"
+                  >
+                    <Headphones className="h-4 w-4 shrink-0" />
+                    {t("connect_human")}
+                  </button>
+                </div>
+              ) : (
+                <div className="border-t border-border bg-muted/20 px-3 py-2 text-center">
+                  <Link
+                    href="/contact"
+                    className="text-xs font-semibold text-blue-600 underline-offset-2 hover:underline dark:text-blue-300"
+                  >
+                    {t("contact_link")}
+                  </Link>
+                </div>
+              )}
+
               <div className="flex items-center gap-2 border-t border-border px-3 py-2">
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && send(input)}
-                  placeholder={
-                    locale === "ko"
-                      ? "메시지 입력..."
-                      : locale === "ja"
-                        ? "メッセージを入力..."
-                        : locale === "zh"
-                          ? "输入消息..."
-                          : "Type a message..."
-                  }
-                  className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                  onKeyDown={(e) => e.key === "Enter" && void send(input)}
+                  placeholder={t("placeholder")}
+                  className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                  autoComplete="off"
                 />
                 <button
                   type="button"
-                  onClick={() => send(input)}
+                  onClick={() => void send(input)}
                   disabled={!input.trim() || loading}
-                  className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-white transition-colors hover:bg-blue-500 disabled:opacity-40"
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white transition-colors hover:bg-blue-500 disabled:opacity-40"
+                  aria-label={t("send_aria")}
                 >
                   <Send className="h-3.5 w-3.5" />
                 </button>

@@ -1,6 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+const AI_OFFLINE_REPLY: Record<string, string> = {
+  ko: "XtheX는 전 세계 옥외광고 매체를 탐색·추천하는 플랫폼입니다. 홈의 미디어 믹스 검색이나 탐색(/explore)에서 지역·예산에 맞는 매체를 찾아보세요. 더 구체적인 상담은 채팅의 ‘실제 지원팀 연결’ 또는 문의 페이지를 이용해 주세요.",
+  en: "XtheX helps you discover and plan global OOH. Try the media mix search on the home page or browse /explore for locations and budgets. For a human specialist, use “Connect to support team” in chat or our contact page.",
+  ja: "XtheXは世界の屋外広告を探せるマーケットプレイスです。トップのミックス検索や/exploreで地域・予算から探せます。担当者はチャットの「サポートチームに接続」またはお問い合わせからどうぞ。",
+  zh: "XtheX 覆盖全球户外广告资源。可在首页组合搜索或 /explore 按地区与预算查找。需要人工支持请使用聊天中的「连接支持团队」或联系页面。",
+};
+
+function offlineReply(locale: string): string {
+  const loc = locale?.slice(0, 2) ?? "en";
+  return AI_OFFLINE_REPLY[loc] ?? AI_OFFLINE_REPLY.en;
+}
+
 const SYSTEM_PROMPT = `당신은 XtheX의 AI 어시스턴트입니다. XtheX는 글로벌 옥외광고(OOH) 마켓플레이스로, 전 세계 매체사와 광고주를 AI로 연결합니다.
 
 주요 기능:
@@ -40,23 +52,32 @@ export async function POST(req: NextRequest) {
   }
 
   const apiKey = process.env.XAI_API_KEY;
-  if (!apiKey) return NextResponse.json({ error: "API key missing" }, { status: 500 });
+  if (!apiKey) {
+    return NextResponse.json({ reply: offlineReply(locale) });
+  }
 
-  const response = await fetch("https://api.x.ai/v1/chat/completions", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-    body: JSON.stringify({
-      model: "grok-3",
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT + mediaContext },
-        { role: "user", content: message },
-      ],
-      max_tokens: 400,
-      stream: false,
-    }),
-  });
+  try {
+    const response = await fetch("https://api.x.ai/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: "grok-3",
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT + mediaContext },
+          { role: "user", content: message },
+        ],
+        max_tokens: 400,
+        stream: false,
+      }),
+    });
 
-  const data = await response.json() as { choices?: { message?: { content?: string } }[] };
-  const reply = data.choices?.[0]?.message?.content ?? "죄송합니다, 잠시 후 다시 시도해주세요.";
-  return NextResponse.json({ reply });
+    const data = (await response.json()) as { choices?: { message?: { content?: string } }[] };
+    const text = data.choices?.[0]?.message?.content?.trim();
+    if (!response.ok || !text) {
+      return NextResponse.json({ reply: offlineReply(locale) });
+    }
+    return NextResponse.json({ reply: text });
+  } catch {
+    return NextResponse.json({ reply: offlineReply(locale) });
+  }
 }

@@ -945,6 +945,23 @@
       "party_advertiser": "Advertiser",
       "party_media": "Media"
     },
+    "invoices": {
+      "title": "Invoices",
+      "subtitle": "Issued automatically when a submitted or approved campaign’s scheduled run period ends.",
+      "back": "Advertiser dashboard",
+      "col_campaign": "Campaign",
+      "col_amount": "Amount",
+      "col_end": "Campaign end (UTC)",
+      "col_due": "Due (UTC)",
+      "col_status": "Status",
+      "status_open": "Open",
+      "status_paid": "Paid",
+      "status_void": "Void",
+      "empty": "No invoices yet.",
+      "footer_hint": "Issue and reminder emails run when Resend (RESEND_API_KEY) is set. Schedule GET /api/cron/auto-invoice with CRON_SECRET.",
+      "untitled": "Untitled",
+      "krw": "KRW"
+    },
     "mobile": {
       "swipe_kpis_hint": "Swipe sideways for more",
       "carousel_campaign_status": "Campaign status summary",

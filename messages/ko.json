@@ -945,6 +945,23 @@
       "party_advertiser": "광고주",
       "party_media": "매체"
     },
+    "invoices": {
+      "title": "인보이스",
+      "subtitle": "제출·승인된 캠페인의 집행 기간(등록일 + 주수)이 끝나면 자동으로 발행됩니다.",
+      "back": "광고주 대시보드",
+      "col_campaign": "캠페인",
+      "col_amount": "금액",
+      "col_end": "집행 종료 (UTC)",
+      "col_due": "납기 (UTC)",
+      "col_status": "상태",
+      "status_open": "미결제",
+      "status_paid": "결제완료",
+      "status_void": "취소",
+      "empty": "인보이스가 없습니다.",
+      "footer_hint": "발행·리마인더 메일은 Resend(RESEND_API_KEY) 설정 시 전송됩니다. CRON_SECRET으로 GET /api/cron/auto-invoice 를 주기 호출하세요.",
+      "untitled": "제목 없음",
+      "krw": "원"
+    },
     "mobile": {
       "swipe_kpis_hint": "좌우로 밀어 더 보기",
       "carousel_campaign_status": "캠페인 상태 요약",

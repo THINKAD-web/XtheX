@@ -938,6 +938,23 @@
       "party_advertiser": "広告主",
       "party_media": "メディア"
     },
+    "invoices": {
+      "title": "請求書",
+      "subtitle": "提出済み・承認済みキャンペーンの実行期間（作成日＋週数）終了後に自動発行されます。",
+      "back": "広告主ダッシュボード",
+      "col_campaign": "キャンペーン",
+      "col_amount": "金額",
+      "col_end": "実行終了 (UTC)",
+      "col_due": "支払期限 (UTC)",
+      "col_status": "状態",
+      "status_open": "未払い",
+      "status_paid": "支払済み",
+      "status_void": "取消",
+      "empty": "請求書はまだありません。",
+      "footer_hint": "発行・リマインダーメールは Resend 設定時に送信されます。GET /api/cron/auto-invoice を CRON_SECRET で定期実行してください。",
+      "untitled": "無題",
+      "krw": "KRW"
+    },
     "mobile": {
       "swipe_kpis_hint": "横にスワイプして続きを表示",
       "carousel_campaign_status": "キャンペーン状況",

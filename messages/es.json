@@ -945,6 +945,23 @@
       "party_advertiser": "Anunciante",
       "party_media": "Medio"
     },
+    "invoices": {
+      "title": "Facturas",
+      "subtitle": "Se emiten automáticamente al terminar el periodo de ejecución (fecha de creación + semanas) de campañas enviadas o aprobadas.",
+      "back": "Panel del anunciante",
+      "col_campaign": "Campaña",
+      "col_amount": "Importe",
+      "col_end": "Fin de ejecución (UTC)",
+      "col_due": "Vencimiento (UTC)",
+      "col_status": "Estado",
+      "status_open": "Pendiente",
+      "status_paid": "Pagada",
+      "status_void": "Anulada",
+      "empty": "Aún no hay facturas.",
+      "footer_hint": "Los correos de emisión y recordatorio se envían si Resend está configurado. Programe GET /api/cron/auto-invoice con CRON_SECRET.",
+      "untitled": "Sin título",
+      "krw": "KRW"
+    },
     "mobile": {
       "swipe_kpis_hint": "Desliza a los lados para ver más",
       "carousel_campaign_status": "Resumen del estado de campañas",

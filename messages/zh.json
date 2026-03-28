@@ -938,6 +938,23 @@
       "party_advertiser": "广告主",
       "party_media": "媒体"
     },
+    "invoices": {
+      "title": "发票",
+      "subtitle": "已提交或已批准活动的执行期（创建日期 + 周数）结束后会自动开具。",
+      "back": "广告主控制台",
+      "col_campaign": "活动",
+      "col_amount": "金额",
+      "col_end": "执行结束 (UTC)",
+      "col_due": "付款截止 (UTC)",
+      "col_status": "状态",
+      "status_open": "待付款",
+      "status_paid": "已付款",
+      "status_void": "作废",
+      "empty": "暂无发票。",
+      "footer_hint": "配置 Resend 后会发送开具与提醒邮件。请用 CRON_SECRET 定期调用 GET /api/cron/auto-invoice。",
+      "untitled": "无标题",
+      "krw": "KRW"
+    },
     "mobile": {
       "swipe_kpis_hint": "左右滑动查看更多",
       "carousel_campaign_status": "活动状态摘要",

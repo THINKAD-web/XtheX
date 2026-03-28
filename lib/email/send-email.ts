@@ -1,6 +1,10 @@
 import { Resend } from "resend";
 import { inquiryConfirmationHtml } from "./templates/inquiry-confirmation";
 import { bookingConfirmationHtml } from "./templates/booking-confirmation";
+import {
+  campaignInvoiceIssuedHtml,
+  campaignInvoiceReminderHtml,
+} from "./templates/campaign-invoice";
 
 let _resend: Resend | null = null;
 function getResend(): Resend | null {
@@ -90,4 +94,90 @@ export async function sendBookingConfirmation(payload: BookingEmailPayload) {
   }
 
   return data;
+}
+
+function appDashboardInvoicesUrl(): string | null {
+  const base =
+    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "");
+  if (!base) return null;
+  return `${base}/dashboard/advertiser/invoices`;
+}
+
+export type CampaignInvoiceIssuedPayload = {
+  to: string;
+  campaignTitle: string;
+  amountKrw: number;
+  campaignEndAtIso: string;
+  dueAtIso: string;
+  invoiceId: string;
+};
+
+export async function sendCampaignInvoiceIssuedEmail(
+  payload: CampaignInvoiceIssuedPayload,
+): Promise<{ ok: true } | { ok: false; skipped?: boolean; error?: unknown }> {
+  const resend = getResend();
+  if (!resend) {
+    console.warn("[email] RESEND_API_KEY not set — skipping invoice issued email");
+    return { ok: false, skipped: true };
+  }
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: payload.to,
+    subject: `[XtheX] Invoice issued — ${payload.campaignTitle}`,
+    html: campaignInvoiceIssuedHtml({
+      campaignTitle: payload.campaignTitle,
+      amountKrw: payload.amountKrw,
+      campaignEndAtIso: payload.campaignEndAtIso,
+      dueAtIso: payload.dueAtIso,
+      invoiceId: payload.invoiceId,
+      dashboardUrl: appDashboardInvoicesUrl(),
+    }),
+  });
+  if (error) {
+    console.error("[email] invoice issued failed:", error);
+    return { ok: false, error };
+  }
+  return { ok: true };
+}
+
+export type CampaignInvoiceReminderPayload = {
+  to: string;
+  campaignTitle: string;
+  amountKrw: number;
+  dueAtIso: string;
+  invoiceId: string;
+  variant: "before_due" | "overdue";
+};
+
+export async function sendCampaignInvoiceReminderEmail(
+  payload: CampaignInvoiceReminderPayload,
+): Promise<{ ok: true } | { ok: false; skipped?: boolean; error?: unknown }> {
+  const resend = getResend();
+  if (!resend) {
+    console.warn("[email] RESEND_API_KEY not set — skipping invoice reminder");
+    return { ok: false, skipped: true };
+  }
+  const subj =
+    payload.variant === "overdue"
+      ? `[XtheX] Overdue invoice — ${payload.campaignTitle}`
+      : `[XtheX] Payment due soon — ${payload.campaignTitle}`;
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: payload.to,
+    subject: subj,
+    html: campaignInvoiceReminderHtml({
+      campaignTitle: payload.campaignTitle,
+      amountKrw: payload.amountKrw,
+      dueAtIso: payload.dueAtIso,
+      invoiceId: payload.invoiceId,
+      variant: payload.variant,
+      dashboardUrl: appDashboardInvoicesUrl(),
+    }),
+  });
+  if (error) {
+    console.error("[email] invoice reminder failed:", error);
+    return { ok: false, error };
+  }
+  return { ok: true };
 }

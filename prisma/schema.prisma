@@ -65,6 +65,13 @@ enum CampaignStatus {
   REJECTED
 }
 
+/** 캠페인 종료 후 자동 발행 인보이스 */
+enum CampaignInvoiceStatus {
+  OPEN
+  PAID
+  VOID
+}
+
 enum InquiryStatus {
   PENDING
   REPLIED
@@ -213,6 +220,7 @@ model User {
   mediaCreated   Media[]         @relation("MediaCreatedBy")
   campaignDrafts CampaignDraft[] @relation("CampaignDraftsByUser")
   campaigns      Campaign[]      @relation("CampaignsByUser")
+  campaignInvoices CampaignInvoice[] @relation("CampaignInvoicesByUser")
   inquiriesSent  Inquiry[]      @relation("InquiryByAdvertiser")
   notifications  Notification[]
   wishlists      Wishlist[]
@@ -364,9 +372,33 @@ model Campaign {
   updatedAt        DateTime       @updatedAt
 
   user User @relation("CampaignsByUser", fields: [userId], references: [id], onDelete: Cascade)
+  invoice CampaignInvoice?
 
   @@index([userId, status])
   @@index([userId, createdAt])
+}
+
+model CampaignInvoice {
+  id                   String                @id @default(uuid()) @db.Uuid
+  campaignId           String                @unique @db.Uuid
+  userId               String                @db.Uuid
+  amountKrw            Int
+  /** 스냅샷: 캠페인 집행 종료 시각(createdAt + duration) */
+  campaignEndAt        DateTime
+  dueAt                DateTime
+  status               CampaignInvoiceStatus @default(OPEN)
+  /** 최초 인보이스 발행 메일 전송 시각 */
+  initialEmailSentAt   DateTime?
+  lastReminderAt       DateTime?
+  reminderCount        Int                   @default(0)
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  user     User     @relation("CampaignInvoicesByUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([status, dueAt])
 }
 
 model CampaignDraft {

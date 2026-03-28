@@ -26,6 +26,7 @@ import { DiscountBanner } from "@/components/medias/DiscountBanner";
 import { ExitIntentPopup } from "@/components/medias/ExitIntentPopup";
 import { VerifiedBadge } from "@/components/medias/VerifiedBadge";
 import { ReviewSection } from "@/components/medias/ReviewSection";
+import { PriceCalculatorWidget } from "@/components/medias/PriceCalculatorWidget";
 import { getCurrentUser } from "@/lib/auth/rbac";
 import {
   convertCurrency,
@@ -574,6 +575,15 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
                 </div>
               </div>
             </article>
+
+            {/* Price Calculator Widget */}
+            <PriceCalculatorWidget
+              mediaId={media.id}
+              mediaName={media.mediaName}
+              price={media.price}
+              locale={locale}
+              contactHref={`/${locale}/medias/${media.id}/contact`}
+            />
 
             {/* Availability Calendar + Booking */}
             <article className="space-y-4">

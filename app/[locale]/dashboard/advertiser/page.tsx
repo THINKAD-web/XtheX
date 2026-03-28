@@ -8,6 +8,7 @@ import { landing } from "@/lib/landing-theme";
 import { prisma } from "@/lib/prisma";
 import { DashboardStatsSection } from "@/components/dashboard/DashboardStatsSection";
 import { DashboardNotificationBanner } from "@/components/layout/DashboardNotificationBanner";
+import { AdvertiserAnalyticsSection } from "@/components/analytics/AdvertiserAnalyticsSection";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -119,6 +120,8 @@ export default async function AdvertiserDashboardPage() {
         </section>
 
         <DashboardStatsSection role="ADVERTISER" />
+
+        <AdvertiserAnalyticsSection />
 
         <section aria-labelledby="advertiser-quick-actions">
           <h2 id="advertiser-quick-actions" className="sr-only">

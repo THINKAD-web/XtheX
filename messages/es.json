@@ -138,5 +138,17 @@
       "gallery_title": "Galería de casos (6)",
       "gallery_subtitle": "Pulsa el botón para aplicar el filterJson del caso."
     }
+  },
+  "welcome": {
+    "badge": "Bienvenido",
+    "step1_title": "Bienvenido a XtheX",
+    "step1_desc": "XtheX es el mayor marketplace de publicidad exterior del mundo — conectando propietarios de medios y anunciantes con IA en más de 50 países.",
+    "step2_title": "Explorar medios",
+    "step2_desc": "Navega por los medios exteriores del mundo con nuestro mapa y filtros. Busca por ubicación, presupuesto y tipo de medio.",
+    "step3_title": "Planificador de campañas",
+    "step3_desc": "Introduce tu presupuesto e información de segmentación y la IA recomendará la mezcla de medios óptima. ¡Empieza tu primera campaña ahora!",
+    "prev": "Atrás",
+    "next": "Siguiente",
+    "start": "Comenzar"
   }
 }

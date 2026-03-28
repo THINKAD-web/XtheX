@@ -1083,6 +1083,18 @@
     "form_success": "Your message has been sent. We'll get back to you soon.",
     "form_error": "Failed to send. Please try again."
   },
+  "welcome": {
+    "badge": "Welcome",
+    "step1_title": "Welcome to XtheX",
+    "step1_desc": "XtheX is the world's largest outdoor ad marketplace — connecting media owners and advertisers with AI across 50+ countries.",
+    "step2_title": "Explore Media",
+    "step2_desc": "Browse outdoor media worldwide using our map and filters. Search by location, budget, and media type to find the perfect fit.",
+    "step3_title": "Start Campaign Planner",
+    "step3_desc": "Enter your budget and targeting info, and AI will recommend the optimal media mix. Start your first campaign now!",
+    "prev": "Back",
+    "next": "Next",
+    "start": "Get Started"
+  },
   "feedback": {
     "button_label": "Send Feedback",
     "title": "Share your feedback",

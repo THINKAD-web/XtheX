@@ -7,6 +7,7 @@ import { OnboardingGate } from "@/components/onboarding/OnboardingGate";
 import { OmniCartShellLazy } from "@/components/omni/OmniCartShellLazy";
 import { ChatWidget } from "@/components/chat/ChatWidget";
 import { FeedbackWidget } from "@/components/feedback/FeedbackWidget";
+import { WelcomeModal } from "@/components/onboarding/WelcomeModal";
 
 type Props = { children: React.ReactNode; params: Promise<{ locale: string }> };
 
@@ -26,6 +27,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       <div className="flex min-h-screen flex-col bg-background text-foreground">
         <main className="flex-1">
           <OnboardingGate>
+            <WelcomeModal />
             <OmniCartShellLazy />
             <ChatWidget />
             <FeedbackWidget />

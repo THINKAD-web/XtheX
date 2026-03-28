@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth/config";
 import { revalidatePath } from "next/cache";
+import { sendInquiryConfirmation } from "@/lib/email/send-email";
 
 export const runtime = "nodejs";
 
@@ -78,6 +79,20 @@ export async function POST(req: Request) {
   }
   revalidatePath("/explore");
   revalidatePath("/dashboard/advertiser/inquiries");
+
+  const contactEmail = data.contactEmail?.trim().toLowerCase();
+  if (contactEmail) {
+    const mediaInfo = await prisma.media.findUnique({
+      where: { id: data.mediaId },
+      select: { mediaName: true },
+    });
+    sendInquiryConfirmation({
+      to: contactEmail,
+      mediaTitle: mediaInfo?.mediaName ?? "매체",
+      message: data.message.trim(),
+      inquiryId: created.id,
+    }).catch((err) => console.error("[inquiry] email send failed:", err));
+  }
 
   return NextResponse.json({ ok: true, id: created.id });
 }

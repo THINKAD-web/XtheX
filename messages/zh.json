@@ -1076,6 +1076,18 @@
     "form_success": "咨询已提交，我们将尽快回复。",
     "form_error": "发送失败，请重试。"
   },
+  "welcome": {
+    "badge": "欢迎",
+    "step1_title": "欢迎来到 XtheX",
+    "step1_desc": "XtheX 是全球最大的户外广告市场——通过 AI 连接 50 多个国家的媒体主和广告主。",
+    "step2_title": "探索媒体",
+    "step2_desc": "使用地图和筛选器浏览全球户外广告媒体。按位置、预算和媒体类型快速找到合适的媒体。",
+    "step3_title": "开始活动规划",
+    "step3_desc": "输入预算和目标信息，AI 将推荐最优媒体组合。立即开始您的第一个活动！",
+    "prev": "上一步",
+    "next": "下一步",
+    "start": "开始"
+  },
   "feedback": {
     "button_label": "发送反馈",
     "title": "分享您的反馈",

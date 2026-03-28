@@ -11,13 +11,13 @@ import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   display: "swap",
 });
 
@@ -105,7 +105,7 @@ const jsonLd = {
       url: siteUrl,
       name: "XtheX",
       publisher: { "@id": `${siteUrl}/#organization` },
-      inLanguage: ["ko", "en", "ja", "zh"],
+      inLanguage: ["ko", "en", "ja", "zh", "es"],
       potentialAction: {
         "@type": "SearchAction",
         target: { "@type": "EntryPoint", urlTemplate: `${siteUrl}/ko/explore?q={search_term_string}` },

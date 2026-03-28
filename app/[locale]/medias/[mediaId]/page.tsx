@@ -594,6 +594,7 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
             <article className="space-y-4">
               <AvailabilityCalendar
                 mediaId={media.id}
+                appLocale={locale}
                 availabilityData={
                   Array.isArray(media.availabilityJson)
                     ? (media.availabilityJson as { date: string; status: "available" | "booked" | "inquiry" }[])
@@ -604,6 +605,7 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
                   available: t("available"),
                   booked: t("booked"),
                   inquiry: t("inquiry_needed"),
+                  holiday: t("availability_holiday"),
                   days: [t("sun"), t("mon"), t("tue"), t("wed"), t("thu"), t("fri"), t("sat")],
                 }}
               />

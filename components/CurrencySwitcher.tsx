@@ -5,10 +5,11 @@ import {
   SUPPORTED_CURRENCIES,
   isSupportedCurrency,
   preferredCurrencyFromLocale,
+  CURRENCY_STORAGE_KEY,
+  CURRENCY_MANUAL_STORAGE_KEY,
   type SupportedCurrency,
 } from "@/lib/currency";
 
-const STORAGE_KEY = "xthex_currency";
 const COOKIE_KEY = "xthex_currency";
 
 type Props = {
@@ -23,7 +24,7 @@ export function CurrencySwitcher({ locale, label }: Props) {
 
   React.useEffect(() => {
     try {
-      const saved = window.localStorage.getItem(STORAGE_KEY);
+      const saved = window.localStorage.getItem(CURRENCY_STORAGE_KEY);
       if (saved && isSupportedCurrency(saved)) {
         setCurrency(saved);
         return;
@@ -38,7 +39,8 @@ export function CurrencySwitcher({ locale, label }: Props) {
     if (!isSupportedCurrency(next)) return;
     setCurrency(next);
     try {
-      window.localStorage.setItem(STORAGE_KEY, next);
+      window.localStorage.setItem(CURRENCY_STORAGE_KEY, next);
+      window.localStorage.setItem(CURRENCY_MANUAL_STORAGE_KEY, "1");
     } catch {
       // ignore
     }

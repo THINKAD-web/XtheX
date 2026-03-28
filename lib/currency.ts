@@ -1,6 +1,10 @@
 export const SUPPORTED_CURRENCIES = ["KRW", "USD", "EUR", "JPY"] as const;
 export type SupportedCurrency = (typeof SUPPORTED_CURRENCIES)[number];
 
+export const CURRENCY_STORAGE_KEY = "xthex_currency";
+/** When set to "1", language changes will not reset the currency preference */
+export const CURRENCY_MANUAL_STORAGE_KEY = "xthex_currency_manual_v1";
+
 /** Mock FX: 1 unit of currency => KRW */
 export const FX_TO_KRW_MOCK: Record<SupportedCurrency, number> = {
   KRW: 1,
@@ -39,5 +43,6 @@ export function preferredCurrencyFromLocale(locale: string): SupportedCurrency {
   if (locale === "ko") return "KRW";
   if (locale === "ja") return "JPY";
   if (locale === "zh") return "USD";
+  if (locale === "es") return "EUR";
   return "USD";
 }

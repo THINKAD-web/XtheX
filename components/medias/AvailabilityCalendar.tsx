@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
+import { appLocaleToBcp47, calendarRegionForLocale } from "@/lib/i18n/locale-config";
+import { regionalHolidayDatesInRange } from "@/lib/calendar/regional-holidays";
 
 type AvailabilityStatus = "available" | "booked" | "inquiry";
 
@@ -11,12 +13,15 @@ interface DayEntry {
 
 interface AvailabilityCalendarProps {
   mediaId: string;
+  /** App locale (ko, en, …) — drives month labels and regional holiday overlay */
+  appLocale?: string;
   availabilityData?: DayEntry[];
   labels: {
     title: string;
     available: string;
     booked: string;
     inquiry: string;
+    holiday: string;
     days: string[]; // [Sun, Mon, Tue, Wed, Thu, Fri, Sat]
   };
 }
@@ -60,8 +65,11 @@ const statusStyles: Record<AvailabilityStatus, string> = {
     "bg-amber-500/20 text-amber-300 ring-1 ring-amber-500/40",
 };
 
+const holidayRing = "ring-1 ring-violet-400/70 ring-offset-1 ring-offset-zinc-900";
+
 export function AvailabilityCalendar({
   mediaId,
+  appLocale = "en",
   availabilityData,
   labels,
 }: AvailabilityCalendarProps) {
@@ -76,13 +84,23 @@ export function AvailabilityCalendar({
     return m;
   }, [entries]);
 
+  const holidaySet = useMemo(() => {
+    if (entries.length === 0) return new Set<string>();
+    const first = entries[0].date;
+    const last = entries[entries.length - 1].date;
+    const region = calendarRegionForLocale(appLocale);
+    return regionalHolidayDatesInRange(region, first, last);
+  }, [entries, appLocale]);
+
+  const intlLocale = appLocaleToBcp47(appLocale);
+
   const { weeks, monthLabel } = useMemo(() => {
     if (entries.length === 0) return { weeks: [], monthLabel: "" };
     const first = new Date(entries[0].date + "T00:00:00");
     const last = new Date(entries[entries.length - 1].date + "T00:00:00");
 
     const fmtMonth = (d: Date) =>
-      d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+      d.toLocaleDateString(intlLocale, { month: "short", year: "numeric" });
     const label =
       first.getMonth() === last.getMonth()
         ? fmtMonth(first)
@@ -106,7 +124,7 @@ export function AvailabilityCalendar({
     }
 
     return { weeks: rows, monthLabel: label };
-  }, [entries]);
+  }, [entries, intlLocale]);
 
   return (
     <div className="space-y-4">
@@ -138,11 +156,16 @@ export function AvailabilityCalendar({
                 const dateStr = day.toISOString().slice(0, 10);
                 const status = statusMap.get(dateStr) ?? "inquiry";
                 const dayNum = day.getDate();
+                const isHoliday = holidaySet.has(dateStr);
                 return (
                   <div
                     key={dateStr}
-                    className={`flex aspect-square items-center justify-center rounded-lg text-[11px] font-medium transition-colors ${statusStyles[status]}`}
-                    title={`${dateStr}: ${status}`}
+                    className={`flex aspect-square items-center justify-center rounded-lg text-[11px] font-medium transition-colors ${statusStyles[status]} ${isHoliday ? holidayRing : ""}`}
+                    title={
+                      isHoliday
+                        ? `${dateStr}: ${labels.holiday} · ${status}`
+                        : `${dateStr}: ${status}`
+                    }
                   >
                     {dayNum}
                   </div>
@@ -168,6 +191,12 @@ export function AvailabilityCalendar({
               <span className="text-[10px] text-zinc-400">{label}</span>
             </div>
           ))}
+          <div className="flex items-center gap-1.5">
+            <span
+              className={`inline-block h-2.5 w-2.5 rounded-sm border border-violet-400/80 bg-violet-500/15`}
+            />
+            <span className="text-[10px] text-zinc-400">{labels.holiday}</span>
+          </div>
         </div>
       </div>
     </div>

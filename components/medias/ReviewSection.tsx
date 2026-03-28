@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { formatAppDate } from "@/lib/i18n/format";
 
 type ReviewUser = {
   id: string;
@@ -101,12 +102,6 @@ function StarPicker({
       })}
     </span>
   );
-}
-
-function formatDate(iso: string, locale: string) {
-  const loc =
-    locale === "ko" ? "ko-KR" : locale === "ja" ? "ja-JP" : locale === "zh" ? "zh-CN" : "en-US";
-  return new Date(iso).toLocaleDateString(loc, { year: "numeric", month: "short", day: "numeric" });
 }
 
 export function ReviewSection({ mediaId, locale }: Props) {
@@ -313,7 +308,11 @@ export function ReviewSection({ mediaId, locale }: Props) {
                             <span className="text-sm font-medium text-zinc-200">
                               {review.user.name ?? t("anonymous")}
                             </span>
-                            <span className="text-xs text-zinc-600">{formatDate(review.createdAt, locale)}</span>
+                            <span className="text-xs text-zinc-600">{formatAppDate(review.createdAt, locale, {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            })}</span>
                           </div>
                           <StarRating rating={review.rating} />
                         </div>

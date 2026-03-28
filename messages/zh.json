@@ -960,7 +960,8 @@
     "wed": "三",
     "thu": "四",
     "fri": "五",
-    "sat": "六"
+    "sat": "六",
+    "availability_holiday": "公共假日（按语言地区）"
   },
   "media_detail": {
     "key_metrics": "关键指标",

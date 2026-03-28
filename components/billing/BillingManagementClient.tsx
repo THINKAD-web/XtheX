@@ -27,8 +27,10 @@ import {
   formatCurrency,
   isSupportedCurrency,
   preferredCurrencyFromLocale,
+  CURRENCY_STORAGE_KEY,
   type SupportedCurrency,
 } from "@/lib/currency";
+import { intlLocaleForApp } from "@/lib/i18n/locale-config";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -60,19 +62,10 @@ import { cn } from "@/lib/utils";
 
 const STORAGE_AUTOPAY = "xthex_billing_autopay";
 const STORAGE_2FA = "xthex_billing_2fa";
-const STORAGE_CURRENCY = "xthex_currency";
-
-function intlLocaleForApp(locale: string): string {
-  if (locale === "zh") return "zh-CN";
-  if (locale === "ja") return "ja-JP";
-  if (locale === "ko") return "ko-KR";
-  return "en-US";
-}
-
 function readStoredCurrency(appLocale: string): SupportedCurrency {
   if (typeof window === "undefined") return preferredCurrencyFromLocale(appLocale);
   try {
-    const raw = window.localStorage.getItem(STORAGE_CURRENCY);
+    const raw = window.localStorage.getItem(CURRENCY_STORAGE_KEY);
     if (raw && isSupportedCurrency(raw)) return raw;
   } catch {
     // ignore

@@ -17,17 +17,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { intlLocaleForApp } from "@/lib/i18n/locale-config";
 
 const GOALS: TemplateGoal[] = ["awareness", "launch", "conversion", "traffic"];
 const INDUSTRIES: TemplateIndustry[] = ["fnb", "tech", "retail", "auto", "beauty", "finance"];
-
-function intlLocaleForApp(locale: string): string {
-  if (locale === "zh") return "zh-CN";
-  if (locale === "ja") return "ja-JP";
-  if (locale === "ko") return "ko-KR";
-  if (locale === "es") return "es-ES";
-  return "en-US";
-}
 
 function formatBudgetKrw(manwon: number, locale: string): string {
   const krw = manwon * 10_000;

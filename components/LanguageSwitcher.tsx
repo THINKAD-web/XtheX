@@ -10,8 +10,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { APP_LOCALES } from "@/lib/i18n/locale-config";
+import { CURRENCY_MANUAL_STORAGE_KEY, CURRENCY_STORAGE_KEY } from "@/lib/currency";
 
-const SUPPORTED_LOCALES = ["ko", "en", "ja", "zh"] as const;
+const SUPPORTED_LOCALES = APP_LOCALES;
 
 type LocaleCode = (typeof SUPPORTED_LOCALES)[number];
 
@@ -20,6 +22,7 @@ const LOCALE_META: Record<LocaleCode, { flag: string; label: string }> = {
   en: { flag: "🇺🇸", label: "English" },
   ja: { flag: "🇯🇵", label: "日本語" },
   zh: { flag: "🇨🇳", label: "中文" },
+  es: { flag: "🇪🇸", label: "Español" },
 };
 
 export function LanguageSwitcher() {
@@ -30,12 +33,19 @@ export function LanguageSwitcher() {
   const handleChange = (nextLocale: string) => {
     if (!SUPPORTED_LOCALES.includes(nextLocale as LocaleCode)) return;
     if (nextLocale === activeLocale) return;
+    try {
+      if (typeof window !== "undefined" && localStorage.getItem(CURRENCY_MANUAL_STORAGE_KEY) !== "1") {
+        localStorage.removeItem(CURRENCY_STORAGE_KEY);
+      }
+    } catch {
+      // ignore
+    }
     const search = typeof window !== "undefined" ? window.location.search : "";
     router.replace(`${pathname}${search}`, { locale: nextLocale });
     router.refresh();
   };
 
-  const active = LOCALE_META[activeLocale];
+  const active = LOCALE_META[activeLocale as LocaleCode] ?? LOCALE_META.en;
 
   return (
     <DropdownMenu>

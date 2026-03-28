@@ -967,7 +967,8 @@
     "wed": "수",
     "thu": "목",
     "fri": "금",
-    "sat": "토"
+    "sat": "토",
+    "availability_holiday": "공휴일(해당 언어권 기준)"
   },
   "media_detail": {
     "key_metrics": "핵심 지표",

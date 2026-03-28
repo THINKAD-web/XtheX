@@ -960,7 +960,8 @@
     "wed": "水",
     "thu": "木",
     "fri": "金",
-    "sat": "土"
+    "sat": "土",
+    "availability_holiday": "祝日（言語リージョン基準）"
   },
   "media_detail": {
     "key_metrics": "主要指標",

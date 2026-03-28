@@ -967,7 +967,8 @@
     "wed": "Wed",
     "thu": "Thu",
     "fri": "Fri",
-    "sat": "Sat"
+    "sat": "Sat",
+    "availability_holiday": "Public holiday (regional calendar)"
   },
   "media_detail": {
     "key_metrics": "Key Metrics",

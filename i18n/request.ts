@@ -1,6 +1,7 @@
 import { getRequestConfig } from "next-intl/server";
+import { defaultTimeZoneForLocale } from "@/lib/i18n/locale-config";
 
-const locales = ["ko", "en", "ja", "zh"] as const;
+const locales = ["ko", "en", "ja", "zh", "es"] as const;
 const defaultLocale = "ko";
 
 export default getRequestConfig(async ({ requestLocale }) => {
@@ -14,6 +15,6 @@ export default getRequestConfig(async ({ requestLocale }) => {
   return {
     locale,
     messages,
-    timeZone: "Asia/Seoul",
+    timeZone: defaultTimeZoneForLocale(locale),
   };
 });

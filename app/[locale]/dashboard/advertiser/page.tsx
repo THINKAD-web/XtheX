@@ -152,6 +152,22 @@ export default async function AdvertiserDashboardPage() {
                 {locale === "ko" ? `위시리스트 (${wishlistCount})` : `Wishlist (${wishlistCount})`}
               </span>
             </Link>
+            <Link
+              href="/dashboard/advertiser/spend"
+              className={`${landing.card} flex min-h-[120px] flex-col justify-center border-violet-200/50 bg-white/90 text-center dark:border-violet-900/30`}
+            >
+              <span className="text-sm font-semibold text-violet-800 dark:text-violet-300">
+                {locale === "ko" ? "지출 내역" : "Spend"}
+              </span>
+            </Link>
+            <Link
+              href="/dashboard/advertiser/roi"
+              className={`${landing.card} flex min-h-[120px] flex-col justify-center border-teal-200/50 bg-white/90 text-center dark:border-teal-900/30`}
+            >
+              <span className="text-sm font-semibold text-teal-800 dark:text-teal-300">
+                {locale === "ko" ? "ROI 리포트" : "ROI snapshot"}
+              </span>
+            </Link>
           </div>
         </section>
 

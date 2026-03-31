@@ -17,6 +17,63 @@ function getResend(): Resend | null {
 const FROM =
   process.env.RESEND_FROM || "XtheX <noreply@xthex.com>";
 
+function escHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function adminInquiryNotifyRecipients(): string[] {
+  const raw = process.env.ADMIN_INQUIRY_NOTIFY_EMAIL?.trim();
+  if (!raw) return [];
+  return [
+    ...new Set(
+      raw
+        .split(/[,;]+/)
+        .map((x) => x.trim().toLowerCase())
+        .filter((x) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x)),
+    ),
+  ];
+}
+
+/** Resend → comma-separated ADMIN_INQUIRY_NOTIFY_EMAIL */
+export async function sendAdminInquiryNotification(p: {
+  mediaTitle: string;
+  inquiryId: string;
+  advertiserEmail?: string | null;
+}): Promise<{ ok: true } | { ok: false; skipped?: boolean; error?: unknown }> {
+  const to = adminInquiryNotifyRecipients();
+  if (to.length === 0) return { ok: false, skipped: true };
+  const resend = getResend();
+  if (!resend) {
+    console.warn("[email] RESEND_API_KEY not set — skipping admin inquiry notify");
+    return { ok: false, skipped: true };
+  }
+  const adv = p.advertiserEmail ? escHtml(p.advertiserEmail) : "—";
+  const html = `<!DOCTYPE html><html><body style="font-family:sans-serif">
+<p><strong>New inquiry</strong> (XtheX)</p>
+<ul>
+<li>Media: ${escHtml(p.mediaTitle)}</li>
+<li>Inquiry ID: <code>${escHtml(p.inquiryId)}</code></li>
+<li>Advertiser contact: ${adv}</li>
+</ul>
+<p>Open <strong>Admin → Inquiries</strong> in the dashboard.</p>
+</body></html>`;
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `[XtheX Admin] New inquiry — ${p.mediaTitle}`,
+    html,
+  });
+  if (error) {
+    console.error("[email] admin inquiry notify failed:", error);
+    return { ok: false, error };
+  }
+  return { ok: true };
+}
+
 export type InquiryEmailPayload = {
   to: string;
   mediaTitle: string;

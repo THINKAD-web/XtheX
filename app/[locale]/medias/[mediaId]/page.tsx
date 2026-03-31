@@ -25,6 +25,7 @@ import { BookingRequestModal } from "@/components/medias/BookingRequestModal";
 import { DiscountBanner } from "@/components/medias/DiscountBanner";
 import { ExitIntentPopup } from "@/components/medias/ExitIntentPopup";
 import { VerifiedBadge } from "@/components/medias/VerifiedBadge";
+import { TrustBadge } from "@/components/medias/TrustBadge";
 import { ReviewSection } from "@/components/medias/ReviewSection";
 import { PriceCalculatorWidget } from "@/components/medias/PriceCalculatorWidget";
 import { getCurrentUser } from "@/lib/auth/rbac";
@@ -218,7 +219,7 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
         })
       : Promise.resolve(0);
 
-  const [similarMedias, inquiryCount, caseStudies, currentUser] = await Promise.all([
+  const [similarMedias, inquiryCount, caseStudies, currentUser, reviewAgg] = await Promise.all([
     prisma.media.findMany({
       where: {
         id: { not: media.id },
@@ -234,6 +235,11 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
       orderBy: { createdAt: "desc" },
     }),
     getCurrentUser().catch(() => null),
+    prisma.mediaReview.aggregate({
+      where: { mediaId: media.id, visible: true },
+      _avg: { rating: true },
+      _count: { id: true },
+    }),
   ]);
 
   const isAdmin = currentUser?.role === "ADMIN";
@@ -320,6 +326,11 @@ export default async function MediaDetailPage({ params, searchParams }: PageProp
                   </span>
                 ))}
                 <VerifiedBadge locale={locale} />
+                <TrustBadge
+                  locale={locale}
+                  avgRating={reviewAgg._avg.rating ?? 0}
+                  reviewCount={reviewAgg._count.id}
+                />
                 {media.trustScore != null && (
                   <span className="ml-1 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-300 ring-1 ring-emerald-500/40">
                     Trust {media.trustScore}/100

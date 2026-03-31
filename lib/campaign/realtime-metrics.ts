@@ -1,5 +1,5 @@
 import { unstable_cache } from "next/cache";
-import { prisma } from "@/lib/prisma";
+import { isDatabaseConfigured, prisma } from "@/lib/prisma";
 
 export type RealtimeTodayKpi = {
   impressions: number; // demo
@@ -26,6 +26,33 @@ function toYmd(d: Date) {
   return `${y}-${m}-${day}`;
 }
 
+function demoRealtimeMiniDashboardMetrics(
+  since: Date,
+): {
+  today: RealtimeTodayKpi;
+  series7d: RealtimeDailyPoint[];
+} {
+  const buckets = new Map<string, number>();
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(since);
+    d.setDate(d.getDate() + i);
+    buckets.set(toYmd(d), [3, 5, 4, 7, 6, 8, 5][i] ?? 4);
+  }
+  const series7d = Array.from(buckets.entries()).map(([date, leads]) => ({
+    date,
+    leads,
+  }));
+  return {
+    today: {
+      impressions: 12450,
+      clicks: 342,
+      leads: 28,
+      roi: 3.2,
+    },
+    series7d,
+  };
+}
+
 async function computeRealtimeMiniDashboardMetrics(): Promise<{
   today: RealtimeTodayKpi;
   series7d: RealtimeDailyPoint[];
@@ -34,52 +61,58 @@ async function computeRealtimeMiniDashboardMetrics(): Promise<{
   const todayStart = startOfDay(now);
   const since = startOfDay(new Date(now.getTime() - 6 * 24 * 60 * 60 * 1000));
 
-  const inquiryDelegate = (prisma as any).inquiry;
-
-  const [todayLeads, last7d] = await Promise.all([
-    typeof inquiryDelegate?.count === "function"
-      ? inquiryDelegate.count({ where: { createdAt: { gte: todayStart } } })
-      : Promise.resolve(0),
-    typeof inquiryDelegate?.findMany === "function"
-      ? inquiryDelegate.findMany({
-          where: { createdAt: { gte: since } },
-          select: { createdAt: true },
-        })
-      : Promise.resolve([]),
-  ]);
-
-  const buckets = new Map<string, number>();
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(since);
-    d.setDate(d.getDate() + i);
-    buckets.set(toYmd(d), 0);
+  if (!isDatabaseConfigured()) {
+    return demoRealtimeMiniDashboardMetrics(since);
   }
 
-  for (const r of last7d as Array<{ createdAt: Date }>) {
-    const key = toYmd(new Date(r.createdAt));
-    if (buckets.has(key)) buckets.set(key, (buckets.get(key) ?? 0) + 1);
+  try {
+    const inquiryDelegate = (prisma as any).inquiry;
+
+    const [todayLeads, last7d] = await Promise.all([
+      typeof inquiryDelegate?.count === "function"
+        ? inquiryDelegate.count({ where: { createdAt: { gte: todayStart } } })
+        : Promise.resolve(0),
+      typeof inquiryDelegate?.findMany === "function"
+        ? inquiryDelegate.findMany({
+            where: { createdAt: { gte: since } },
+            select: { createdAt: true },
+          })
+        : Promise.resolve([]),
+    ]);
+
+    const buckets = new Map<string, number>();
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(since);
+      d.setDate(d.getDate() + i);
+      buckets.set(toYmd(d), 0);
+    }
+
+    for (const r of last7d as Array<{ createdAt: Date }>) {
+      const key = toYmd(new Date(r.createdAt));
+      if (buckets.has(key)) buckets.set(key, (buckets.get(key) ?? 0) + 1);
+    }
+
+    const series7d = Array.from(buckets.entries()).map(([date, leads]) => ({
+      date,
+      leads,
+    }));
+
+    const hasRealData = todayLeads > 0;
+    const today: RealtimeTodayKpi = {
+      impressions: hasRealData ? todayLeads * 12000 : 12450,
+      clicks: hasRealData ? Math.round(todayLeads * 28) : 342,
+      leads: hasRealData ? todayLeads : 28,
+      roi: hasRealData ? null : 3.2,
+    };
+
+    const demoSeries = series7d.every((p) => p.leads === 0)
+      ? series7d.map((p, i) => ({ ...p, leads: [3, 5, 4, 7, 6, 8, 5][i] ?? 4 }))
+      : series7d;
+
+    return { today, series7d: demoSeries };
+  } catch {
+    return demoRealtimeMiniDashboardMetrics(since);
   }
-
-  const series7d = Array.from(buckets.entries()).map(([date, leads]) => ({
-    date,
-    leads,
-  }));
-
-  // Demo fallback: show realistic numbers when no real data exists
-  const hasRealData = todayLeads > 0;
-  const today: RealtimeTodayKpi = {
-    impressions: hasRealData ? todayLeads * 12000 : 12450,
-    clicks: hasRealData ? Math.round(todayLeads * 28) : 342,
-    leads: hasRealData ? todayLeads : 28,
-    roi: hasRealData ? null : 3.2,
-  };
-
-  // Fallback demo series if all zeros
-  const demoSeries = series7d.every(p => p.leads === 0)
-    ? series7d.map((p, i) => ({ ...p, leads: [3, 5, 4, 7, 6, 8, 5][i] ?? 4 }))
-    : series7d;
-
-  return { today, series7d: demoSeries };
 }
 
 const realtimeMiniCached = unstable_cache(

@@ -1,5 +1,5 @@
 import type { MediaCategory, Prisma } from "@prisma/client";
-import { prisma } from "@/lib/prisma";
+import { prisma, isDatabaseConfigured } from "@/lib/prisma";
 import { getMockGlobalRecommendations } from "@/lib/recommend/mock-global-recommendations";
 import type {
   RecommendationAgeBand,
@@ -111,6 +111,9 @@ function fallbackAiReason(args: {
 export async function getAdvertiserRecommendations(): Promise<RecommendationItem[]> {
   // TODO: Replace this mapper with dedicated AI recommendation service.
   // Current stage: Prisma media read + deterministic fallback scoring.
+  if (!isDatabaseConfigured()) {
+    return getMockGlobalRecommendations();
+  }
   const medias = await prisma.media.findMany({
     where: { status: "PUBLISHED" },
     orderBy: { updatedAt: "desc" },

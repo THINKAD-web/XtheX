@@ -122,6 +122,7 @@ export default async function AdvertiserInquiriesPage({
                   <th className="px-4 py-3">Message</th>
                   <th className="px-4 py-3">Time</th>
                   <th className="px-4 py-3">Contract</th>
+                  <th className="px-4 py-3">Thread</th>
                 </tr>
               </thead>
               <tbody>
@@ -180,11 +181,19 @@ export default async function AdvertiserInquiriesPage({
                         }
                       />
                     </td>
+                    <td className="px-4 py-3">
+                      <Link
+                        href={`/dashboard/advertiser/inquiries/${r.id}`}
+                        className="text-xs font-medium text-blue-700 hover:underline dark:text-sky-300"
+                      >
+                        Open
+                      </Link>
+                    </td>
                   </tr>
                 ))}
                 {rows.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-10 text-center text-zinc-500">
+                    <td colSpan={8} className="px-4 py-10 text-center text-zinc-500">
                       아직 문의가 없어요. 탐색에서 매체를 둘러보고 문의를 남겨보세요.
                     </td>
                   </tr>

@@ -8,22 +8,22 @@ import { useTranslations } from "next-intl";
 const STORAGE_KEY = "xthex_beta_notice_dismissed";
 
 export function BetaNoticebar() {
-  const [visible, setVisible] = useState(true);
+  /** null = not mounted yet (avoid SSR/client localStorage mismatch) */
+  const [visible, setVisible] = useState<boolean | null>(null);
   const tHero = useTranslations("home.hero");
   const tNotice = useTranslations("home.betaNotice");
 
   useEffect(() => {
-    if (typeof window !== "undefined" && localStorage.getItem(STORAGE_KEY)) {
-      setVisible(false);
-    }
+    const dismissed = localStorage.getItem(STORAGE_KEY);
+    setVisible(!dismissed);
   }, []);
 
   const dismiss = () => {
     setVisible(false);
-    if (typeof window !== "undefined") localStorage.setItem(STORAGE_KEY, "1");
+    localStorage.setItem(STORAGE_KEY, "1");
   };
 
-  if (!visible) return null;
+  if (visible === null || !visible) return null;
 
   return (
     <section className="border-b border-zinc-200/80 bg-white/90 py-4 dark:border-zinc-800 dark:bg-zinc-950/80">

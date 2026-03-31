@@ -5,7 +5,10 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth/config";
 import { revalidatePath } from "next/cache";
-import { sendInquiryConfirmation } from "@/lib/email/send-email";
+import {
+  sendInquiryConfirmation,
+  sendAdminInquiryNotification,
+} from "@/lib/email/send-email";
 import { withRateLimit } from "@/lib/security/rate-limit";
 import { E2E_INQUIRY_PLACEHOLDER } from "@/lib/crypto/inquiry-e2e-constants";
 import { parseInquiryE2eEnvelope } from "@/lib/crypto/inquiry-e2e-schema";
@@ -127,21 +130,29 @@ export async function POST(req: Request) {
   revalidatePath("/explore");
   revalidatePath("/dashboard/advertiser/inquiries");
 
+  const mediaInfo = await prisma.media.findUnique({
+    where: { id: data.mediaId },
+    select: { mediaName: true },
+  });
+  const mediaTitle = mediaInfo?.mediaName ?? "매체";
+
   const contactEmail = data.contactEmail?.trim().toLowerCase();
   if (contactEmail) {
-    const mediaInfo = await prisma.media.findUnique({
-      where: { id: data.mediaId },
-      select: { mediaName: true },
-    });
     sendInquiryConfirmation({
       to: contactEmail,
-      mediaTitle: mediaInfo?.mediaName ?? "매체",
+      mediaTitle,
       message: e2e
         ? "[E2E] Your inquiry was sent with end-to-end encryption. The media owner decrypts it in their dashboard; plaintext is not stored on our servers."
         : data.message.trim(),
       inquiryId: created.id,
     }).catch((err) => console.error("[inquiry] email send failed:", err));
   }
+
+  sendAdminInquiryNotification({
+    mediaTitle,
+    inquiryId: created.id,
+    advertiserEmail: contactEmail ?? session?.user?.email ?? null,
+  }).catch((err) => console.error("[inquiry] admin notify failed:", err));
 
   return NextResponse.json({ ok: true, id: created.id });
 }

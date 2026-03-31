@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma, isDatabaseConfigured } from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth/session";
 import { getDisabledNotificationTypes } from "@/lib/notifications/prefs-shared";
 
@@ -9,6 +9,10 @@ export async function GET() {
   const session = await getAuthSession();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!isDatabaseConfigured()) {
+    return NextResponse.json({ notifications: [], unreadCount: 0 });
   }
 
   const user = await prisma.user.findUnique({
@@ -41,6 +45,10 @@ export async function POST(req: Request) {
   const session = await getAuthSession();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!isDatabaseConfigured()) {
+    return NextResponse.json({ ok: true, skipped: true });
   }
 
   const user = await prisma.user.findUnique({

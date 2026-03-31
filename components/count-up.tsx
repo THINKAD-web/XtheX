@@ -64,7 +64,7 @@ export function CountUp({
   const formatted = Math.round(display).toLocaleString();
 
   return (
-    <span ref={ref} className="tabular-nums">
+    <span ref={ref} className="tabular-nums" suppressHydrationWarning>
       {formatted}
       {suffix}
     </span>

@@ -1,5 +1,5 @@
 import type { MediaCategory, Prisma } from "@prisma/client";
-import { prisma } from "@/lib/prisma";
+import { prisma, isDatabaseConfigured } from "@/lib/prisma";
 import { getAdvertiserRecommendations } from "@/lib/recommend/get-advertiser-recommendations";
 import type { RecommendationItem } from "@/lib/recommend/recommendations-ui-types";
 import type { ExploreSearchSignal } from "@/lib/recommend/explore-search-signals";
@@ -14,6 +14,26 @@ export type PersonalizedRecoItem = RecommendationItem & {
 };
 
 const MODEL_VERSION = "xthex-rank-v1"; // 가중 임베딩 + 협업 필터 스타일 스코어링
+
+/** DB 없을 때 getAdvertiserRecommendations() 모킹 결과만으로 카드 노출 (prisma 미사용) */
+function personalizedFromBaseOnly(
+  base: RecommendationItem[],
+  locale: string,
+  clientDismissedIds: string[],
+): PersonalizedRecoItem[] {
+  const dismissed = new Set(clientDismissedIds);
+  const filtered = base.filter((b) => !dismissed.has(b.id)).slice(0, 5);
+  return filtered.map((item) => {
+    const { lines, summary } = contributorMessages(["ml_global"], locale);
+    return {
+      ...item,
+      personalizedReason: summary,
+      personalizedReasonDetail: lines.join("\n\n"),
+      contributorKeys: ["ml_global"],
+      modelVersion: MODEL_VERSION,
+    };
+  });
+}
 
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
@@ -137,6 +157,14 @@ export async function computePersonalizedRecommendations(args: {
 }): Promise<PersonalizedRecoItem[]> {
   const base = await getAdvertiserRecommendations();
   if (base.length === 0) return [];
+
+  if (!isDatabaseConfigured()) {
+    return personalizedFromBaseOnly(
+      base,
+      args.locale,
+      args.clientDismissedIds,
+    );
+  }
 
   const dismissedServer = args.userId
     ? (
@@ -270,6 +298,7 @@ function emptyTaste(): TasteBundle {
 }
 
 export async function loadUserTasteBundle(userId: string): Promise<TasteBundle> {
+  if (!isDatabaseConfigured()) return emptyTaste();
   const bundle = emptyTaste();
   const [campaigns, wishlists, inquiries] = await Promise.all([
     prisma.campaign.findMany({

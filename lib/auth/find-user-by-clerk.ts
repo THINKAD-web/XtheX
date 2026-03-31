@@ -4,7 +4,7 @@
  * 근본 해결: `npx prisma db push` 또는 마이그레이션 적용.
  */
 import { Prisma, type UserRole } from "@prisma/client";
-import { getPrisma } from "@/lib/prisma";
+import { getPrisma, isDatabaseConfigured } from "@/lib/prisma";
 
 /** DB 연결 실패(ECONNREFUSED 등) 시 throw. 호출처에서 안내 UI 표시용. */
 export class DatabaseConnectionError extends Error {
@@ -35,6 +35,7 @@ export type UserByClerkRow = {
 
 export async function findUserById(id: string): Promise<UserByClerkRow | null> {
   if (!id?.trim()) return null;
+  if (!isDatabaseConfigured()) return null;
   const prisma = getPrisma();
   try {
     return await prisma.user.findUnique({
@@ -62,6 +63,7 @@ export async function findUserByClerkId(
   clerkId: string,
 ): Promise<UserByClerkRow | null> {
   if (!clerkId?.trim()) return null;
+  if (!isDatabaseConfigured()) return null;
   const prisma = getPrisma();
   try {
     const user = await prisma.user.findUnique({

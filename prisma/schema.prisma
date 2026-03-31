@@ -101,6 +101,28 @@ enum InquiryContractStatus {
   COMPLETED
 }
 
+/** Stripe Checkout for inquiry contract payment */
+enum InquiryStripePaymentStatus {
+  AWAITING_PAYMENT
+  PAID
+  PARTIALLY_REFUNDED
+  REFUNDED
+  CANCELLED
+  FAILED
+}
+
+enum AdvertiserLedgerKind {
+  INQUIRY_CHECKOUT_PAYMENT
+  /** Stripe 환불 — amountKrw는 음수로 저장(지출 순액 계산용) */
+  REFUND_INQUIRY_CHECKOUT
+}
+
+enum MediaCalendarEventKind {
+  BLOCKED
+  HOLD
+  BOOKED
+}
+
 enum CurrencyCode {
   KRW
   USD
@@ -188,6 +210,8 @@ model Media {
 
   createdBy User? @relation("MediaCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   inquiries   Inquiry[]
+  calendarEvents MediaCalendarEvent[]
+  completionReviews InquiryCompletionReview[]
   broadcastSchedules BroadcastSchedule[]
   caseStudies CaseStudy[]
   wishlists   Wishlist[]
@@ -239,6 +263,10 @@ model User {
   campaigns      Campaign[]      @relation("CampaignsByUser")
   campaignInvoices CampaignInvoice[] @relation("CampaignInvoicesByUser")
   inquiriesSent  Inquiry[]      @relation("InquiryByAdvertiser")
+  inquiryThreadMessages InquiryThreadMessage[] @relation("InquiryThreadByAuthor")
+  advertiserLedgerEntries AdvertiserLedgerEntry[]
+  mediaCalendarEventsCreated MediaCalendarEvent[] @relation("MediaCalendarByOwner")
+  inquiryCompletionReviews InquiryCompletionReview[] @relation("InquiryCompletionByAdvertiser")
   notifications  Notification[]
   wishlists      Wishlist[]
   mediaReviews   MediaReview[]  @relation("MediaReviewsByUser")
@@ -538,6 +566,12 @@ model Inquiry {
   advertiser User  @relation("InquiryByAdvertiser", fields: [advertiserId], references: [id], onDelete: Cascade)
   media      Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
   contract   InquiryContract?
+  stripePayment InquiryStripePayment?
+  threadMessages InquiryThreadMessage[]
+  calendarEvents MediaCalendarEvent[]
+  completionReview InquiryCompletionReview?
+  ledgerEntries AdvertiserLedgerEntry[]
+  mediaReviewsFromInquiry MediaReview[] @relation("MediaReviewFromInquiry")
 
   @@index([advertiserId])
   @@index([mediaId])
@@ -563,6 +597,97 @@ model InquiryContract {
   inquiry Inquiry @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
 
   @@index([status, updatedAt])
+}
+
+model InquiryStripePayment {
+  id                      String                   @id @default(uuid()) @db.Uuid
+  inquiryId               String                   @unique @db.Uuid
+  stripeCheckoutSessionId String?                  @unique
+  stripePaymentIntentId   String?                  @unique
+  amountKrw               Int
+  currency                String                   @default("krw")
+  status                  InquiryStripePaymentStatus @default(AWAITING_PAYMENT)
+  paidAt                  DateTime?
+  /** 누적 환불액(KRW) */
+  refundedAmountKrw       Int                      @default(0)
+  /** 가장 최근 처리한 Stripe Refund id (표시용; 부분 환불 시 매 이벤트는 원장 description으로 중복 방지) */
+  lastStripeRefundId      String?
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+
+  inquiry     Inquiry                 @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  ledgerEntry AdvertiserLedgerEntry?
+
+  @@index([status, updatedAt])
+}
+
+model AdvertiserLedgerEntry {
+  id                     String               @id @default(uuid()) @db.Uuid
+  userId                 String               @db.Uuid
+  kind                   AdvertiserLedgerKind
+  amountKrw              Int
+  description            String?              @db.Text
+  inquiryId              String?              @db.Uuid
+  inquiryStripePaymentId String?              @unique @db.Uuid
+  createdAt              DateTime             @default(now())
+
+  user            User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  inquiry         Inquiry?              @relation(fields: [inquiryId], references: [id], onDelete: SetNull)
+  inquiryStripePayment InquiryStripePayment? @relation(fields: [inquiryStripePaymentId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+}
+
+model InquiryThreadMessage {
+  id            String    @id @default(uuid()) @db.Uuid
+  inquiryId     String    @db.Uuid
+  authorId      String    @db.Uuid
+  body          String    @db.Text
+  attachmentUrl String?
+  /** 상대방이 스레드를 읽은 시각(읽음 표시) */
+  readAt        DateTime?
+  createdAt     DateTime  @default(now())
+
+  inquiry Inquiry @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  author  User    @relation("InquiryThreadByAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([inquiryId, createdAt])
+}
+
+model MediaCalendarEvent {
+  id          String                 @id @default(uuid()) @db.Uuid
+  mediaId     String                 @db.Uuid
+  createdById String                 @db.Uuid
+  startAt     DateTime
+  endAt       DateTime
+  kind        MediaCalendarEventKind
+  inquiryId   String?                @db.Uuid
+  note        String?                @db.Text
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+
+  media     Media    @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  createdBy User     @relation("MediaCalendarByOwner", fields: [createdById], references: [id], onDelete: Cascade)
+  inquiry   Inquiry? @relation(fields: [inquiryId], references: [id], onDelete: SetNull)
+
+  @@index([mediaId, startAt])
+  @@index([createdById, startAt])
+}
+
+model InquiryCompletionReview {
+  id           String   @id @default(uuid()) @db.Uuid
+  inquiryId    String   @unique @db.Uuid
+  advertiserId String   @db.Uuid
+  mediaId      String   @db.Uuid
+  rating       Int
+  comment      String?  @db.Text
+  createdAt    DateTime @default(now())
+
+  inquiry    Inquiry @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  advertiser User    @relation("InquiryCompletionByAdvertiser", fields: [advertiserId], references: [id], onDelete: Cascade)
+  media      Media   @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@index([mediaId, createdAt])
 }
 
 /** 송출·집행 일정 (관리자 캘린더) */
@@ -797,11 +922,14 @@ model MediaReview {
   content   String?  @db.Text
   images    String[] @default([])
   visible   Boolean  @default(true)
+  /** 문의 결제 완료 후 리뷰와 연결 (선택) */
+  sourceInquiryId String? @unique @db.Uuid
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
   user  User  @relation("MediaReviewsByUser", fields: [userId], references: [id], onDelete: Cascade)
+  sourceInquiry Inquiry? @relation("MediaReviewFromInquiry", fields: [sourceInquiryId], references: [id], onDelete: SetNull)
   abuseReports MediaReviewReport[]
 
   @@unique([mediaId, userId])

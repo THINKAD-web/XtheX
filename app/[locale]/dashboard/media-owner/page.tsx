@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import {
   MediaOwnerMapPreview,
@@ -22,6 +22,7 @@ export const metadata: Metadata = {
 
 export default async function MediaOwnerDashboardPage() {
   const user = await gateMediaOwnerDashboard();
+  const locale = await getLocale();
   const t = await getTranslations("dashboard.mediaOwner");
   const tm = await getTranslations("dashboard.mobile");
   const mediasForMap = await prisma.media.findMany({
@@ -109,6 +110,24 @@ export default async function MediaOwnerDashboardPage() {
             mediasLabel={t("quick_medias")}
             inquiriesLabel={t("quick_inquiries_contracts")}
           />
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Link
+              href="/dashboard/media-owner/calendar"
+              className={`${landing.card} flex min-h-[100px] flex-col justify-center border-amber-200/50 bg-white/90 text-center dark:border-amber-900/30`}
+            >
+              <span className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+                {locale.startsWith("ko") ? "예약 캘린더" : "Booking calendar"}
+              </span>
+            </Link>
+            <Link
+              href="/dashboard/media-owner/revenue"
+              className={`${landing.card} flex min-h-[100px] flex-col justify-center border-lime-200/50 bg-white/90 text-center dark:border-lime-900/30`}
+            >
+              <span className="text-sm font-semibold text-lime-800 dark:text-lime-300">
+                {locale.startsWith("ko") ? "수익 통계" : "Revenue"}
+              </span>
+            </Link>
+          </div>
         </section>
 
         <section

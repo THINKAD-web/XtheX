@@ -20,6 +20,8 @@ const querySchema = z.object({
   cursor: z.string().optional(), // id
   /** When set, return more rows and only medias with lat/lng in locationJson (map pins) */
   map: z.enum(["1", "true"]).optional(),
+  /** ISO-3166-1 alpha-2, matches Media.globalCountryCode */
+  country: z.string().optional(),
 });
 
 export async function GET(req: Request) {
@@ -42,6 +44,7 @@ export async function GET(req: Request) {
     take: takeRaw,
     cursor,
     map: mapParam,
+    country,
   } = parsed.data;
 
   const mapMode = mapParam === "1" || mapParam === "true";
@@ -50,6 +53,11 @@ export async function GET(req: Request) {
     : Math.min(takeRaw ?? 20, 50);
 
   const where: Prisma.MediaWhereInput = { status: MediaStatus.PUBLISHED };
+
+  const cc = country?.trim().toUpperCase();
+  if (cc && /^[A-Z]{2}$/.test(cc)) {
+    where.globalCountryCode = cc;
+  }
 
   if (mediaType && mediaType !== "ALL") {
     if (Object.values(MediaCategory).includes(mediaType as MediaCategory)) {

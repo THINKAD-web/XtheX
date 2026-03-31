@@ -1,5 +1,5 @@
 import { unstable_cache } from "next/cache";
-import { prisma } from "@/lib/prisma";
+import { isDatabaseConfigured, prisma } from "@/lib/prisma";
 
 export type LiveTodayKpi = {
   impressions: number;
@@ -30,6 +30,35 @@ function toYmd(d: Date) {
   return `${y}-${m}-${day}`;
 }
 
+function demoLivePerformanceMetrics(days: number): {
+  today: LiveTodayKpi;
+  series: LiveDailyPoint[];
+} {
+  const series = Array.from({ length: days }).map((_, i) => {
+    const d = startOfDay(new Date(Date.now() - (days - 1 - i) * 24 * 60 * 60 * 1000));
+    const imp = 1200 + i * 180;
+    const clk = 28 + i * 4;
+    const spend = 45000 + i * 6000;
+    return {
+      date: toYmd(d),
+      impressions: imp,
+      clicks: clk,
+      spend,
+      cpm: imp > 0 ? (spend / imp) * 1000 : null,
+    };
+  });
+  return {
+    today: {
+      impressions: 12450,
+      clicks: 342,
+      spend: 890000,
+      cpm: 71.5,
+      roi: 2.1,
+    },
+    series,
+  };
+}
+
 async function _getLivePerformanceMetrics(input?: {
   campaignDraftId?: string;
   days?: number;
@@ -39,68 +68,81 @@ async function _getLivePerformanceMetrics(input?: {
   const todayStart = startOfDay(now);
   const since = startOfDay(new Date(now.getTime() - (days - 1) * 24 * 60 * 60 * 1000));
 
-  const delegate = (prisma as any).campaignEvent;
-  if (!delegate?.findMany) {
-    const series = Array.from({ length: days }).map((_, i) => {
-      const d = startOfDay(new Date(Date.now() - (days - 1 - i) * 24 * 60 * 60 * 1000));
-      return { date: toYmd(d), impressions: 0, clicks: 0, spend: 0, cpm: null };
+  if (!isDatabaseConfigured()) {
+    return demoLivePerformanceMetrics(days);
+  }
+
+  try {
+    const delegate = (prisma as any).campaignEvent;
+    if (!delegate?.findMany) {
+      const series = Array.from({ length: days }).map((_, i) => {
+        const d = startOfDay(new Date(Date.now() - (days - 1 - i) * 24 * 60 * 60 * 1000));
+        return { date: toYmd(d), impressions: 0, clicks: 0, spend: 0, cpm: null };
+      });
+      return {
+        today: { impressions: 0, clicks: 0, spend: 0, cpm: null, roi: null },
+        series,
+      };
+    }
+
+    const where: Record<string, unknown> = {
+      occurredAt: { gte: since },
+    };
+    if (input?.campaignDraftId) where.campaignDraftId = input.campaignDraftId;
+
+    const rows = await delegate.findMany({
+      where,
+      select: { occurredAt: true, impressions: true, clicks: true, spend: true },
     });
+
+    const buckets = new Map<string, { impressions: number; clicks: number; spend: number }>();
+    for (let i = 0; i < days; i++) {
+      const d = new Date(since);
+      d.setDate(d.getDate() + i);
+      buckets.set(toYmd(d), { impressions: 0, clicks: 0, spend: 0 });
+    }
+    for (const r of rows as Array<{
+      occurredAt: Date;
+      impressions: number;
+      clicks: number;
+      spend: number;
+    }>) {
+      const key = toYmd(new Date(r.occurredAt));
+      const b = buckets.get(key);
+      if (!b) continue;
+      b.impressions += r.impressions ?? 0;
+      b.clicks += r.clicks ?? 0;
+      b.spend += r.spend ?? 0;
+    }
+
+    const todayKey = toYmd(todayStart);
+    const todayRaw = buckets.get(todayKey) ?? { impressions: 0, clicks: 0, spend: 0 };
+    const cpm =
+      todayRaw.impressions > 0 ? (todayRaw.spend / todayRaw.impressions) * 1000 : null;
+
+    const revenue = todayRaw.clicks * 120 + todayRaw.impressions * 0.02;
+    const roi = todayRaw.spend > 0 ? (revenue - todayRaw.spend) / todayRaw.spend : null;
+
+    const series = Array.from(buckets.entries()).map(([date, v]) => ({
+      date,
+      impressions: v.impressions,
+      clicks: v.clicks,
+      spend: v.spend,
+      cpm: v.impressions > 0 ? (v.spend / v.impressions) * 1000 : null,
+    }));
     return {
-      today: { impressions: 0, clicks: 0, spend: 0, cpm: null, roi: null },
+      today: {
+        impressions: todayRaw.impressions,
+        clicks: todayRaw.clicks,
+        spend: todayRaw.spend,
+        cpm,
+        roi,
+      },
       series,
     };
+  } catch {
+    return demoLivePerformanceMetrics(days);
   }
-
-  const where: any = {
-    occurredAt: { gte: since },
-  };
-  if (input?.campaignDraftId) where.campaignDraftId = input.campaignDraftId;
-
-  const rows = await delegate.findMany({
-    where,
-    select: { occurredAt: true, impressions: true, clicks: true, spend: true },
-  });
-
-  const buckets = new Map<string, { impressions: number; clicks: number; spend: number }>();
-  for (let i = 0; i < days; i++) {
-    const d = new Date(since);
-    d.setDate(d.getDate() + i);
-    buckets.set(toYmd(d), { impressions: 0, clicks: 0, spend: 0 });
-  }
-  for (const r of rows as Array<{ occurredAt: Date; impressions: number; clicks: number; spend: number }>) {
-    const key = toYmd(new Date(r.occurredAt));
-    const b = buckets.get(key);
-    if (!b) continue;
-    b.impressions += r.impressions ?? 0;
-    b.clicks += r.clicks ?? 0;
-    b.spend += r.spend ?? 0;
-  }
-
-  const todayKey = toYmd(todayStart);
-  const todayRaw = buckets.get(todayKey) ?? { impressions: 0, clicks: 0, spend: 0 };
-  const cpm = todayRaw.impressions > 0 ? (todayRaw.spend / todayRaw.impressions) * 1000 : null;
-
-  // Demo ROI: revenue proxy = clicks * 120 (KRW) + impressions * 0.02 (KRW)
-  const revenue = todayRaw.clicks * 120 + todayRaw.impressions * 0.02;
-  const roi = todayRaw.spend > 0 ? (revenue - todayRaw.spend) / todayRaw.spend : null;
-
-  const series = Array.from(buckets.entries()).map(([date, v]) => ({
-    date,
-    impressions: v.impressions,
-    clicks: v.clicks,
-    spend: v.spend,
-    cpm: v.impressions > 0 ? (v.spend / v.impressions) * 1000 : null,
-  }));
-  return {
-    today: {
-      impressions: todayRaw.impressions,
-      clicks: todayRaw.clicks,
-      spend: todayRaw.spend,
-      cpm,
-      roi,
-    },
-    series,
-  };
 }
 
 export const getLivePerformanceMetrics = unstable_cache(

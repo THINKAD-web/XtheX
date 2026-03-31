@@ -1,5 +1,5 @@
 import { unstable_cache } from "next/cache";
-import { prisma } from "@/lib/prisma";
+import { isDatabaseConfigured, prisma } from "@/lib/prisma";
 
 export type TrendingMedia = {
   id: string;
@@ -34,51 +34,57 @@ function seoulScore(m: { mediaName: string; locationJson: any }): number {
 }
 
 async function fetchTrendingMediasTop5(preferSeoul: boolean): Promise<TrendingMedia[]> {
+  if (!isDatabaseConfigured()) {
+    return [];
+  }
   try {
-    // viewCount가 없으면 Prisma가 에러를 던지므로 try/catch로 fallback
-    const rows = await prisma.media.findMany({
-      where: { status: "PUBLISHED" },
-      orderBy: [{ viewCount: "desc" as any }, { updatedAt: "desc" }],
-      take: 5,
-      select: {
-        id: true,
-        mediaName: true,
-        category: true,
-        locationJson: true,
-        cpm: true,
-        trustScore: true,
-        viewCount: true as any,
-        updatedAt: true,
-        createdAt: true,
-      },
-    });
+    try {
+      const rows = await prisma.media.findMany({
+        where: { status: "PUBLISHED" },
+        orderBy: [{ viewCount: "desc" as any }, { updatedAt: "desc" }],
+        take: 5,
+        select: {
+          id: true,
+          mediaName: true,
+          category: true,
+          locationJson: true,
+          cpm: true,
+          trustScore: true,
+          viewCount: true as any,
+          updatedAt: true,
+          createdAt: true,
+        },
+      });
 
-    const sorted = preferSeoul
-      ? [...(rows as any[])].sort((a, b) => seoulScore(b) - seoulScore(a))
-      : (rows as any[]);
-    return sorted as TrendingMedia[];
+      const sorted = preferSeoul
+        ? [...(rows as any[])].sort((a, b) => seoulScore(b) - seoulScore(a))
+        : (rows as any[]);
+      return sorted as TrendingMedia[];
+    } catch {
+      const rows = await prisma.media.findMany({
+        where: { status: "PUBLISHED" },
+        orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
+        take: 5,
+        select: {
+          id: true,
+          mediaName: true,
+          category: true,
+          locationJson: true,
+          cpm: true,
+          trustScore: true,
+          updatedAt: true,
+          createdAt: true,
+        },
+      });
+
+      const sorted = preferSeoul
+        ? [...rows].sort((a, b) => seoulScore(b) - seoulScore(a))
+        : rows;
+
+      return sorted as TrendingMedia[];
+    }
   } catch {
-    const rows = await prisma.media.findMany({
-      where: { status: "PUBLISHED" },
-      orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
-      take: 5,
-      select: {
-        id: true,
-        mediaName: true,
-        category: true,
-        locationJson: true,
-        cpm: true,
-        trustScore: true,
-        updatedAt: true,
-        createdAt: true,
-      },
-    });
-
-    const sorted = preferSeoul
-      ? [...rows].sort((a, b) => seoulScore(b) - seoulScore(a))
-      : rows;
-
-    return sorted as TrendingMedia[];
+    return [];
   }
 }
 

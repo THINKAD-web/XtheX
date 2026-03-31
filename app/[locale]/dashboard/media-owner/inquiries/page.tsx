@@ -70,6 +70,7 @@ export default async function MediaOwnerInquiriesPage() {
                   <th className="px-4 py-3">Period</th>
                   <th className="px-4 py-3">Message</th>
                   <th className="px-4 py-3">Time</th>
+                  <th className="px-4 py-3">Thread</th>
                 </tr>
               </thead>
               <tbody>
@@ -134,11 +135,19 @@ export default async function MediaOwnerInquiriesPage() {
                         }
                       />
                     </td>
+                    <td className="px-4 py-3">
+                      <Link
+                        href={`/dashboard/media-owner/inquiries/${r.id}`}
+                        className="text-xs font-medium text-emerald-700 hover:underline dark:text-emerald-400"
+                      >
+                        Open
+                      </Link>
+                    </td>
                   </tr>
                 ))}
                 {rows.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-4 py-10 text-center text-zinc-500">
+                    <td colSpan={9} className="px-4 py-10 text-center text-zinc-500">
                       {t("inquiries_placeholder")}
                     </td>
                   </tr>

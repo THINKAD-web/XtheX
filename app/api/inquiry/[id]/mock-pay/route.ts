@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
-import { InquiryStatus, UserRole } from "@prisma/client";
+import {
+  AdvertiserLedgerKind,
+  InquiryContractStatus,
+  InquiryStatus,
+  UserRole,
+} from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth/config";
 import { revalidatePath } from "next/cache";
+import { resolveInquiryCheckoutAmountKrw } from "@/lib/payments/inquiry-checkout-amount";
 
 export const runtime = "nodejs";
 
@@ -11,6 +17,10 @@ export async function POST(
   req: Request,
   ctx: { params: Promise<{ id: string }> },
 ) {
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json({ error: "Mock payment disabled" }, { status: 403 });
+  }
+
   const { id } = await ctx.params;
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id?.trim() || null;
@@ -27,29 +37,54 @@ export async function POST(
     // ok
   }
   const locale =
-    body && typeof body === "object" && "locale" in body && typeof (body as any).locale === "string"
-      ? ((body as any).locale as string).trim()
+    body && typeof body === "object" && "locale" in body && typeof (body as { locale?: string }).locale === "string"
+      ? (body as { locale: string }).locale.trim()
       : null;
 
   const row = await prisma.inquiry.findFirst({
     where: { id, advertiserId: userId },
-    select: { id: true, status: true },
+    include: { contract: true },
   });
   if (!row) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  if (row.status !== InquiryStatus.PENDING) {
+  if (row.contract?.status !== InquiryContractStatus.COMPLETED) {
     return NextResponse.json(
-      { ok: true, id: row.id, status: row.status },
-      { status: 200 },
+      { error: "Contract must be completed before payment" },
+      { status: 400 },
     );
   }
 
-  const updated = await prisma.inquiry.update({
-    where: { id: row.id },
-    data: { status: InquiryStatus.REPLIED },
-    select: { id: true, status: true },
+  if (row.status === InquiryStatus.REPLIED) {
+    return NextResponse.json({ ok: true, id: row.id, status: row.status });
+  }
+
+  if (row.status !== InquiryStatus.PENDING) {
+    return NextResponse.json({ error: "Invalid inquiry status" }, { status: 400 });
+  }
+
+  const amountKrw = resolveInquiryCheckoutAmountKrw(row);
+
+  await prisma.$transaction(async (tx) => {
+    await tx.inquiry.update({
+      where: { id: row.id },
+      data: { status: InquiryStatus.REPLIED },
+    });
+    const existing = await tx.advertiserLedgerEntry.findFirst({
+      where: { inquiryId: row.id, kind: AdvertiserLedgerKind.INQUIRY_CHECKOUT_PAYMENT },
+    });
+    if (!existing) {
+      await tx.advertiserLedgerEntry.create({
+        data: {
+          userId,
+          kind: AdvertiserLedgerKind.INQUIRY_CHECKOUT_PAYMENT,
+          amountKrw,
+          description: "Inquiry payment (mock / dev)",
+          inquiryId: row.id,
+        },
+      });
+    }
   });
 
   if (locale) {
@@ -59,6 +94,5 @@ export async function POST(
   revalidatePath("/dashboard/advertiser/inquiries");
   revalidatePath("/explore");
 
-  return NextResponse.json({ ok: true, id: updated.id, status: updated.status });
+  return NextResponse.json({ ok: true, id: row.id, status: InquiryStatus.REPLIED });
 }
-

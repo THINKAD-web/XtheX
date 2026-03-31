@@ -52,6 +52,7 @@ type Filters = {
   mediaType: string;
   q: string;
   district: string;
+  country: string;
   minTrustScore: string;
   priceMin: string;
   priceMax: string;
@@ -62,6 +63,7 @@ const DEFAULT_FILTERS: Filters = {
   mediaType: "ALL",
   q: "",
   district: "",
+  country: "",
   minTrustScore: "",
   priceMin: "",
   priceMax: "",
@@ -94,6 +96,7 @@ function filtersFromSearchParams(
     mediaType: sp.get("mediaType") ?? "ALL",
     q: sp.get("q") ?? "",
     district: sp.get("district") ?? "",
+    country: sp.get("country") ?? "",
     minTrustScore: sp.get("minTrustScore") ?? "",
     priceMin: priceMinDisplay,
     priceMax: priceMaxDisplay,
@@ -119,6 +122,8 @@ function buildSearchParams(
     sp.set("priceMax", String(Math.round(convertCurrency(maxInput, currency, "KRW"))));
   }
   if (f.sort && f.sort !== DEFAULT_FILTERS.sort) sp.set("sort", f.sort);
+  const c = f.country.trim().toUpperCase();
+  if (/^[A-Z]{2}$/.test(c)) sp.set("country", c);
   return sp;
 }
 
@@ -141,6 +146,8 @@ function appendExploreFilters(
     p.set("priceMax", String(Math.round(convertCurrency(maxInput, currency, "KRW"))));
   }
   if (f.sort && f.sort !== DEFAULT_FILTERS.sort) p.set("sort", f.sort);
+  const c = f.country.trim().toUpperCase();
+  if (/^[A-Z]{2}$/.test(c)) p.set("country", c);
 }
 
 function getAddress(loc: unknown): string {
@@ -414,7 +421,7 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
         </header>
 
         <div className="mb-6 hidden rounded-2xl border border-zinc-200/80 bg-white/90 p-4 shadow-sm ring-1 ring-black/[0.04] dark:border-zinc-700 dark:bg-zinc-900/80 dark:ring-white/[0.06] md:block">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
             <div className="xl:col-span-2">
               <label className="mb-1 block text-xs font-medium text-zinc-600 dark:text-zinc-400">
                 {t("search.label")}
@@ -456,6 +463,24 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
                 }
                 placeholder={tv("filter_region_ph")}
               />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-zinc-600">
+                {tv("filter_country")}
+              </label>
+              <Input
+                value={draft.country}
+                onChange={(e) =>
+                  setDraft((d) => ({
+                    ...d,
+                    country: e.target.value.toUpperCase().slice(0, 2),
+                  }))
+                }
+                placeholder={tv("filter_country_ph")}
+                maxLength={2}
+                className="uppercase"
+              />
+              <p className="mt-0.5 text-[10px] text-zinc-500">{tv("filter_country_hint")}</p>
             </div>
             <div>
               <label className="mb-1 block text-xs font-medium text-zinc-600">
@@ -581,6 +606,23 @@ export function ExploreExperience({ variant = "public" }: { variant?: Variant })
                       setDraft((d) => ({ ...d, district: e.target.value }))
                     }
                     placeholder={tv("filter_region_ph")}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-zinc-600">
+                    {tv("filter_country")}
+                  </label>
+                  <Input
+                    value={draft.country}
+                    onChange={(e) =>
+                      setDraft((d) => ({
+                        ...d,
+                        country: e.target.value.toUpperCase().slice(0, 2),
+                      }))
+                    }
+                    placeholder={tv("filter_country_ph")}
+                    maxLength={2}
+                    className="uppercase"
                   />
                 </div>
                 <div>

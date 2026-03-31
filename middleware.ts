@@ -2,6 +2,11 @@ import createMiddleware from "next-intl/middleware";
 import { type NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { routing } from "./i18n/routing";
+import {
+  ADMIN_GATE_COOKIE,
+  adminSitePasswordConfigured,
+  verifyAdminGateCookie,
+} from "./lib/admin-site-gate";
 
 const handleI18nRouting = createMiddleware(routing);
 
@@ -75,6 +80,21 @@ export default async function middleware(req: NextRequest) {
       const loginUrl = new URL(`${prefix}/login`, req.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);
+    }
+
+    const stripped = stripLocalePrefix(pathname);
+    if (
+      adminSitePasswordConfigured() &&
+      stripped.startsWith("/admin") &&
+      stripped !== "/admin/gate"
+    ) {
+      const gateVal = req.cookies.get(ADMIN_GATE_COOKIE)?.value;
+      if (!verifyAdminGateCookie(gateVal)) {
+        const prefix = localePrefixFromPathname(pathname);
+        const gateUrl = new URL(`${prefix}/admin/gate`, req.url);
+        gateUrl.searchParams.set("callbackUrl", pathname);
+        return NextResponse.redirect(gateUrl);
+      }
     }
   }
 

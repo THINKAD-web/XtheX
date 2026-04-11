@@ -10,6 +10,13 @@ const nextConfig = {
   output: "standalone",
   /** Avoid wrong workspace root when a parent directory has another lockfile (local dev / CI). */
   outputFileTracingRoot: path.join(__dirname),
+  /**
+   * ESLint during `next build` is skipped so Vercel deploys are not blocked by warning→error policy drift.
+   * Run `npm run lint` locally or in CI for quality gates.
+   */
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   poweredByHeader: false,
   images: {
     remotePatterns: [

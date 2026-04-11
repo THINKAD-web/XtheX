@@ -1,9 +1,15 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import createNextIntlPlugin from "next-intl/plugin";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   /** Smaller serverless bundles on Vercel; deployment still runs `next start` via Vercel’s adapter. */
   output: "standalone",
+  /** Avoid wrong workspace root when a parent directory has another lockfile (local dev / CI). */
+  outputFileTracingRoot: path.join(__dirname),
   poweredByHeader: false,
   images: {
     remotePatterns: [

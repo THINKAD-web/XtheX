@@ -21,13 +21,29 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
-const siteUrl = (() => {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
-  if (appUrl) return appUrl;
-  const vercelUrl = process.env.VERCEL_URL?.trim();
-  if (vercelUrl) return `https://${vercelUrl}`;
+/** metadataBase / JSON-LD — 프로토콜 없는 값은 Invalid URL로 전역 500(global-error) 유발 */
+function resolveSiteUrl(): string {
+  const app = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  const vercel = process.env.VERCEL_URL?.trim();
+  const candidates = [app, vercel ? `https://${vercel}` : null, "https://xthex.com"].filter(
+    (v): v is string => Boolean(v),
+  );
+
+  for (const raw of candidates) {
+    const withProto = raw.includes("://") ? raw : `https://${raw}`;
+    try {
+      const u = new URL(withProto);
+      if (u.protocol === "http:" || u.protocol === "https:") {
+        return u.origin;
+      }
+    } catch {
+      /* try next */
+    }
+  }
   return "https://xthex.com";
-})();
+}
+
+const siteUrl = resolveSiteUrl();
 
 export const metadata: Metadata = {
   title: {

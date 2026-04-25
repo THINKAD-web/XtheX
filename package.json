@@ -10,7 +10,7 @@
     "dev": "next dev",
     "dev:turbo": "next dev --turbo",
     "build": "next build",
-    "vercel-build": "prisma migrate deploy && prisma generate && next build",
+    "vercel-build": "bash scripts/vercel-build.sh",
     "start": "next start",
     "lint": "eslint",
     "prisma:generate": "prisma generate",

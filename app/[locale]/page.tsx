@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { AppSiteChrome } from "@/components/layout/AppSiteChrome";
 import { CountUp } from "@/components/count-up";
 import { Link } from "@/i18n/navigation";
@@ -218,6 +218,7 @@ export default async function Home({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <AppSiteChrome>
       <main>

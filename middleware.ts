@@ -7,6 +7,7 @@ import {
   adminSitePasswordConfigured,
   verifyAdminGateCookie,
 } from "./lib/admin-site-gate";
+import { authenticateAdminInMiddleware } from "./lib/auth/admin-guard";
 
 const handleI18nRouting = createMiddleware(routing);
 
@@ -19,19 +20,6 @@ function stripLocalePrefix(pathname: string): string {
   return pathname;
 }
 
-function isProtectedPath(pathname: string): boolean {
-  const path = stripLocalePrefix(pathname);
-  return (
-    path.startsWith("/dashboard") ||
-    path.startsWith("/advertiser") ||
-    path.startsWith("/admin") ||
-    path.startsWith("/upload") ||
-    path.startsWith("/campaigns") ||
-    path.startsWith("/recommend") ||
-    path.startsWith("/community")
-  );
-}
-
 function localePrefixFromPathname(pathname: string): string {
   const segments = pathname.split("/").filter(Boolean);
   const first = segments[0];
@@ -42,7 +30,35 @@ function localePrefixFromPathname(pathname: string): string {
   return "";
 }
 
-function isApiAuthBypassI18n(pathname: string) {
+function isAdminApiPath(pathname: string): boolean {
+  return pathname.startsWith("/api/admin/");
+}
+
+function isAdminPagePath(pathname: string): boolean {
+  return stripLocalePrefix(pathname).startsWith("/admin");
+}
+
+function isProtectedPath(pathname: string): boolean {
+  // /admin is handled separately (admin-only role gate). This list covers
+  // routes that just require any logged-in user.
+  const path = stripLocalePrefix(pathname);
+  return (
+    path.startsWith("/dashboard") ||
+    path.startsWith("/advertiser") ||
+    path.startsWith("/upload") ||
+    path.startsWith("/campaigns") ||
+    path.startsWith("/recommend") ||
+    path.startsWith("/community")
+  );
+}
+
+/**
+ * Paths that should skip next-intl rewriting (they're API endpoints, not
+ * locale-prefixed pages). Admin/campaign/onboarding APIs were previously
+ * lumped into a single "bypass" branch that ALSO skipped auth — that was
+ * the bug. Now i18n bypass is the only thing this controls.
+ */
+function bypassesI18nRouting(pathname: string): boolean {
   return (
     pathname.startsWith("/api/admin/") ||
     pathname.startsWith("/api/campaign/") ||
@@ -53,17 +69,67 @@ function isApiAuthBypassI18n(pathname: string) {
 export default async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
 
-  // NextAuth: JSON만 반환해야 함 (HTML이면 CLIENT_FETCH_ERROR).
-  // matcher에서 /api/auth/* 는 제외해 이 분기가 필요 없지만, 실수로 matcher에
-  // /api/auth 가 다시 들어오면 여기서 즉시 통과시킨다.
+  // NextAuth must always pass through (its handlers respond JSON; HTML breaks
+  // the client-side fetch with CLIENT_FETCH_ERROR).
   if (pathname.startsWith("/api/auth")) {
     return NextResponse.next();
   }
 
-  if (isApiAuthBypassI18n(pathname)) {
+  // ── Admin gate ────────────────────────────────────────────────────────
+  // Page paths under `/[locale]/admin/*` and API paths under `/api/admin/*`
+  // require ADMIN role (NextAuth session) OR a valid `ADMIN_SECRET`.
+  const adminApi = isAdminApiPath(pathname);
+  const adminPage = !adminApi && isAdminPagePath(pathname);
+  if (adminApi || adminPage) {
+    const auth = await authenticateAdminInMiddleware(req);
+    if (auth.kind === "none") {
+      if (adminApi) {
+        const status = auth.reason === "no-token" ? 401 : 403;
+        return NextResponse.json(
+          {
+            error:
+              auth.reason === "no-token" ? "Unauthorized" : "Forbidden",
+          },
+          { status },
+        );
+      }
+      const prefix = localePrefixFromPathname(pathname);
+      if (auth.reason === "no-token") {
+        const loginUrl = new URL(`${prefix}/login`, req.url);
+        loginUrl.searchParams.set("callbackUrl", pathname);
+        return NextResponse.redirect(loginUrl);
+      }
+      // Logged in but not admin: send home rather than back to login.
+      return NextResponse.redirect(new URL(`${prefix}/`, req.url));
+    }
+
+    // Optional second factor for /admin/* pages: ADMIN_SITE_PASSWORD gate.
+    // (Skipped for API and for the gate page itself.)
+    if (adminPage && auth.kind === "session" && adminSitePasswordConfigured()) {
+      const stripped = stripLocalePrefix(pathname);
+      if (stripped !== "/admin/gate") {
+        const gateVal = req.cookies.get(ADMIN_GATE_COOKIE)?.value;
+        if (!verifyAdminGateCookie(gateVal)) {
+          const prefix = localePrefixFromPathname(pathname);
+          const gateUrl = new URL(`${prefix}/admin/gate`, req.url);
+          gateUrl.searchParams.set("callbackUrl", pathname);
+          return NextResponse.redirect(gateUrl);
+        }
+      }
+    }
+
+    // Admin authenticated. API paths skip i18n; page paths fall through to
+    // next-intl below.
+    if (adminApi) return NextResponse.next();
+    return handleI18nRouting(req);
+  }
+
+  // ── Non-admin API i18n bypass ────────────────────────────────────────
+  if (bypassesI18nRouting(pathname)) {
     return NextResponse.next();
   }
 
+  // ── Generic protected paths (any logged-in user) ─────────────────────
   if (isProtectedPath(pathname)) {
     const secret = process.env.NEXTAUTH_SECRET;
     if (!secret && process.env.NODE_ENV === "development") {
@@ -71,30 +137,12 @@ export default async function middleware(req: NextRequest) {
         "[middleware] NEXTAUTH_SECRET is missing — login cookies cannot be verified. Set it in .env.local (openssl rand -base64 32).",
       );
     }
-    const token = await getToken({
-      req,
-      secret,
-    });
+    const token = await getToken({ req, secret });
     if (!token) {
       const prefix = localePrefixFromPathname(pathname);
       const loginUrl = new URL(`${prefix}/login`, req.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);
-    }
-
-    const stripped = stripLocalePrefix(pathname);
-    if (
-      adminSitePasswordConfigured() &&
-      stripped.startsWith("/admin") &&
-      stripped !== "/admin/gate"
-    ) {
-      const gateVal = req.cookies.get(ADMIN_GATE_COOKIE)?.value;
-      if (!verifyAdminGateCookie(gateVal)) {
-        const prefix = localePrefixFromPathname(pathname);
-        const gateUrl = new URL(`${prefix}/admin/gate`, req.url);
-        gateUrl.searchParams.set("callbackUrl", pathname);
-        return NextResponse.redirect(gateUrl);
-      }
     }
   }
 
@@ -107,7 +155,5 @@ export const config = {
     "/api/admin/:path*",
     "/api/campaign/:path*",
     "/api/onboarding/:path*",
-    // /api/auth/* 는 matcher에 넣지 않음 — middleware가 돌면 일부 환경에서
-    // 세션 요청이 비정상 처리될 수 있고, 어차피 첫 패턴이 api를 제외함.
   ],
 };

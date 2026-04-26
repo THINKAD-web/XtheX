@@ -109,7 +109,7 @@ export default async function middleware(req: NextRequest) {
       const stripped = stripLocalePrefix(pathname);
       if (stripped !== "/admin/gate") {
         const gateVal = req.cookies.get(ADMIN_GATE_COOKIE)?.value;
-        if (!verifyAdminGateCookie(gateVal)) {
+        if (!(await verifyAdminGateCookie(gateVal))) {
           const prefix = localePrefixFromPathname(pathname);
           const gateUrl = new URL(`${prefix}/admin/gate`, req.url);
           gateUrl.searchParams.set("callbackUrl", pathname);

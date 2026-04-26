@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const value = signAdminGateValue();
+  const value = await signAdminGateValue();
   if (!value) {
     return NextResponse.json(
       { error: "ADMIN_GATE_SECRET or NEXTAUTH_SECRET required to sign cookie" },

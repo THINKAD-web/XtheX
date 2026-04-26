@@ -15,6 +15,7 @@ import {
 } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
+import { seedAdditionalUsers, seedAsiaMediaCatalog } from "./seed-asia-media";
 
 /** NextAuth credentials 로그인용 — 테스트 계정 비밀번호 보강 */
 const SEED_TEST_PASSWORD_PLAIN = "password123";
@@ -605,6 +606,16 @@ async function main() {
     });
   }
   console.log("[seed] 테스트 문의 10개 upsert 완료");
+
+  // ── Asia catalog (20 KR + 5 JP) + 6 추가 더미 사용자 ──────────────────
+  const asiaUserIds = await seedAdditionalUsers(prisma);
+  await seedAsiaMediaCatalog(prisma, {
+    partner1: partner1.id,
+    partner2: partner2.id,
+    ownerBusan: asiaUserIds.ownerBusan,
+    ownerJapan: asiaUserIds.ownerJapan,
+    ownerJeju: asiaUserIds.ownerJeju,
+  });
 
   await ensureHashedPasswordsForClerkUsers(prisma);
 }

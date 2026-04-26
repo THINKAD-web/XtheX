@@ -3,7 +3,6 @@
 import { Link } from "@/i18n/navigation";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Globe, Twitter, Instagram, Linkedin } from "lucide-react";
 
 /**
  * /admin/* 에서는 렌더하지 않음(admin 레이아웃에서 SiteFooter 사용).
@@ -27,60 +26,44 @@ export function ConditionalSiteFooter() {
             {t("copyright", { year })}
           </p>
         </div>
-        <div className="flex items-center gap-6">
-          <nav className="flex gap-6 text-sm">
-            <Link
-              href="/about"
-              className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-            >
-              {t("about")}
-            </Link>
-            <Link
-              href="/community"
-              className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-            >
-              {tNav("community")}
-            </Link>
-            <Link
-              href="/contact"
-              className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-            >
-              {t("contact")}
-            </Link>
-            <Link
-              href="/terms"
-              className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-            >
-              {t("terms")}
-            </Link>
-            <Link
-              href="/help"
-              className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-            >
-              {t("help")}
-            </Link>
-            <Link
-              href="/developers"
-              className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-            >
-              {t("developers")}
-            </Link>
-          </nav>
-          <div className="flex items-center gap-3">
-            <a href="#" aria-label="Website">
-              <Globe className="h-4 w-4 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200" />
-            </a>
-            <a href="#" aria-label="Twitter">
-              <Twitter className="h-4 w-4 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200" />
-            </a>
-            <a href="#" aria-label="Instagram">
-              <Instagram className="h-4 w-4 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200" />
-            </a>
-            <a href="#" aria-label="LinkedIn">
-              <Linkedin className="h-4 w-4 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200" />
-            </a>
-          </div>
-        </div>
+        <nav className="flex flex-wrap justify-center gap-6 text-sm sm:justify-end">
+          <Link
+            href="/about"
+            className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+          >
+            {t("about")}
+          </Link>
+          <Link
+            href="/community"
+            className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+          >
+            {tNav("community")}
+          </Link>
+          <Link
+            href="/contact"
+            className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+          >
+            {t("contact")}
+          </Link>
+          <Link
+            href="/terms"
+            className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+          >
+            {t("terms")}
+          </Link>
+          <Link
+            href="/help"
+            className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+          >
+            {t("help")}
+          </Link>
+          <Link
+            href="/developers"
+            className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+          >
+            {t("developers")}
+          </Link>
+        </nav>
       </div>
     </footer>
   );

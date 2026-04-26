@@ -80,7 +80,7 @@ function getMenu(role: DashboardSidebarRole): NavItem[] {
       { label: "알림 기록", href: "/dashboard/notifications", icon: Bell },
       { label: "문의 E2E 암호화", href: "/dashboard/media-owner/inquiry-encryption", icon: Lock },
       { label: "설정 · 알림", href: "/dashboard/media-owner/settings", icon: Settings },
-      { label: "수익 현황", comingSoon: true, icon: BarChart3 },
+      { label: "수익 현황", href: "/dashboard/media-owner/revenue", icon: BarChart3 },
     ];
   }
   return [
@@ -98,7 +98,7 @@ function getMenu(role: DashboardSidebarRole): NavItem[] {
     { label: "내 문의함", href: "/dashboard/advertiser/inquiries", icon: Inbox },
     { label: "인보이스", href: "/dashboard/advertiser/invoices", icon: Receipt },
     { label: "알림 기록", href: "/dashboard/notifications", icon: Bell },
-    { label: "내 캠페인", comingSoon: true, icon: BriefcaseBusiness },
+    { label: "내 캠페인", href: "/dashboard/advertiser/campaigns", icon: BriefcaseBusiness },
     { label: "설정", href: "/dashboard/advertiser/settings", icon: Settings },
     { label: "보안", href: "/dashboard/advertiser/settings/security", icon: Shield },
   ];

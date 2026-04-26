@@ -6,7 +6,31 @@ import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import rehypeStringify from "rehype-stringify";
+
+/**
+ * Allow-list for blog HTML rendering.
+ *
+ * Starts from `rehype-sanitize`'s defaultSchema (the GitHub-flavored allow
+ * list — strips <script>, <style>, <iframe>, on* handlers, javascript: URLs,
+ * etc.) and adds `id` to headings so anchor links keep working if a future
+ * remark plugin (e.g. rehype-slug) introduces them. No other tag/attr is
+ * extended — raw HTML in markdown still gets escaped, since
+ * `remarkRehype` is invoked without `allowDangerousHtml`.
+ */
+const blogSanitizeSchema = {
+  ...defaultSchema,
+  attributes: {
+    ...defaultSchema.attributes,
+    h1: [...(defaultSchema.attributes?.h1 ?? []), "id"],
+    h2: [...(defaultSchema.attributes?.h2 ?? []), "id"],
+    h3: [...(defaultSchema.attributes?.h3 ?? []), "id"],
+    h4: [...(defaultSchema.attributes?.h4 ?? []), "id"],
+    h5: [...(defaultSchema.attributes?.h5 ?? []), "id"],
+    h6: [...(defaultSchema.attributes?.h6 ?? []), "id"],
+  },
+};
 
 const BLOG_DIR = path.join(process.cwd(), "content", "blog");
 
@@ -83,6 +107,7 @@ export async function renderMarkdown(source: string): Promise<string> {
     .use(remarkParse)
     .use(remarkGfm)
     .use(remarkRehype)
+    .use(rehypeSanitize, blogSanitizeSchema)
     .use(rehypeStringify)
     .process(source);
   return String(result);

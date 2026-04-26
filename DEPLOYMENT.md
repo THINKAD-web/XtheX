@@ -20,6 +20,7 @@
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | ◯ | ◯ | ◯ | ◯ | ◯ | Google 로그인 활성화 시 |
 | `ADMIN_SITE_PASSWORD` | ◯ | ◯ | ◯ | ◯ | ◯ | `/admin/*` 2차 잠금 |
 | `ADMIN_GATE_SECRET` | ◯ | ◯ | ◯ | ◯ | ◯ | 위 쿠키 HMAC (기본=NEXTAUTH_SECRET) |
+| `CRON_SECRET` | ◯ | ◯ | ✅ | ✅ | ✅ | `/api/cron/*` Bearer 토큰. 미설정 시 auto-bid·auto-invoice·weekly-report·fetch-news 모두 503 |
 | `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | — | ✅ | ✅ | ✅ | ✅ | referrer 제한 필수 |
 | `GOOGLE_MAPS_GEOCODING_KEY` | — | ◯ | ◯ | ◯ | ◯ | 서버 전용, IP 제한 |
 | `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | — | ✅ | ✅ | ✅ | ✅ | 매체 이미지 업로드 |

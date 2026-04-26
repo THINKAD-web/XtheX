@@ -67,6 +67,11 @@ const nextConfig = {
   /**
    * Reduce output file tracing for API/serverless routes (Vercel 250MB unzipped limit).
    * Leaflet/react-leaflet are client-only; uploads/cache must not ship with functions.
+   *
+   * NOTE: do NOT exclude `recharts` here — the home page server-renders client
+   * components that import it (Realtime/LivePerformance dashboards). Excluding
+   * it caused the deployed home page to 500 because the function bundle was
+   * missing the module at SSR time.
    */
   outputFileTracingExcludes: {
     "*": [
@@ -79,7 +84,6 @@ const nextConfig = {
       "node_modules/sharp/**/*",
       "node_modules/canvas/**/*",
       "node_modules/pdfjs-dist/**/*",
-      "node_modules/recharts/**/*",
       "node_modules/leaflet.markercluster/**/*",
       "node_modules/leaflet/**/*",
       "node_modules/react-leaflet/**/*",

@@ -8,12 +8,6 @@ export const runtime = "nodejs";
 export async function POST(req: Request) {
   const auth = await requireAdminApi();
   if (!auth.ok) return auth.response;
-  if (!auth.userId) {
-    return NextResponse.json(
-      { error: "This action requires a signed-in admin session" },
-      { status: 403 },
-    );
-  }
 
   let json: unknown;
   try {

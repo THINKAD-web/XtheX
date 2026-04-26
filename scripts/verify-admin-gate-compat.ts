@@ -1,3 +1,4 @@
+// Edge crypto 마이그레이션 회귀 테스트용. 향후 admin-site-gate.ts 수정 시 동일 스크립트로 재검증할 것.
 /**
  * Node createHmac token should verify with Web Crypto admin gate (commit 1).
  * Run: npx tsx scripts/verify-admin-gate-compat.ts
